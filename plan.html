@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Creektown Apartment · Plan</title>
+<meta name="description" content="The architect's plan of the Creektown apartment, furnished and empty, with every room measured.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300..700&display=swap">
+<style>
+:root{--olive:#7B7258;--olive-deep:#6A624B;--navy:#0C3B5C;--gold:#B79565;--grey:#E3E3E3;--charcoal:#403F41;
+  --paper:#F1F0EC;--sheet:#FFFFFF;--ink:#23252A;--ink2:#55585E;--muted:#7A7C80;--line:#D9D8D3;--head:var(--navy);--link:var(--navy);
+  --on-olive:#FFFFFF;--on-olive2:rgba(255,255,255,.78);--hl:rgba(183,149,101,.28);--font:"Montserrat","Helvetica Neue",Arial,sans-serif}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){color-scheme:dark;--olive:#4A4535;--olive-deep:#3E3A2C;--navy:#9DB8CF;--gold:#CDAE7E;--grey:#26272A;--charcoal:#141416;
+  --paper:#18191B;--sheet:#1F2023;--ink:#ECEBE6;--ink2:#C3C3BE;--muted:#9A9A95;--line:#34353A;--head:#E9E6DD;--link:#CDAE7E;--hl:rgba(205,174,126,.3)}}
+:root[data-theme="dark"]{color-scheme:dark;--olive:#4A4535;--olive-deep:#3E3A2C;--navy:#9DB8CF;--gold:#CDAE7E;--grey:#26272A;--charcoal:#141416;
+  --paper:#18191B;--sheet:#1F2023;--ink:#ECEBE6;--ink2:#C3C3BE;--muted:#9A9A95;--line:#34353A;--head:#E9E6DD;--link:#CDAE7E;--hl:rgba(205,174,126,.3)}
+*{box-sizing:border-box}[hidden]{display:none!important}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 16px/1.7 var(--font);font-variant-numeric:lining-nums tabular-nums}
+a{color:var(--link)}img{max-width:100%}
+.wrap{max-width:1200px;margin:0 auto;padding-inline:24px}
+.eyebrow{font:600 11.5px/1.2 var(--font);letter-spacing:.24em;text-transform:uppercase;color:var(--gold)}
+h1,h2,h3{font-family:var(--font);margin:0;text-wrap:balance;color:var(--head)}
+.bar .wrap{display:flex;justify-content:space-between;align-items:center;gap:12px;padding-block:22px;font:500 11.5px var(--font);letter-spacing:.2em;text-transform:uppercase}
+.bar a{text-decoration:none;margin-left:22px}
+.hero{background:var(--olive);color:var(--on-olive)}
+.hero .bar{color:var(--on-olive2)}.hero .bar a{color:var(--on-olive);opacity:.85}.hero .bar a:hover{opacity:1;color:var(--gold)}
+.hero .copy{padding-block:clamp(48px,9vw,120px) clamp(48px,7vw,88px);display:grid;gap:18px;justify-items:start}
+.hero h1{color:var(--on-olive);font:300 clamp(44px,8vw,104px)/.98 var(--font);letter-spacing:-.02em}.hero h1 b{font-weight:600}
+.hero .rule{width:88px;height:2px;background:var(--gold)}
+.hero p{margin:0;max-width:58ch;font-size:clamp(16px,1.5vw,19px);font-weight:300;color:var(--on-olive2)}
+.cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:8px}
+.btn{display:inline-flex;align-items:center;gap:8px;font:600 12.5px var(--font);letter-spacing:.14em;text-transform:uppercase;padding:14px 20px;text-decoration:none}
+.btn.solid{background:#fff;color:#4A4535}.btn.ghost{border:1.5px solid var(--gold);color:#fff}
+.btn:focus-visible,.card:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+.factsband{background:var(--grey)}
+.facts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}
+.facts div{padding:22px 20px 22px 0;display:grid;gap:4px;align-content:start;border-right:1px solid var(--line)}
+.facts div+div{padding-left:22px}.facts div:last-child{border-right:0}
+.facts span{font:600 10.5px var(--font);letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
+.facts b{font:500 16.5px/1.3 var(--font);color:var(--navy)}.facts small{font-size:12.5px;line-height:1.45;color:var(--ink2)}
+main{display:grid;gap:80px;padding-block:72px 88px}
+section{display:grid;gap:28px}
+.sh{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px 40px;align-items:end}
+.sh .eyebrow{grid-column:1/-1}.sh h2{font:300 clamp(30px,4vw,50px)/1.05 var(--font);letter-spacing:-.01em}.sh p{margin:0;max-width:56ch;color:var(--ink2)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px}
+.card{display:grid;grid-template-rows:auto 1fr;background:var(--sheet);color:inherit;text-decoration:none;border-top:3px solid var(--gold);box-shadow:0 1px 0 var(--line);transition:transform .25s ease,box-shadow .25s ease}
+.card:hover{transform:translateY(-4px);box-shadow:0 14px 30px rgba(35,37,42,.12)}
+.card .thumb{aspect-ratio:4/3;overflow:hidden;background:var(--grey)}.card .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.card .body{padding:16px 16px 20px;display:grid;gap:6px;align-content:start}
+.card .n{font:600 10.5px var(--font);letter-spacing:.22em;text-transform:uppercase;color:var(--gold)}
+.card h3{font:600 17px/1.25 var(--font)}.card p{margin:0;font-size:13.5px;line-height:1.55;color:var(--ink2)}
+.list{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 48px}
+.list li{display:grid;gap:2px;padding:16px 0;border-top:1px solid var(--line)}
+.list b{font:600 15px/1.35 var(--font);color:var(--head)}.list span{font-size:14.5px;color:var(--ink2)}
+table{width:100%;border-collapse:collapse;font-size:14.5px;background:var(--sheet)}
+th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--line)}
+th{font:600 10.5px var(--font);letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+td.n,th.n{text-align:right}tfoot td{font-weight:600;color:var(--head)}
+tbody tr{cursor:pointer}tbody tr:hover,tbody tr.on{background:var(--hl)}
+footer{background:var(--charcoal);color:rgba(255,255,255,.7)}
+footer .wrap{padding-block:26px 34px;display:flex;flex-wrap:wrap;gap:8px 28px;font:500 11px var(--font);letter-spacing:.16em;text-transform:uppercase}
+footer a{color:inherit}
+/* plan page */
+.top{background:var(--sheet);border-bottom:1px solid var(--line)}.top .bar a{color:var(--link)}.top .bar .here{border-bottom:2px solid var(--gold)}
+.ptitle{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:end;gap:16px}
+.ptitle h1{font:300 clamp(32px,4.4vw,54px)/1.05 var(--font)}
+.seg{display:inline-flex;border:1px solid var(--line);background:var(--sheet)}
+.seg button{appearance:none;border:0;background:none;font:600 11.5px var(--font);letter-spacing:.14em;text-transform:uppercase;padding:11px 14px;color:var(--ink2);cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--navy);color:var(--paper)}
+.seg button:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
+.sheet{background:#fff;box-shadow:0 1px 0 var(--line);padding:clamp(6px,1.5vw,18px);position:relative}
+.sheet svg{display:block;width:100%;height:auto}
+.room{fill:transparent;stroke:none;cursor:pointer;transition:fill .15s}
+.room:hover,.room.on{fill:rgba(183,149,101,.30)}
+.room:focus-visible{outline:none;fill:rgba(183,149,101,.40);stroke:#B79565;stroke-width:4}
+.wall{fill:#3A3B3F}.facade{fill:#9C9A94}.mfloor{fill:#F4F2EE}.mlbl{font:600 22px var(--font);letter-spacing:.12em;text-transform:uppercase;fill:#3A3B3F;text-anchor:middle;pointer-events:none}
+.mdim{font:500 18px var(--font);fill:#7A7C80;text-anchor:middle;pointer-events:none}
+.tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--paper);font:500 13px/1.4 var(--font);padding:7px 10px;border-radius:4px;white-space:nowrap;transform:translate(-50%,calc(-100% - 10px))}
+.tip b{font-weight:600}
+.note{margin:0;font-size:14px;color:var(--ink2);max-width:80ch;border-left:3px solid var(--gold);padding-left:14px}
+@media (max-width:900px){.facts{grid-template-columns:repeat(2,minmax(0,1fr))}.facts div{border-right:0;padding-left:0!important;border-bottom:1px solid var(--line)}
+  .facts div:nth-child(odd){padding-right:16px}.sh{grid-template-columns:1fr}.list{grid-template-columns:1fr}}
+@media (max-width:640px){.wrap{padding-inline:16px}.hero .bar nav a{margin-left:14px}.bar .wrap>span{display:none}
+  th,td{padding:8px 8px}.hide-s{display:none}.seg button{padding:10px 10px;letter-spacing:.08em}}
+@media (prefers-reduced-motion:reduce){.card{transition:none}}
+</style>
+</head>
+<body>
+<header class="top"><div class="bar"><div class="wrap"><a href="index.html" style="margin:0">← Creektown Apartment</a>
+<nav aria-label="Site"><a class="here" href="plan.html" aria-current="page">Plan</a><a href="3d.html">3D</a></nav></div></div></header>
+<div class="wrap"><main>
+<section>
+  <div class="ptitle"><div><div class="eyebrow">The architect's plan, to scale</div><h1>Plan</h1></div>
+  <div class="seg" role="group" aria-label="Drawing">
+    <button type="button" data-k="furnished" aria-pressed="true">Furnished</button>
+    <button type="button" data-k="empty" aria-pressed="false">Empty</button>
+    <button type="button" data-k="model" aria-pressed="false">Model</button>
+  </div></div>
+  <div class="sheet" id="sheet">
+    <svg viewBox="0 0 3210 2522" role="img" aria-label="Floor plan of the apartment; each room can be selected">
+      <image id="bg" href="img/plan-furnished.jpg" x="0" y="0" width="3210" height="2522"/>
+      <g id="mdl" hidden="">
+      <rect class="mfloor" x="0" y="0" width="3210" height="2522"/>
+      <rect class="wall" x="456" y="82" width="446" height="36"/>
+      <rect class="wall" x="1892" y="82" width="26" height="36"/>
+      <rect class="wall" x="1930" y="82" width="12" height="50"/>
+      <rect class="wall" x="1954" y="82" width="156" height="50"/>
+      <rect class="wall" x="2478" y="82" width="200" height="36"/>
+      <rect class="wall" x="3118" y="82" width="50" height="50"/>
+      <rect class="wall" x="456" y="118" width="410" height="4"/>
+      <rect class="wall" x="878" y="118" width="24" height="14"/>
+      <rect class="wall" x="1892" y="118" width="12" height="54"/>
+      <rect class="wall" x="1918" y="118" width="12" height="4"/>
+      <rect class="wall" x="1942" y="118" width="12" height="4"/>
+      <rect class="wall" x="2478" y="118" width="6" height="4"/>
+      <rect class="wall" x="2510" y="118" width="116" height="24"/>
+      <rect class="wall" x="456" y="122" width="88" height="10"/>
+      <rect class="wall" x="614" y="122" width="134" height="10"/>
+      <rect class="wall" x="798" y="122" width="68" height="10"/>
+      <rect class="wall" x="908" y="122" width="194" height="50"/>
+      <rect class="wall" x="1126" y="122" width="310" height="10"/>
+      <rect class="wall" x="1802" y="122" width="90" height="50"/>
+      <rect class="wall" x="504" y="132" width="110" height="10"/>
+      <rect class="wall" x="866" y="132" width="18" height="40"/>
+      <rect class="wall" x="902" y="132" width="6" height="10"/>
+      <rect class="wall" x="1102" y="132" width="24" height="50"/>
+      <rect class="wall" x="1154" y="132" width="140" height="40"/>
+      <rect class="wall" x="1314" y="132" width="92" height="10"/>
+      <rect class="wall" x="1904" y="132" width="26" height="40"/>
+      <rect class="wall" x="1942" y="132" width="12" height="10"/>
+      <rect class="wall" x="2052" y="132" width="8" height="10"/>
+      <rect class="wall" x="2478" y="132" width="6" height="10"/>
+      <rect class="wall" x="2626" y="132" width="52" height="40"/>
+      <rect class="wall" x="3118" y="132" width="28" height="168"/>
+      <rect class="wall" x="456" y="142" width="48" height="186"/>
+      <rect class="wall" x="854" y="142" width="12" height="158"/>
+      <rect class="wall" x="884" y="142" width="18" height="30"/>
+      <rect class="wall" x="1126" y="142" width="28" height="30"/>
+      <rect class="wall" x="1294" y="142" width="20" height="30"/>
+      <rect class="wall" x="1330" y="142" width="106" height="30"/>
+      <rect class="wall" x="1930" y="142" width="12" height="854"/>
+      <rect class="wall" x="3146" y="142" width="22" height="30"/>
+      <rect class="wall" x="866" y="172" width="12" height="128"/>
+      <rect class="wall" x="984" y="172" width="118" height="10"/>
+      <rect class="wall" x="1918" y="172" width="12" height="824"/>
+      <rect class="wall" x="2626" y="182" width="52" height="190"/>
+      <rect class="wall" x="3146" y="182" width="22" height="92"/>
+      <rect class="wall" x="3146" y="300" width="22" height="312"/>
+      <rect class="wall" x="2678" y="322" width="42" height="50"/>
+      <rect class="wall" x="3086" y="322" width="60" height="50"/>
+      <rect class="wall" x="3168" y="322" width="12" height="50"/>
+      <rect class="wall" x="3118" y="372" width="28" height="504"/>
+      <rect class="wall" x="866" y="468" width="12" height="542"/>
+      <rect class="wall" x="456" y="476" width="48" height="160"/>
+      <rect class="wall" x="854" y="476" width="12" height="534"/>
+      <rect class="wall" x="84" y="586" width="60" height="26"/>
+      <rect class="wall" x="434" y="586" width="22" height="26"/>
+      <rect class="wall" x="84" y="612" width="50" height="584"/>
+      <rect class="wall" x="144" y="612" width="22" height="24"/>
+      <rect class="wall" x="504" y="612" width="350" height="24"/>
+      <rect class="wall" x="3146" y="636" width="22" height="340"/>
+      <rect class="wall" x="3044" y="876" width="74" height="96"/>
+      <rect class="wall" x="1942" y="896" width="110" height="24"/>
+      <rect class="wall" x="3118" y="896" width="28" height="300"/>
+      <rect class="wall" x="1960" y="920" width="100" height="76"/>
+      <rect class="wall" x="878" y="972" width="24" height="24"/>
+      <rect class="wall" x="908" y="972" width="236" height="24"/>
+      <rect class="wall" x="1154" y="972" width="64" height="24"/>
+      <rect class="wall" x="1406" y="972" width="186" height="24"/>
+      <rect class="wall" x="1626" y="972" width="292" height="24"/>
+      <rect class="wall" x="1942" y="972" width="18" height="24"/>
+      <rect class="wall" x="3086" y="972" width="32" height="4"/>
+      <rect class="wall" x="902" y="976" width="6" height="20"/>
+      <rect class="wall" x="1144" y="976" width="10" height="20"/>
+      <rect class="wall" x="1592" y="976" width="34" height="20"/>
+      <rect class="wall" x="1592" y="996" width="24" height="20"/>
+      <rect class="wall" x="3146" y="996" width="22" height="20"/>
+      <rect class="wall" x="3146" y="1042" width="22" height="160"/>
+      <rect class="wall" x="134" y="1048" width="10" height="148"/>
+      <rect class="wall" x="854" y="1198" width="24" height="18"/>
+      <rect class="wall" x="1592" y="1198" width="24" height="432"/>
+      <rect class="wall" x="84" y="1202" width="50" height="458"/>
+      <rect class="wall" x="854" y="1216" width="12" height="14"/>
+      <rect class="wall" x="878" y="1216" width="6" height="24"/>
+      <rect class="wall" x="1072" y="1216" width="54" height="14"/>
+      <rect class="wall" x="1294" y="1216" width="298" height="24"/>
+      <rect class="wall" x="1616" y="1216" width="10" height="24"/>
+      <rect class="wall" x="1802" y="1216" width="656" height="24"/>
+      <rect class="wall" x="3118" y="1216" width="50" height="14"/>
+      <rect class="wall" x="820" y="1230" width="34" height="160"/>
+      <rect class="wall" x="866" y="1230" width="12" height="160"/>
+      <rect class="wall" x="1078" y="1230" width="48" height="10"/>
+      <rect class="wall" x="1626" y="1230" width="6" height="10"/>
+      <rect class="wall" x="1800" y="1230" width="2" height="10"/>
+      <rect class="wall" x="3146" y="1230" width="22" height="430"/>
+      <rect class="wall" x="854" y="1240" width="12" height="150"/>
+      <rect class="wall" x="1078" y="1240" width="24" height="390"/>
+      <rect class="wall" x="1930" y="1240" width="24" height="330"/>
+      <rect class="wall" x="2434" y="1240" width="24" height="462"/>
+      <rect class="wall" x="3118" y="1248" width="28" height="322"/>
+      <rect class="wall" x="134" y="1366" width="686" height="24"/>
+      <rect class="wall" x="1154" y="1570" width="64" height="60"/>
+      <rect class="wall" x="1802" y="1570" width="28" height="60"/>
+      <rect class="wall" x="1890" y="1570" width="2" height="60"/>
+      <rect class="wall" x="1904" y="1570" width="14" height="10"/>
+      <rect class="wall" x="1930" y="1570" width="12" height="10"/>
+      <rect class="wall" x="854" y="1580" width="30" height="80"/>
+      <rect class="wall" x="902" y="1580" width="176" height="50"/>
+      <rect class="wall" x="1102" y="1580" width="42" height="50"/>
+      <rect class="wall" x="1218" y="1580" width="116" height="50"/>
+      <rect class="wall" x="1482" y="1580" width="110" height="50"/>
+      <rect class="wall" x="1616" y="1580" width="10" height="50"/>
+      <rect class="wall" x="1774" y="1580" width="28" height="50"/>
+      <rect class="wall" x="1830" y="1580" width="60" height="50"/>
+      <rect class="wall" x="1892" y="1580" width="12" height="50"/>
+      <rect class="wall" x="1918" y="1580" width="12" height="80"/>
+      <rect class="wall" x="1942" y="1580" width="12" height="92"/>
+      <rect class="wall" x="3118" y="1580" width="28" height="250"/>
+      <rect class="wall" x="884" y="1630" width="18" height="30"/>
+      <rect class="wall" x="1930" y="1630" width="12" height="42"/>
+      <rect class="wall" x="854" y="1660" width="24" height="12"/>
+      <rect class="wall" x="902" y="1660" width="2" height="12"/>
+      <rect class="wall" x="1904" y="1660" width="14" height="12"/>
+      <rect class="wall" x="878" y="1672" width="24" height="248"/>
+      <rect class="wall" x="3146" y="1672" width="22" height="158"/>
+      <rect class="wall" x="854" y="1702" width="24" height="218"/>
+      <rect class="wall" x="902" y="1770" width="2" height="60"/>
+      <rect class="wall" x="2758" y="1770" width="360" height="60"/>
+      <rect class="wall" x="3168" y="1770" width="12" height="60"/>
+      <rect class="wall" x="2758" y="1830" width="60" height="420"/>
+      <rect class="wall" x="902" y="1882" width="2" height="62"/>
+      <rect class="wall" x="1904" y="1882" width="50" height="38"/>
+      <rect class="wall" x="2434" y="1882" width="24" height="368"/>
+      <rect class="wall" x="854" y="1920" width="12" height="24"/>
+      <rect class="wall" x="884" y="1920" width="18" height="24"/>
+      <rect class="wall" x="1904" y="1920" width="14" height="48"/>
+      <rect class="wall" x="1930" y="1920" width="314" height="24"/>
+      <rect class="wall" x="2412" y="1920" width="22" height="24"/>
+      <rect class="wall" x="866" y="1944" width="18" height="152"/>
+      <rect class="wall" x="1942" y="1944" width="12" height="24"/>
+      <rect class="wall" x="854" y="1968" width="12" height="128"/>
+      <rect class="wall" x="884" y="1968" width="20" height="128"/>
+      <rect class="wall" x="84" y="2008" width="50" height="176"/>
+      <rect class="wall" x="866" y="2096" width="12" height="34"/>
+      <rect class="wall" x="1904" y="2096" width="14" height="214"/>
+      <rect class="wall" x="1942" y="2096" width="12" height="24"/>
+      <rect class="wall" x="144" y="2120" width="100" height="64"/>
+      <rect class="wall" x="748" y="2120" width="72" height="60"/>
+      <rect class="wall" x="878" y="2120" width="24" height="10"/>
+      <rect class="wall" x="1802" y="2120" width="28" height="60"/>
+      <rect class="wall" x="1890" y="2120" width="14" height="10"/>
+      <rect class="wall" x="1930" y="2120" width="12" height="10"/>
+      <rect class="wall" x="244" y="2130" width="504" height="50"/>
+      <rect class="wall" x="820" y="2130" width="46" height="50"/>
+      <rect class="wall" x="884" y="2130" width="24" height="50"/>
+      <rect class="wall" x="1794" y="2130" width="8" height="50"/>
+      <rect class="wall" x="1830" y="2130" width="60" height="50"/>
+      <rect class="wall" x="1918" y="2130" width="12" height="180"/>
+      <rect class="wall" x="1942" y="2130" width="12" height="180"/>
+      <rect class="wall" x="2458" y="2130" width="52" height="50"/>
+      <rect class="wall" x="2738" y="2130" width="20" height="50"/>
+      <rect class="wall" x="244" y="2180" width="300" height="4"/>
+      <rect class="wall" x="748" y="2180" width="50" height="70"/>
+      <rect class="wall" x="2458" y="2180" width="26" height="64"/>
+      <rect class="wall" x="1930" y="2184" width="12" height="60"/>
+      <rect class="wall" x="2458" y="2244" width="20" height="66"/>
+      <rect class="wall" x="748" y="2260" width="50" height="56"/>
+      <rect class="wall" x="1930" y="2260" width="12" height="50"/>
+      <rect class="wall" x="1954" y="2260" width="504" height="50"/>
+      <rect class="wall" x="2160" y="2310" width="50" height="6"/>
+      <rect class="facade" x="434" y="18" width="432" height="64"/>
+      <rect class="facade" x="1830" y="18" width="1350" height="60"/>
+      <rect class="facade" x="1330" y="58" width="500" height="60"/>
+      <rect class="facade" x="1830" y="78" width="88" height="4"/>
+      <rect class="facade" x="1930" y="78" width="12" height="4"/>
+      <rect class="facade" x="1954" y="78" width="156" height="4"/>
+      <rect class="facade" x="2478" y="78" width="200" height="4"/>
+      <rect class="facade" x="3118" y="78" width="50" height="4"/>
+      <rect class="facade" x="434" y="82" width="22" height="50"/>
+      <rect class="facade" x="1830" y="82" width="62" height="40"/>
+      <rect class="facade" x="1330" y="118" width="106" height="4"/>
+      <rect class="facade" x="1802" y="118" width="28" height="4"/>
+      <rect class="facade" x="434" y="132" width="16" height="142"/>
+      <rect class="facade" x="450" y="142" width="6" height="132"/>
+      <rect class="facade" x="80" y="522" width="376" height="60"/>
+      <rect class="facade" x="84" y="582" width="60" height="4"/>
+      <rect class="facade" x="434" y="582" width="22" height="4"/>
+      <rect class="facade" x="80" y="2184" width="464" height="60"/>
+      <rect class="facade" x="20" y="524" width="60" height="1720"/>
+      <rect class="facade" x="390" y="20" width="44" height="254"/>
+      <text class="mlbl" x="680" y="370">Master bath</text>
+      <text class="mdim" x="680" y="396">1.78 × 2.43</text>
+      <text class="mlbl" x="1400" y="600">Master bedroom</text>
+      <text class="mdim" x="1400" y="626">5.24 × 4.04</text>
+      <text class="mlbl" x="500" y="1000">Bedroom 1</text>
+      <text class="mdim" x="500" y="1026">3.61 × 3.68</text>
+      <text class="mlbl" x="500" y="1760">Bedroom 2</text>
+      <text class="mdim" x="500" y="1786">3.63 × 3.68</text>
+      <text class="mlbl" x="1400" y="1110">Corridor</text>
+      <text class="mdim" x="1400" y="1136">7.78 × 1.12</text>
+      <text class="mlbl" x="1350" y="1410">Bathroom 1</text>
+      <text class="mdim" x="1350" y="1436">2.46 × 1.72</text>
+      <text class="mlbl" x="1776" y="1410">Guest bath</text>
+      <text class="mdim" x="1776" y="1436">1.56 × 1.72</text>
+      <text class="mlbl" x="2194" y="1580">Kitchen</text>
+      <text class="mdim" x="2194" y="1606">2.38 × 3.44</text>
+      <text class="mlbl" x="2194" y="2100">Maid&#x27;s room</text>
+      <text class="mdim" x="2194" y="2126">2.38 × 1.60</text>
+      <text class="mlbl" x="2270" y="540">Reception</text>
+      <text class="mdim" x="2270" y="566">3.28 × 4.14</text>
+      <text class="mlbl" x="2860" y="660">Living</text>
+      <text class="mdim" x="2860" y="686">2.62 × 2.88</text>
+      <text class="mlbl" x="2860" y="1310">Dining</text>
+      <text class="mdim" x="2860" y="1336">3.44 × 4.08</text>
+      <text class="mlbl" x="2610" y="1950">Entrance</text>
+      <text class="mdim" x="2610" y="1976">1.50 × 1.76</text>
+      <text class="mlbl" x="2900" y="210">Terrace</text>
+      <text class="mdim" x="2900" y="236">2.20 × 1.32</text>
+      </g>
+      <g id="rooms"><rect class="room" data-i="0" x="504" y="124" width="356" height="486" tabindex="0" role="button" aria-label="Master bathroom, 1.78 by 2.43 m, 4.3 square metres"/><rect class="room" data-i="1" x="876" y="176" width="1048" height="808" tabindex="0" role="button" aria-label="Master bedroom, 5.24 by 4.04 m, 21.2 square metres"/><rect class="room" data-i="2" x="134" y="636" width="722" height="736" tabindex="0" role="button" aria-label="Bedroom 1, 3.61 by 3.68 m, 13.3 square metres"/><rect class="room" data-i="3" x="134" y="1388" width="726" height="736" tabindex="0" role="button" aria-label="Bedroom 2, 3.63 by 3.68 m, 15.2 square metres"/><rect class="room" data-i="3" x="880" y="1236" width="216" height="348" tabindex="0" role="button" aria-label="Bedroom 2, 3.63 by 3.68 m, 15.2 square metres"/><rect class="room" data-i="4" x="880" y="996" width="1556" height="224" tabindex="0" role="button" aria-label="Corridor, 7.78 by 1.12 m, 8.7 square metres"/><rect class="room" data-i="5" x="1104" y="1236" width="492" height="344" tabindex="0" role="button" aria-label="Bathroom 1, 2.46 by 1.72 m, 4.2 square metres"/><rect class="room" data-i="6" x="1620" y="1236" width="312" height="344" tabindex="0" role="button" aria-label="Guest bathroom, 1.56 by 1.72 m, 2.7 square metres"/><rect class="room" data-i="7" x="1956" y="1236" width="476" height="688" tabindex="0" role="button" aria-label="Kitchen, 2.38 by 3.44 m, 8.2 square metres"/><rect class="room" data-i="8" x="1956" y="1944" width="476" height="320" tabindex="0" role="button" aria-label="Maid&#x27;s room, 2.38 by 1.60 m, 3.8 square metres"/><rect class="room" data-i="9" x="1944" y="132" width="656" height="828" tabindex="0" role="button" aria-label="Reception, 3.28 by 4.14 m, 13.6 square metres"/><rect class="room" data-i="10" x="2600" y="384" width="524" height="576" tabindex="0" role="button" aria-label="Living, 2.62 by 2.88 m, 7.5 square metres"/><rect class="room" data-i="11" x="2436" y="960" width="688" height="816" tabindex="0" role="button" aria-label="Dining, 3.44 by 4.08 m, 14.0 square metres"/><rect class="room" data-i="12" x="2460" y="1776" width="300" height="352" tabindex="0" role="button" aria-label="Entrance, 1.50 by 1.76 m, 2.6 square metres"/><rect class="room" data-i="13" x="2680" y="80" width="440" height="264" tabindex="0" role="button" aria-label="Terrace, 2.20 by 1.32 m, 2.9 square metres"/></g>
+    </svg>
+    <div class="tip" id="tip" hidden></div>
+  </div>
+  <p class="note">Furnished and Empty are the architect's two sheets, turned so the room names read upright. Model is what the 3D walkthrough is built from: the walls traced from the empty sheet, at 1:50, to the centimetre. Hover or tap a room for its size.</p>
+</section>
+<section>
+  <div class="sh"><div class="eyebrow">Room schedule</div><h2>Every room, measured</h2>
+  <p>Net floor areas between finished walls, from the model. The reception, living and dining are one open space on the drawing; they are split here only to give each part its size.</p></div>
+  <table id="sched"><thead><tr><th>Room</th><th class="hide-s">Zone</th><th class="n">Size, m</th><th class="n">Area, m²</th></tr></thead>
+  <tbody><tr data-i="0"><td>Master bathroom</td><td class="hide-s">Wet rooms</td><td class="n">1.78 × 2.43</td><td class="n">4.3</td></tr><tr data-i="1"><td>Master bedroom</td><td class="hide-s">Bedrooms</td><td class="n">5.24 × 4.04</td><td class="n">21.2</td></tr><tr data-i="2"><td>Bedroom 1</td><td class="hide-s">Bedrooms</td><td class="n">3.61 × 3.68</td><td class="n">13.3</td></tr><tr data-i="3"><td>Bedroom 2</td><td class="hide-s">Bedrooms</td><td class="n">3.63 × 3.68</td><td class="n">15.2</td></tr><tr data-i="4"><td>Corridor</td><td class="hide-s">Circulation</td><td class="n">7.78 × 1.12</td><td class="n">8.7</td></tr><tr data-i="5"><td>Bathroom 1</td><td class="hide-s">Wet rooms</td><td class="n">2.46 × 1.72</td><td class="n">4.2</td></tr><tr data-i="6"><td>Guest bathroom</td><td class="hide-s">Wet rooms</td><td class="n">1.56 × 1.72</td><td class="n">2.7</td></tr><tr data-i="7"><td>Kitchen</td><td class="hide-s">Service</td><td class="n">2.38 × 3.44</td><td class="n">8.2</td></tr><tr data-i="8"><td>Maid&#x27;s room</td><td class="hide-s">Service</td><td class="n">2.38 × 1.60</td><td class="n">3.8</td></tr><tr data-i="9"><td>Reception</td><td class="hide-s">Living</td><td class="n">3.28 × 4.14</td><td class="n">13.6</td></tr><tr data-i="10"><td>Living</td><td class="hide-s">Living</td><td class="n">2.62 × 2.88</td><td class="n">7.5</td></tr><tr data-i="11"><td>Dining</td><td class="hide-s">Living</td><td class="n">3.44 × 4.08</td><td class="n">14.0</td></tr><tr data-i="12"><td>Entrance</td><td class="hide-s">Circulation</td><td class="n">1.50 × 1.76</td><td class="n">2.6</td></tr><tr data-i="13"><td>Terrace</td><td class="hide-s">Outdoor</td><td class="n">2.20 × 1.32</td><td class="n">2.9</td></tr></tbody>
+  <tfoot><tr><td>Inside, net</td><td class="hide-s"></td><td></td><td class="n">119.4</td></tr>
+  <tr><td>With the terrace</td><td class="hide-s"></td><td></td><td class="n">122.3</td></tr></tfoot></table>
+</section>
+</main></div>
+<footer><div class="wrap"><span>Creektown Apartment</span><span>Drawings: the architect's plan, 2 Sep 2026</span>
+<span>Built on the <a href="https://github.com/kamelshenouda/azad">AZAD</a> site and 3D viewer</span></div></footer>
+
+<script>
+(function(){
+  var R=[{"n": "Master bathroom", "z": "Wet rooms", "d": "1.78 \u00d7 2.43 m", "a": "4.3 m\u00b2"}, {"n": "Master bedroom", "z": "Bedrooms", "d": "5.24 \u00d7 4.04 m", "a": "21.2 m\u00b2"}, {"n": "Bedroom 1", "z": "Bedrooms", "d": "3.61 \u00d7 3.68 m", "a": "13.3 m\u00b2"}, {"n": "Bedroom 2", "z": "Bedrooms", "d": "3.63 \u00d7 3.68 m", "a": "15.2 m\u00b2"}, {"n": "Corridor", "z": "Circulation", "d": "7.78 \u00d7 1.12 m", "a": "8.7 m\u00b2"}, {"n": "Bathroom 1", "z": "Wet rooms", "d": "2.46 \u00d7 1.72 m", "a": "4.2 m\u00b2"}, {"n": "Guest bathroom", "z": "Wet rooms", "d": "1.56 \u00d7 1.72 m", "a": "2.7 m\u00b2"}, {"n": "Kitchen", "z": "Service", "d": "2.38 \u00d7 3.44 m", "a": "8.2 m\u00b2"}, {"n": "Maid's room", "z": "Service", "d": "2.38 \u00d7 1.60 m", "a": "3.8 m\u00b2"}, {"n": "Reception", "z": "Living", "d": "3.28 \u00d7 4.14 m", "a": "13.6 m\u00b2"}, {"n": "Living", "z": "Living", "d": "2.62 \u00d7 2.88 m", "a": "7.5 m\u00b2"}, {"n": "Dining", "z": "Living", "d": "3.44 \u00d7 4.08 m", "a": "14.0 m\u00b2"}, {"n": "Entrance", "z": "Circulation", "d": "1.50 \u00d7 1.76 m", "a": "2.6 m\u00b2"}, {"n": "Terrace", "z": "Outdoor", "d": "2.20 \u00d7 1.32 m", "a": "2.9 m\u00b2"}], IM={furnished:'img/plan-furnished.jpg',empty:'img/plan-empty.jpg'};
+  var bg=document.getElementById('bg'), mdl=document.getElementById('mdl'), tip=document.getElementById('tip'), sheet=document.getElementById('sheet');
+  function store(k,v){try{localStorage.setItem(k,v)}catch(e){}} function read(k){try{return localStorage.getItem(k)}catch(e){return null}}
+  var segs=[].slice.call(document.querySelectorAll('.seg button'));
+  function show(k){ segs.forEach(function(b){b.setAttribute('aria-pressed',b.getAttribute('data-k')===k?'true':'false');});
+    if(k==='model')mdl.removeAttribute('hidden'); else mdl.setAttribute('hidden',''); bg.style.display=k==='model'?'none':''; if(IM[k])bg.setAttribute('href',IM[k]); store('creektown-plan-view',k); }
+  segs.forEach(function(b){b.addEventListener('click',function(){show(b.getAttribute('data-k'));});});
+  var k0=read('creektown-plan-view'); if(k0&&/^(furnished|empty|model)$/.test(k0))show(k0);
+  var rects=[].slice.call(document.querySelectorAll('#rooms rect')), trs=[].slice.call(document.querySelectorAll('#sched tbody tr'));
+  function on(i,el){ rects.forEach(function(r){r.classList.toggle('on',+r.getAttribute('data-i')===i);}); trs.forEach(function(t){t.classList.toggle('on',+t.getAttribute('data-i')===i);});
+    if(i<0||!el){tip.hidden=true;return;} var r=R[i], b=el.getBoundingClientRect(), s=sheet.getBoundingClientRect();
+    tip.innerHTML='<b>'+r.n+'</b> · '+r.d+' · '+r.a; tip.style.left=(b.left+b.width/2-s.left)+'px'; tip.style.top=(b.top+b.height/2-s.top)+'px'; tip.hidden=false; }
+  rects.forEach(function(el){ var i=+el.getAttribute('data-i');
+    el.addEventListener('mouseenter',function(){on(i,el);}); el.addEventListener('mouseleave',function(){on(-1);});
+    el.addEventListener('focus',function(){on(i,el);}); el.addEventListener('blur',function(){on(-1);});
+    el.addEventListener('click',function(){on(i,el);}); });
+  trs.forEach(function(t){ var i=+t.getAttribute('data-i'); t.addEventListener('mouseenter',function(){ on(i,rects.filter(function(r){return +r.getAttribute('data-i')===i;})[0]); });
+    t.addEventListener('mouseleave',function(){on(-1);}); });
+})();
+</script>
+</body>
+</html>
