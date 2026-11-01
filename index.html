@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Creektown Apartment</title>
-<meta name="description" content="Amira's Creektown apartment in New Cairo: the plan to scale and a 3D walkthrough with the real sun.">
+<meta name="description" content="Amira's Creektown apartment in New Cairo: the plans to scale, as built and two layout options, and a 3D walkthrough with the real sun.">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300..700&display=swap">
 <style>
@@ -79,7 +79,18 @@ footer a{color:inherit}
 .tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--paper);font:500 13px/1.4 var(--font);padding:7px 10px;border-radius:4px;white-space:nowrap;transform:translate(-50%,calc(-100% - 10px))}
 .tip b{font-weight:600}
 .note{margin:0;font-size:14px;color:var(--ink2);max-width:80ch;border-left:3px solid var(--gold);padding-left:14px}
-@media (max-width:900px){.facts{grid-template-columns:repeat(2,minmax(0,1fr))}.facts div{border-right:0;padding-left:0!important;border-bottom:1px solid var(--line)}
+.segs{display:flex;flex-wrap:wrap;gap:10px}
+.seg small{font-weight:500;letter-spacing:.04em;text-transform:none;opacity:.8}
+.opts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.opt{background:var(--sheet);border-top:3px solid var(--gold);padding:18px 18px 16px;display:grid;gap:8px;align-content:start;box-shadow:0 1px 0 var(--line)}
+.opt .n{font:600 10.5px var(--font);letter-spacing:.22em;text-transform:uppercase;color:var(--gold)}
+.opt h3{font:600 19px/1.3 var(--font)}
+.opt .dims{margin:0;font:600 12.5px var(--font);letter-spacing:.06em;color:var(--navy)}
+.opt ul{margin:0;padding-left:18px;font-size:14px;line-height:1.55;color:var(--ink2);display:grid;gap:6px}
+.opt .go{margin:6px 0 0;display:flex;gap:18px;font:600 11.5px var(--font);letter-spacing:.14em;text-transform:uppercase}
+.opt .go a{text-decoration:none;border-bottom:2px solid var(--gold);padding-bottom:2px}
+.cmp tbody tr{cursor:default}.cmp tbody tr:hover{background:none}
+@media (max-width:900px){.opts{grid-template-columns:minmax(0,1fr)}.facts{grid-template-columns:repeat(2,minmax(0,1fr))}.facts div{border-right:0;padding-left:0!important;border-bottom:1px solid var(--line)}
   .facts div:nth-child(odd){padding-right:16px}.sh{grid-template-columns:1fr}.list{grid-template-columns:1fr}}
 @media (max-width:640px){.wrap{padding-inline:16px}.hero .bar nav a{margin-left:14px}.bar .wrap>span{display:none}
   th,td{padding:8px 8px}.hide-s{display:none}.seg button{padding:10px 10px;letter-spacing:.08em}}
@@ -93,39 +104,48 @@ footer a{color:inherit}
     <div class="eyebrow">Creek Town · New Cairo · interior architecture</div>
     <h1><b>Creektown</b> Apartment</h1>
     <div class="rule" aria-hidden="true"></div>
-    <p>Amira's new apartment: three bedrooms, a maid's room and an open reception, living and dining onto a terrace. Measured from the architect's drawings and built as a 3D model you can walk through with the real sun.</p>
-    <div class="cta"><a class="btn solid" href="plan.html">See the plan</a><a class="btn ghost" href="3d.html">Walk through it</a></div>
+    <p>Amira's new apartment: three bedrooms, a maid's room and an open reception, living and dining onto a terrace, and the architect's two options for reworking it. Measured from the drawings and built as a 3D model you can walk through with the real sun.</p>
+    <div class="cta"><a class="btn solid" href="plan.html">See the plans</a><a class="btn ghost" href="3d.html">Walk through them</a></div>
   </div>
 </header>
 <div class="factsband"><div class="wrap"><div class="facts" aria-label="Key facts">
-  <div><span>Size</span><b>About 119 m² net + 2.9 m² terrace</b><small>Floor area between walls, from the drawing at 1:50</small></div>
-  <div><span>Rooms</span><b>Master suite · 3 bedrooms in all</b><small>3 bathrooms · maid's room · kitchen</small></div>
-  <div><span>Living</span><b>One open space, 35 m²</b><small>Reception, living and dining for six, onto the terrace</small></div>
-  <div><span>Status</span><b>As built, with the architect's furniture</b><small>Ready for layout options and finishes</small></div>
+  <div><span>Size</span><b>About 119 m² net + 2.9 m² terrace</b><small>Floor area between walls, from the drawings at 1:50</small></div>
+  <div><span>As built</span><b>Master suite · 3 bedrooms in all</b><small>3 bathrooms · maid's room · kitchen</small></div>
+  <div><span>Options</span><b>Two bedrooms or three</b><small>Option 1 trades a bedroom for a master suite and a galley kitchen; option 2 opens up the kitchen</small></div>
+  <div><span>Status</span><b>Choosing the layout</b><small>As built and both options, each with the architect's furniture</small></div>
 </div></div></div>
 <div class="wrap"><main>
 <section>
-  <div class="sh"><div class="eyebrow">The project</div><h2>Explore</h2><p>Every view is drawn from the same centimetre model, traced from the architect's plan.</p></div>
+  <div class="sh"><div class="eyebrow">The project</div><h2>Explore</h2><p>Every view is drawn from the same centimetre model, traced from the architect's plans.</p></div>
   <div class="cards">
-    <a class="card" href="plan.html"><div class="thumb"><img src="img/plan-thumb.jpg" alt="The furnished floor plan" loading="lazy"></div><div class="body"><div class="n">01 · Plan</div><h3>Layout, to scale</h3><p>The architect's sheets, furnished and empty, and the traced model; every room measured.</p></div></a>
-    <a class="card" href="3d.html"><div class="thumb"><img src="img/3d-thumb.jpg" alt="The 3D model from above" loading="lazy"></div><div class="body"><div class="n">02 · 3D</div><h3>Walk it freely</h3><p>From above or standing in any room; furnished or empty; doors open or closed; the sun at any hour; true size on screen or in a VR headset.</p></div></a>
+    <a class="card" href="plan.html"><div class="thumb"><img src="img/plan-thumb.jpg" alt="The furnished floor plan" loading="lazy"></div><div class="body"><div class="n">01 · Plan</div><h3>Layouts, to scale</h3><p>As built and both options: the architect's sheets, furnished and empty, and the traced model; every room measured.</p></div></a>
+    <a class="card" href="3d.html"><div class="thumb"><img src="img/3d-thumb.jpg" alt="The 3D model from above" loading="lazy"></div><div class="body"><div class="n">02 · 3D</div><h3>Walk it freely</h3><p>Switch between the three plans, from above or standing in any room; furnished or empty; the sun at any hour; true size on screen or in a VR headset.</p></div></a>
   </div>
 </section>
 <section>
-  <div class="sh"><div class="eyebrow">The spaces</div><h2>Room by room</h2><p>As drawn. Sizes are between finished walls.</p></div>
+  <div class="sh"><div class="eyebrow">The layout</div><h2>Three plans</h2><p>The architect's two options rework the inside of the same shell: the facade, windows, terrace and front door stay as built.</p></div>
+  <div class="opts"><article class="opt"><div class="n">As built · with furniture</div><h3>As handed over</h3><p class="dims">3 bedrooms · 3 bathrooms · 119 m² net</p><ul><li>Three bedrooms, the master with a dressing area and its own bathroom.</li><li>Two more bathrooms off the corridor, a closed kitchen and a maid&#x27;s room.</li><li>One open reception, living and dining space onto the terrace.</li></ul><p class="go"><a href="plan.html?plan=existing">Plan</a><a href="3d.html?plan=existing">3D</a></p></article><article class="opt"><div class="n">Option 1 · 2 bedrooms</div><h3>A bigger master suite</h3><p class="dims">2 bedrooms · 2 bathrooms · 120 m² net</p><ul><li>The master bedroom moves to bedroom 1 and opens into a dressing area, which leads to the master bathroom.</li><li>A galley kitchen takes the old master bedroom: two runs facing each other, open to the corridor, with a breakfast table.</li><li>The two corridor bathrooms become one, with a shower and the washing machine.</li><li>The old kitchen opens into the living area and takes the dining table; the maid&#x27;s room becomes storage.</li><li>Bedroom 2 is entered from a wider corridor, which takes in its old entry.</li></ul><p class="go"><a href="plan.html?plan=o1">Plan</a><a href="3d.html?plan=o1">3D</a></p></article><article class="opt"><div class="n">Option 2 · 3 bedrooms</div><h3>A family kitchen</h3><p class="dims">3 bedrooms · 2 bathrooms · 120 m² net</p><ul><li>The bedrooms stay; the master bedroom door moves along the corridor and its dressing becomes an L of wardrobes.</li><li>Bedroom 2 is entered from a wider corridor, its old entry now a cupboard; it is drawn as a sitting room or study.</li><li>The two corridor bathrooms become one, with a shower and the washing machine.</li><li>The kitchen takes in the maid&#x27;s room and opens onto the dining area, with an island and three stools.</li></ul><p class="go"><a href="plan.html?plan=o2">Plan</a><a href="3d.html?plan=o2">3D</a></p></article></div>
+  <table class="cmp"><thead><tr><th>Room, m²</th><th class="n">As built</th><th class="n">Option 1</th><th class="n">Option 2</th></tr></thead><tbody><tr><td>Master bathroom</td><td class="n">4.3</td><td class="n">4.3</td><td class="n">4.3</td></tr><tr><td>Master bedroom</td><td class="n">21.2</td><td class="n">18.6</td><td class="n">21.2</td></tr><tr><td>Bedroom 1</td><td class="n">13.3</td><td class="n">–</td><td class="n">13.3</td></tr><tr><td>Bedroom 2</td><td class="n">15.2</td><td class="n">13.4</td><td class="n">13.4</td></tr><tr><td>Corridor</td><td class="n">8.7</td><td class="n">12.1</td><td class="n">12.1</td></tr><tr><td>Bathroom 1</td><td class="n">4.2</td><td class="n">–</td><td class="n">–</td></tr><tr><td>Guest bathroom</td><td class="n">2.7</td><td class="n">–</td><td class="n">–</td></tr><tr><td>Kitchen</td><td class="n">8.2</td><td class="n">15.5</td><td class="n">12.8</td></tr><tr><td>Maid&#x27;s room</td><td class="n">3.8</td><td class="n">–</td><td class="n">–</td></tr><tr><td>Reception</td><td class="n">13.6</td><td class="n">13.6</td><td class="n">13.6</td></tr><tr><td>Living</td><td class="n">7.5</td><td class="n">12.1</td><td class="n">7.5</td></tr><tr><td>Dining</td><td class="n">14.0</td><td class="n">18.0</td><td class="n">13.6</td></tr><tr><td>Entrance</td><td class="n">2.6</td><td class="n">2.6</td><td class="n">2.6</td></tr><tr><td>Bathroom</td><td class="n">–</td><td class="n">5.7</td><td class="n">5.7</td></tr><tr><td>Storage</td><td class="n">–</td><td class="n">3.8</td><td class="n">–</td></tr></tbody>
+  <tfoot><tr><td>Inside, net</td><td class="n">119.4</td><td class="n">119.7</td><td class="n">120.1</td></tr></tfoot></table>
+  <p class="note">Open spaces are split only to give each part its size, so an area moves when a neighbouring wall comes down: in option 1 the dining area takes in the old kitchen, and in both options the corridor takes in bedroom 2's old entry.</p>
+</section>
+<section>
+  <div class="sh"><div class="eyebrow">As built</div><h2>Room by room</h2><p>As drawn. Sizes are between finished walls.</p></div>
   <ul class="list"><li><b>Master bathroom · 1.78 × 2.43 m</b><span>Vanity under the window wall, WC, and a full-length bath.</span></li><li><b>Master bedroom · 5.24 × 4.04 m</b><span>A king bed on the far wall between two windows&#x27; light, a walk-in dressing area behind a partition, and its own bathroom.</span></li><li><b>Bedroom 1 · 3.61 × 3.68 m</b><span>A double bed against the outside wall under the window, and a full-width wardrobe.</span></li><li><b>Bedroom 2 · 3.63 × 3.68 m</b><span>Two single beds with a shared bedside table, a wardrobe, and its own small entry from the corridor.</span></li><li><b>Kitchen · 2.38 × 3.44 m</b><span>Hob on the run along the corridor wall, the sink under the window, and an opening to the dining area.</span></li><li><b>Maid&#x27;s room · 2.38 × 1.60 m</b><span>Off the kitchen, with its own window.</span></li><li><b>Reception · 3.28 × 4.14 m</b><span>A three-seat sofa, two armchairs under the window, and a two-seat sofa round a coffee table.</span></li><li><b>Living · 2.62 × 2.88 m</b><span>TV wall, sofa and a lounge chair, next to the terrace doors.</span></li><li><b>Dining · 3.44 × 4.08 m</b><span>A table for six, between the kitchen and the living area.</span></li></ul>
 </section>
 <section>
-  <div class="sh"><div class="eyebrow">Before the design</div><h2>Still to confirm</h2><p>The drawings don't say these, so the model uses a stand-in until they are checked on site.</p></div>
+  <div class="sh"><div class="eyebrow">Before the design</div><h2>Still to confirm</h2><p>The drawings don't say these, so the model uses a stand-in until they are checked on site or with the architect.</p></div>
   <ul class="list">
     <li><b>Which way it faces</b><span>The sheets have no north arrow. The 3D sun assumes the window wall (the top of the plan) faces due south; one compass reading on site fixes it.</span></li>
     <li><b>Ceiling height</b><span>Taken as 2.80 m to the slab. Any beams and dropped ceilings still need measuring.</span></li>
     <li><b>Window sills and heads</b><span>Main windows from 0.90 to 2.25 m, bathroom and kitchen windows higher. The terrace has full-height sliding doors.</span></li>
     <li><b>The concrete band outside</b><span>Drawn on the facade outside the bedrooms and the reception; shown in 3D as a low planter or parapet, to be confirmed.</span></li>
+    <li><b>Option 1: dressing area and kitchen</b><span>The empty sheet draws no wall between them, and no door to the master bathroom. The 3D model puts a partition where the furnished sheet draws a line, and leaves the bathroom doorway open.</span></li>
+    <li><b>Doors and chairs the sheets leave out</b><span>Option 1's bathroom door has no swing drawn, so it is hinged on the vanity side; dining chairs are added where the options draw the table alone.</span></li>
   </ul>
 </section>
 </main></div>
-<footer><div class="wrap"><span>Creektown Apartment</span><span>Drawings: the architect's plan, 2 Sep 2026</span>
+<footer><div class="wrap"><span>Creektown Apartment</span><span>Drawings: the architect's plans, 2 Sep 2026</span>
 <span>Built on the <a href="https://github.com/kamelshenouda/azad">AZAD</a> site and 3D viewer</span></div></footer>
 
 </body>

@@ -14,7 +14,12 @@ with every line still a vector. This script turns it into axis-aligned wall rect
 Plan coordinates: the sheet is turned 90 degrees anticlockwise so the room names read upright (as in the furnished
 plan), x to the right, y down, in cm, origin near the top-left corner of the drawing. 1 pt on the sheet = 1.764 cm.
 
-Usage: python3 tools/extract_walls.py  ->  data/walls.json
+Every sheet the architect plotted (the original and the layout options) has the same 1:50 scale but sits at a slightly
+different place on the page, so each is first moved onto the original's frame by its concrete facade band, which no
+option changes.
+
+Usage: python3 tools/extract_walls.py [original|option_1|option_2 ...]  ->  data/walls_<sheet>.json
+       (no argument: every sheet)
 """
 import json, os, re, subprocess, sys, tempfile
 
@@ -22,8 +27,8 @@ import numpy as np
 from PIL import Image, ImageDraw
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-PDF = os.path.join(ROOT, 'source', 'original_empty.pdf')
-OUT = os.path.join(ROOT, 'data', 'walls.json')
+SHEETS = ('original', 'option_1', 'option_2')
+FACADE_AT = (190.44, 90.26)       # top-left of the facade band on the original sheet, turned, in pt
 
 CM_PER_PT = 0.3528 * 50 / 10      # 1:50 on the sheet: 1 pt = 0.3528 mm = 1.764 cm
 X0, Y0, X1, Y1 = 185, 85, 1095, 800   # the drawing's window on the turned sheet, in pt
@@ -73,15 +78,36 @@ def turn(p):          # sheet point -> turned sheet point (anticlockwise, so the
     return (p[1], SHEET_W - p[0])
 
 
+def facade_offset(P):
+    """How far (turned pt) this sheet must move to sit on the original's frame, from its facade band."""
+    pts = [turn(x) for p in P if p['fill'] and p['fill'].startswith('rgb(78') for s in p['subs'] for x in s]
+    return FACADE_AT[0] - min(a for a, b in pts), FACADE_AT[1] - min(b for a, b in pts)
+
+
+def align(P):
+    dx, dy = (0 if abs(v) < .05 else v for v in facade_offset(P))   # the original itself stays exactly where it is
+    for p in P:   # turned (x, y) = (raw y, W - raw x): a turned shift (dx, dy) is a raw shift (-dy, +dx)
+        p['subs'] = [[(x - dy, y + dx) for x, y in s] for s in p['subs']]
+    return dx, dy
+
+
 def cm(v, o):
     return (v - o) * CM_PER_PT
 
 
 def main():
+    for sheet in sys.argv[1:] or SHEETS:
+        extract(sheet)
+
+
+def extract(sheet):
+    pdf = os.path.join(ROOT, 'source', sheet + '_empty.pdf')
+    out = os.path.join(ROOT, 'data', 'walls_%s.json' % sheet)
     with tempfile.TemporaryDirectory() as td:
         svg = os.path.join(td, 'plan.svg')
-        subprocess.run(['pdftocairo', '-svg', PDF, svg], check=True)
+        subprocess.run(['pdftocairo', '-svg', pdf, svg], check=True)
         P = parse_svg(svg)
+    shift = align(P)
 
     is_outline = lambda p: p['sw'] in ('0.54', '1.44')
     is_hatch = lambda p: (p['sw'] == '0.06' and p['stroke'].startswith('rgb(49')) or (p['sw'] == '0.24' and p['stroke'].startswith('rgb(76'))
@@ -154,10 +180,10 @@ def main():
     # the two grey facade strips drawn as dotted concrete without a fill (left and top-left of the bedrooms)
     rects += [[10, 262, 40, 1122, 'facade'], [195, 10, 217, 137, 'facade']]
 
-    os.makedirs(os.path.dirname(OUT), exist_ok=True)
-    json.dump({'source': 'source/original_empty.pdf', 'units': 'cm', 'scale': '1:50 on A3', 'rects': rects},
-              open(OUT, 'w'), indent=0)
-    print('%d wall rectangles -> %s' % (len(rects), os.path.relpath(OUT, ROOT)))
+    os.makedirs(os.path.dirname(out), exist_ok=True)
+    json.dump({'source': os.path.relpath(pdf, ROOT), 'units': 'cm', 'scale': '1:50 on A3',
+               'shift_pt': [round(v, 2) for v in shift], 'rects': rects}, open(out, 'w'), indent=0)
+    print('%s: %d wall rectangles (sheet moved %.1f, %.1f pt) -> %s' % (sheet, len(rects), shift[0], shift[1], os.path.relpath(out, ROOT)))
 
 
 if __name__ == '__main__':
