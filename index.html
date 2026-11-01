@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Creektown Apartment</title>
+<meta name="description" content="Amira's Creektown apartment in New Cairo: the plan to scale and a 3D walkthrough with the real sun.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300..700&display=swap">
+<style>
+:root{--olive:#7B7258;--olive-deep:#6A624B;--navy:#0C3B5C;--gold:#B79565;--grey:#E3E3E3;--charcoal:#403F41;
+  --paper:#F1F0EC;--sheet:#FFFFFF;--ink:#23252A;--ink2:#55585E;--muted:#7A7C80;--line:#D9D8D3;--head:var(--navy);--link:var(--navy);
+  --on-olive:#FFFFFF;--on-olive2:rgba(255,255,255,.78);--hl:rgba(183,149,101,.28);--font:"Montserrat","Helvetica Neue",Arial,sans-serif}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){color-scheme:dark;--olive:#4A4535;--olive-deep:#3E3A2C;--navy:#9DB8CF;--gold:#CDAE7E;--grey:#26272A;--charcoal:#141416;
+  --paper:#18191B;--sheet:#1F2023;--ink:#ECEBE6;--ink2:#C3C3BE;--muted:#9A9A95;--line:#34353A;--head:#E9E6DD;--link:#CDAE7E;--hl:rgba(205,174,126,.3)}}
+:root[data-theme="dark"]{color-scheme:dark;--olive:#4A4535;--olive-deep:#3E3A2C;--navy:#9DB8CF;--gold:#CDAE7E;--grey:#26272A;--charcoal:#141416;
+  --paper:#18191B;--sheet:#1F2023;--ink:#ECEBE6;--ink2:#C3C3BE;--muted:#9A9A95;--line:#34353A;--head:#E9E6DD;--link:#CDAE7E;--hl:rgba(205,174,126,.3)}
+*{box-sizing:border-box}[hidden]{display:none!important}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 16px/1.7 var(--font);font-variant-numeric:lining-nums tabular-nums}
+a{color:var(--link)}img{max-width:100%}
+.wrap{max-width:1200px;margin:0 auto;padding-inline:24px}
+.eyebrow{font:600 11.5px/1.2 var(--font);letter-spacing:.24em;text-transform:uppercase;color:var(--gold)}
+h1,h2,h3{font-family:var(--font);margin:0;text-wrap:balance;color:var(--head)}
+.bar .wrap{display:flex;justify-content:space-between;align-items:center;gap:12px;padding-block:22px;font:500 11.5px var(--font);letter-spacing:.2em;text-transform:uppercase}
+.bar a{text-decoration:none;margin-left:22px}
+.hero{background:var(--olive);color:var(--on-olive)}
+.hero .bar{color:var(--on-olive2)}.hero .bar a{color:var(--on-olive);opacity:.85}.hero .bar a:hover{opacity:1;color:var(--gold)}
+.hero .copy{padding-block:clamp(48px,9vw,120px) clamp(48px,7vw,88px);display:grid;gap:18px;justify-items:start}
+.hero h1{color:var(--on-olive);font:300 clamp(44px,8vw,104px)/.98 var(--font);letter-spacing:-.02em}.hero h1 b{font-weight:600}
+.hero .rule{width:88px;height:2px;background:var(--gold)}
+.hero p{margin:0;max-width:58ch;font-size:clamp(16px,1.5vw,19px);font-weight:300;color:var(--on-olive2)}
+.cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:8px}
+.btn{display:inline-flex;align-items:center;gap:8px;font:600 12.5px var(--font);letter-spacing:.14em;text-transform:uppercase;padding:14px 20px;text-decoration:none}
+.btn.solid{background:#fff;color:#4A4535}.btn.ghost{border:1.5px solid var(--gold);color:#fff}
+.btn:focus-visible,.card:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+.factsband{background:var(--grey)}
+.facts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}
+.facts div{padding:22px 20px 22px 0;display:grid;gap:4px;align-content:start;border-right:1px solid var(--line)}
+.facts div+div{padding-left:22px}.facts div:last-child{border-right:0}
+.facts span{font:600 10.5px var(--font);letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
+.facts b{font:500 16.5px/1.3 var(--font);color:var(--navy)}.facts small{font-size:12.5px;line-height:1.45;color:var(--ink2)}
+main{display:grid;gap:80px;padding-block:72px 88px}
+section{display:grid;gap:28px}
+.sh{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px 40px;align-items:end}
+.sh .eyebrow{grid-column:1/-1}.sh h2{font:300 clamp(30px,4vw,50px)/1.05 var(--font);letter-spacing:-.01em}.sh p{margin:0;max-width:56ch;color:var(--ink2)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px}
+.card{display:grid;grid-template-rows:auto 1fr;background:var(--sheet);color:inherit;text-decoration:none;border-top:3px solid var(--gold);box-shadow:0 1px 0 var(--line);transition:transform .25s ease,box-shadow .25s ease}
+.card:hover{transform:translateY(-4px);box-shadow:0 14px 30px rgba(35,37,42,.12)}
+.card .thumb{aspect-ratio:4/3;overflow:hidden;background:var(--grey)}.card .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.card .body{padding:16px 16px 20px;display:grid;gap:6px;align-content:start}
+.card .n{font:600 10.5px var(--font);letter-spacing:.22em;text-transform:uppercase;color:var(--gold)}
+.card h3{font:600 17px/1.25 var(--font)}.card p{margin:0;font-size:13.5px;line-height:1.55;color:var(--ink2)}
+.list{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 48px}
+.list li{display:grid;gap:2px;padding:16px 0;border-top:1px solid var(--line)}
+.list b{font:600 15px/1.35 var(--font);color:var(--head)}.list span{font-size:14.5px;color:var(--ink2)}
+table{width:100%;border-collapse:collapse;font-size:14.5px;background:var(--sheet)}
+th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--line)}
+th{font:600 10.5px var(--font);letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+td.n,th.n{text-align:right}tfoot td{font-weight:600;color:var(--head)}
+tbody tr{cursor:pointer}tbody tr:hover,tbody tr.on{background:var(--hl)}
+footer{background:var(--charcoal);color:rgba(255,255,255,.7)}
+footer .wrap{padding-block:26px 34px;display:flex;flex-wrap:wrap;gap:8px 28px;font:500 11px var(--font);letter-spacing:.16em;text-transform:uppercase}
+footer a{color:inherit}
+/* plan page */
+.top{background:var(--sheet);border-bottom:1px solid var(--line)}.top .bar a{color:var(--link)}.top .bar .here{border-bottom:2px solid var(--gold)}
+.ptitle{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:end;gap:16px}
+.ptitle h1{font:300 clamp(32px,4.4vw,54px)/1.05 var(--font)}
+.seg{display:inline-flex;border:1px solid var(--line);background:var(--sheet)}
+.seg button{appearance:none;border:0;background:none;font:600 11.5px var(--font);letter-spacing:.14em;text-transform:uppercase;padding:11px 14px;color:var(--ink2);cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--navy);color:var(--paper)}
+.seg button:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
+.sheet{background:#fff;box-shadow:0 1px 0 var(--line);padding:clamp(6px,1.5vw,18px);position:relative}
+.sheet svg{display:block;width:100%;height:auto}
+.room{fill:transparent;stroke:none;cursor:pointer;transition:fill .15s}
+.room:hover,.room.on{fill:rgba(183,149,101,.30)}
+.room:focus-visible{outline:none;fill:rgba(183,149,101,.40);stroke:#B79565;stroke-width:4}
+.wall{fill:#3A3B3F}.facade{fill:#9C9A94}.mfloor{fill:#F4F2EE}.mlbl{font:600 22px var(--font);letter-spacing:.12em;text-transform:uppercase;fill:#3A3B3F;text-anchor:middle;pointer-events:none}
+.mdim{font:500 18px var(--font);fill:#7A7C80;text-anchor:middle;pointer-events:none}
+.tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--paper);font:500 13px/1.4 var(--font);padding:7px 10px;border-radius:4px;white-space:nowrap;transform:translate(-50%,calc(-100% - 10px))}
+.tip b{font-weight:600}
+.note{margin:0;font-size:14px;color:var(--ink2);max-width:80ch;border-left:3px solid var(--gold);padding-left:14px}
+@media (max-width:900px){.facts{grid-template-columns:repeat(2,minmax(0,1fr))}.facts div{border-right:0;padding-left:0!important;border-bottom:1px solid var(--line)}
+  .facts div:nth-child(odd){padding-right:16px}.sh{grid-template-columns:1fr}.list{grid-template-columns:1fr}}
+@media (max-width:640px){.wrap{padding-inline:16px}.hero .bar nav a{margin-left:14px}.bar .wrap>span{display:none}
+  th,td{padding:8px 8px}.hide-s{display:none}.seg button{padding:10px 10px;letter-spacing:.08em}}
+@media (prefers-reduced-motion:reduce){.card{transition:none}}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="bar"><div class="wrap"><span>About 119 m² inside + terrace</span><nav aria-label="Site"><a href="plan.html">Plan</a><a href="3d.html">3D</a></nav></div></div>
+  <div class="copy wrap">
+    <div class="eyebrow">Creek Town · New Cairo · interior architecture</div>
+    <h1><b>Creektown</b> Apartment</h1>
+    <div class="rule" aria-hidden="true"></div>
+    <p>Amira's new apartment: three bedrooms, a maid's room and an open reception, living and dining onto a terrace. Measured from the architect's drawings and built as a 3D model you can walk through with the real sun.</p>
+    <div class="cta"><a class="btn solid" href="plan.html">See the plan</a><a class="btn ghost" href="3d.html">Walk through it</a></div>
+  </div>
+</header>
+<div class="factsband"><div class="wrap"><div class="facts" aria-label="Key facts">
+  <div><span>Size</span><b>About 119 m² net + 2.9 m² terrace</b><small>Floor area between walls, from the drawing at 1:50</small></div>
+  <div><span>Rooms</span><b>Master suite · 3 bedrooms in all</b><small>3 bathrooms · maid's room · kitchen</small></div>
+  <div><span>Living</span><b>One open space, 35 m²</b><small>Reception, living and dining for six, onto the terrace</small></div>
+  <div><span>Status</span><b>As built, with the architect's furniture</b><small>Ready for layout options and finishes</small></div>
+</div></div></div>
+<div class="wrap"><main>
+<section>
+  <div class="sh"><div class="eyebrow">The project</div><h2>Explore</h2><p>Every view is drawn from the same centimetre model, traced from the architect's plan.</p></div>
+  <div class="cards">
+    <a class="card" href="plan.html"><div class="thumb"><img src="img/plan-thumb.jpg" alt="The furnished floor plan" loading="lazy"></div><div class="body"><div class="n">01 · Plan</div><h3>Layout, to scale</h3><p>The architect's sheets, furnished and empty, and the traced model; every room measured.</p></div></a>
+    <a class="card" href="3d.html"><div class="thumb"><img src="img/3d-thumb.jpg" alt="The 3D model from above" loading="lazy"></div><div class="body"><div class="n">02 · 3D</div><h3>Walk it freely</h3><p>From above or standing in any room; furnished or empty; doors open or closed; the sun at any hour; true size on screen or in a VR headset.</p></div></a>
+  </div>
+</section>
+<section>
+  <div class="sh"><div class="eyebrow">The spaces</div><h2>Room by room</h2><p>As drawn. Sizes are between finished walls.</p></div>
+  <ul class="list"><li><b>Master bathroom · 1.78 × 2.43 m</b><span>Vanity under the window wall, WC, and a full-length bath.</span></li><li><b>Master bedroom · 5.24 × 4.04 m</b><span>A king bed on the far wall between two windows&#x27; light, a walk-in dressing area behind a partition, and its own bathroom.</span></li><li><b>Bedroom 1 · 3.61 × 3.68 m</b><span>A double bed against the outside wall under the window, and a full-width wardrobe.</span></li><li><b>Bedroom 2 · 3.63 × 3.68 m</b><span>Two single beds with a shared bedside table, a wardrobe, and its own small entry from the corridor.</span></li><li><b>Kitchen · 2.38 × 3.44 m</b><span>Hob on the run along the corridor wall, the sink under the window, and an opening to the dining area.</span></li><li><b>Maid&#x27;s room · 2.38 × 1.60 m</b><span>Off the kitchen, with its own window.</span></li><li><b>Reception · 3.28 × 4.14 m</b><span>A three-seat sofa, two armchairs under the window, and a two-seat sofa round a coffee table.</span></li><li><b>Living · 2.62 × 2.88 m</b><span>TV wall, sofa and a lounge chair, next to the terrace doors.</span></li><li><b>Dining · 3.44 × 4.08 m</b><span>A table for six, between the kitchen and the living area.</span></li></ul>
+</section>
+<section>
+  <div class="sh"><div class="eyebrow">Before the design</div><h2>Still to confirm</h2><p>The drawings don't say these, so the model uses a stand-in until they are checked on site.</p></div>
+  <ul class="list">
+    <li><b>Which way it faces</b><span>The sheets have no north arrow. The 3D sun assumes the window wall (the top of the plan) faces due south; one compass reading on site fixes it.</span></li>
+    <li><b>Ceiling height</b><span>Taken as 2.80 m to the slab. Any beams and dropped ceilings still need measuring.</span></li>
+    <li><b>Window sills and heads</b><span>Main windows from 0.90 to 2.25 m, bathroom and kitchen windows higher. The terrace has full-height sliding doors.</span></li>
+    <li><b>The concrete band outside</b><span>Drawn on the facade outside the bedrooms and the reception; shown in 3D as a low planter or parapet, to be confirmed.</span></li>
+  </ul>
+</section>
+</main></div>
+<footer><div class="wrap"><span>Creektown Apartment</span><span>Drawings: the architect's plan, 2 Sep 2026</span>
+<span>Built on the <a href="https://github.com/kamelshenouda/azad">AZAD</a> site and 3D viewer</span></div></footer>
+
+</body>
+</html>
