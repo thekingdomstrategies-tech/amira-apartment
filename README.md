@@ -43,6 +43,11 @@ The overview's header is the compound's apartment-building render (brochure page
 by `tools/build_pages.py`) under a forest-green gradient, drifting slowly under a moving soft light; it holds still for
 visitors who ask their system for reduced motion.
 
+On a phone the 3D page is cut down to its main job, looking round the flat: the model fills the screen, from nearly
+overhead on the overview; under it sit only the plan switch and a row of rooms to swipe through; over it only the room
+you are in, the small plan, 1:1 and Whole apartment. The other controls are a pull-up of the sheet away
+(`PHONE_CSS` in `tools/build_3d.py`).
+
 The 3D page opens from above (Overview) with no furniture and no sun path; the Furniture, Sun path, Shutters and
 Neighbours switches turn them on. Every room view opens at 34 % zoom; 1:1 is true size.
 
