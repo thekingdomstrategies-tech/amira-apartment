@@ -16,9 +16,10 @@ import model  # noqa: E402
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 NAME = 'Creektown Apartment'
 
-# Creek Town, New Cairo. The latitude/longitude are the compound's; the bearing the plan's top edge faces is NOT known
-# yet (the drawings carry no north arrow), so 180 (top edge facing due south) is a placeholder: set it once confirmed.
-SITE = dict(lat=30.0280, lon=31.4590, facing=180)
+# Creek Town, on the Suez Road opposite Rehab, New Cairo (approximate). Unit E07-53 looks over its building's pool
+# garden from the plan's top edge; the brochure's maps are drawn with the Suez Road at the top and Rehab at the
+# bottom, i.e. north up, and on them that side faces down the page: south, within about 15 degrees.
+SITE = dict(lat=30.0740, lon=31.4870, facing=180)
 
 # The Creek Town palette, measured from the vector fills of the compound's brochure; text panels use a slightly deeper
 # leaf so white text keeps a 4.5:1 contrast.
@@ -128,7 +129,26 @@ def main():
             % (json.dumps(model.GARDEN).replace(' ', ''), E, E))
     s = rep("staticFloors.push(grass);\n", "staticFloors.push(grass);\n" + lawn, s)
     s = rep("cshadow.visible=ov; land.material=ov?studioMat:landMat; land.position.y=ov?-.006-PLINTH-.001:-.02;",
-            "cshadow.visible=ov; land.material=ov?studioMat:landMat; land.position.y=ov?-.006-PLINTH-.001:-%g-.02; pave.visible=ov; LAWN.visible=!ov;" % E, s)
+            "cshadow.visible=ov; land.material=ov?studioMat:landMat; land.position.y=ov?-.006-PLINTH-.001:-%g-.02; pave.visible=ov; LAWN.visible=!ov; if(SURR)SURR.visible=!ov&&state.up==='on';" % E, s)
+    # the compound at ground level round E07, from the masterplan: pools, roads and trees (the buildings are ALL.context)
+    surr = ("var SURR=(function(){var d=ALL.surround; if(!d)return null; var grp=new T.Group(), G=d.ground*S;"
+            "function slab(list,z0,z1,mat){ if(!list.length)return; var gs=list.map(function(b){var g=new T.BoxGeometry((b[2]-b[0])*S,(z1-z0)*S,(b[3]-b[1])*S);"
+            "g.translate((b[0]+b[2])/2*S,G+(z0+z1)/2*S,(b[1]+b[3])/2*S); return g;});"
+            "var m=new T.Mesh(mergeGeometries(gs,false),mat); m.receiveShadow=true; m.userData={fixed:1}; grp.add(m); }"
+            "slab(d.roads,1.5,3,std({color:0x4A4D4F,roughness:.95}));"
+            "slab(d.water,2,5,std({color:0x3C9DCB,roughness:.06,metalness:.05}));"
+            "var trunks=[], crowns=[];"
+            "d.trees.forEach(function(t){ var x=t[0]*S, z=t[1]*S, k=t[3], palm=t[2]==='palm';"
+            "var th=(palm?7.5:2.6)*k, tr=new T.CylinderGeometry(palm?.13:.17,palm?.2:.24,th,7); tr.translate(x,G+th/2,z); trunks.push(tr);"
+            "if(palm){ var fl=2.6*k, rot=(t[0]*7+t[1]*3)%60*Math.PI/180; for(var f=0;f<8;f++){ var fr=new T.BoxGeometry(fl,.04,.55*k); fr.translate(fl/2,0,0);"
+            "fr.rotateZ(-.42-.12*(f%2)); fr.rotateY(rot+f*Math.PI/4); fr.translate(x,G+th,z); crowns.push(fr); }"
+            "var hd=new T.SphereGeometry(.45*k,8,6); hd.translate(x,G+th,z); crowns.push(hd); }"
+            "else { var r=2.6*k, c=new T.SphereGeometry(r,14,10); c.scale(1,.82,1); c.translate(x,G+th+r*.62,z); crowns.push(c);"
+            "var c2=new T.SphereGeometry(r*.7,12,8); c2.translate(x+r*.45,G+th+r*.95,z-r*.2); crowns.push(c2); } });"
+            "if(trunks.length){ var tm=new T.Mesh(mergeGeometries(trunks,false),M.trunk), cm=new T.Mesh(mergeGeometries(crowns,false),M.leaf);"
+            "tm.castShadow=cm.castShadow=true; tm.receiveShadow=cm.receiveShadow=true; tm.userData=cm.userData={fixed:1}; grp.add(tm); grp.add(cm); }"
+            "grp.visible=false; scene.add(grp); return grp;})();   // the compound below the windows\n")
+    s = rep("var LAWN=(function(){", surr + "var LAWN=(function(){", s)
     s = rep("p.n!=='Window'&&p.n!=='Garden doors'", "p.n!=='Window'&&p.n!=='Terrace doors'", s, 0)
     s = rep("It reaches the garden glass.':'The garden glass is in shade.'", "It reaches the main windows.':'The main windows are in shade.'", s)
     s = rep("['top','garden side'],['bottom','entrance side']", "['top','window side'],['bottom','entrance side']", s)
