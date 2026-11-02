@@ -26,7 +26,8 @@ SITE = dict(lat=30.0740, lon=31.4870, facing=180)
 # you are in, Whole apartment and 1:1.
 PHONE_CSS = (
     '@media (max-width:760px){'
-    '.lbl,.status,#zhome,#zmeas,#zin,#zout,.hud>svg,.hud>span:not(#hudroom),.joy{display:none!important}'
+    '.lbl,.status,#zhome,#zmeas,#zin,#zout,.hud>svg,.hud>span:not(#hudroom){display:none!important}'
+    '.joy{left:12px!important;bottom:12px!important;width:112px!important;height:112px!important}'
     '.hud{left:10px!important;right:auto!important;top:10px!important;padding:6px 10px!important;font-size:12.5px!important;max-width:calc(100% - 130px)}'
     '.hud #hudroom{border-right:0!important;padding-right:0!important}.hud:has(#hudroom:empty){display:none!important}'
     '.minimap{width:96px!important;height:88px!important;top:10px!important}'
@@ -34,12 +35,15 @@ PHONE_CSS = (
     '.panel>.sitenav{padding-top:0!important}.panel>.sitenav a{min-height:34px!important}'
     '.panel .plans{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:4px!important;margin:2px 16px 0!important}'
     '.panel .plans button{min-height:40px;padding:6px 4px!important;border-radius:10px!important}.panel .plans button small{display:none!important}'
-    '#views.vstrip{flex:none!important;display:flex!important;flex-wrap:nowrap!important;overflow-x:auto;gap:8px!important;padding:10px 16px 12px!important;margin:0!important;'
+    '#tab-go{padding-top:10px!important;grid-auto-rows:max-content}#tab-go #views{min-height:48px!important}'
+    '#tab-go #views{flex:none!important;display:flex!important;flex-wrap:nowrap!important;overflow-x:auto;gap:8px!important;padding:0 16px 2px!important;margin:0 -16px!important;'
     'scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;scrollbar-width:none;grid-template-columns:none!important}'
-    '#views.vstrip::-webkit-scrollbar{display:none}'
-    '#views.vstrip button{flex:none!important;width:auto!important;min-height:42px;padding:0 16px!important;border-radius:999px!important;white-space:nowrap;scroll-snap-align:start;grid-column:auto!important}'
-    '#views.vstrip button[hidden]{display:none!important}#views.vstrip kbd{display:none}'
+    '#tab-go #views::-webkit-scrollbar{display:none}'
+    '#tab-go #views button{flex:none!important;width:auto!important;min-height:42px;padding:0 16px!important;border-radius:999px!important;white-space:nowrap;scroll-snap-align:start;grid-column:auto!important}'
+    '#tab-go #views button[hidden]{display:none!important}#tab-go #views kbd{display:none}'
     '#tab-go .hint{display:none}'
+    '.sheetgrip{height:34px!important}.sheetgrip i{width:52px!important;height:6px!important}'
+    '.panel>.sitenav{touch-action:none}.panel{overscroll-behavior:contain}'
     '}'
 )
 
@@ -179,14 +183,69 @@ def main():
     s = rep("var LAWN=(function(){", surr + "var LAWN=(function(){", s)
 
     # ---------------- phones (see PHONE_CSS)
-    s = rep("(function(){                                  // phone: pull the controls up or down; tap the handle to step",
-            "(function(){ var mq=window.matchMedia('(max-width:760px)'), v=document.getElementById('views'), home=v.parentNode, next=v.nextSibling, plans=document.getElementById('layout');"
-            " function place(){ if(mq.matches){ plans.parentNode.insertBefore(v,plans.nextSibling); v.classList.add('vstrip'); } else { home.insertBefore(v,next); v.classList.remove('vstrip'); } }"
-            " place(); if(mq.addEventListener)mq.addEventListener('change',place); })();   // phone: the rooms in a row under the plan switch\n"
-            "(function(){                                  // phone: pull the controls up or down; tap the handle to step", s)
     s = rep("function peekH(){ var t=panelEl.querySelector('.tabs'); return t?Math.round(t.offsetTop+t.offsetHeight+16):190; }",
-            "function peekH(){ var t=(mq.matches&&panelEl.querySelector('#views.vstrip'))||panelEl.querySelector('.tabs'); return t?Math.round(t.offsetTop+t.offsetHeight+(mq.matches?1:8)):190; }", s)
+            "function peekH(){ var go=document.getElementById('tab-go'), t=(mq.matches&&go&&!go.hidden&&document.getElementById('views'))||panelEl.querySelector('.tabs'); if(!t)return 190;"
+            " return Math.round(t.getBoundingClientRect().bottom-panelEl.getBoundingClientRect().top+(mq.matches?12:16)); }", s)
+    # a drag settles one step in the direction it went (or further if it went that far), not back where it started
+    s = rep("    var h=panelEl.offsetHeight, best='peek'; ['peek','half','full'].forEach(function(k){ if(Math.abs(hOf(k)-h)<Math.abs(hOf(best)-h))best=k; }); snap(best); });",
+            "    settle(); });", s)
+    s = rep("  g.addEventListener('pointerdown',function(e){ drag={y:e.clientY,h:panelEl.offsetHeight,moved:false};",
+            "  var ORD=mq.matches?['min','peek','half']:['peek','half','full'];\n"
+            "  function settle(){ var h=panelEl.offsetHeight, i=ORD.indexOf(cur), best=cur;\n"
+            "    if(i<0)i=0; if(h>hOf(cur)+24){ best=ORD[Math.min(2,i+1)]; ORD.forEach(function(k,j){ if(j>ORD.indexOf(best)&&hOf(k)<=h+40)best=k; }); }\n"
+            "    else if(h<hOf(cur)-24){ best=ORD[Math.max(0,i-1)]; ORD.forEach(function(k,j){ if(j<ORD.indexOf(best)&&hOf(k)>=h-40)best=k; }); }\n"
+            "    snap(best); }\n"
+            "  g.addEventListener('pointerdown',function(e){ drag={y:e.clientY,h:panelEl.offsetHeight,moved:false};", s)
+    # the sheet's header row (the Plan / 3D links) drags it too, once the finger has moved; a tap still follows the link
+    s = rep("  init(); if(mq.addEventListener)mq.addEventListener('change',init);\n",
+            "  init(); if(mq.addEventListener)mq.addEventListener('change',init);\n"
+            "  var nav=panelEl.querySelector('.sitenav'), nd=null, swallow=false;\n"
+            "  if(nav){ nav.addEventListener('pointerdown',function(e){ if(mq.matches)nd={y:e.clientY,h:panelEl.offsetHeight,on:false,id:e.pointerId}; });\n"
+            "    nav.addEventListener('pointermove',function(e){ if(!nd)return; var dy=nd.y-e.clientY; if(!nd.on&&Math.abs(dy)>8){ nd.on=true; try{nav.setPointerCapture(nd.id);}catch(x){} } if(nd.on){ setH(nd.h+dy); e.preventDefault(); } });\n"
+            "    nav.addEventListener('pointerup',function(){ if(!nd)return; var d=nd; nd=null; if(d.on){ swallow=true; setTimeout(function(){swallow=false;},400); settle(); } });\n"
+            "    nav.addEventListener('pointercancel',function(){ nd=null; });\n"
+            "    nav.addEventListener('click',function(e){ if(swallow){ swallow=false; e.preventDefault(); e.stopPropagation(); } },true); }\n"
+            # the peek is measured again once the Go tab is on screen (it is chosen after the sheet is set up)
+            "  var goTab=document.getElementById('tab-go'); function refit(){ if(mq.matches&&cur==='peek')snap('peek'); }\n"
+            "  if(goTab&&window.MutationObserver)new MutationObserver(refit).observe(goTab,{attributes:true,attributeFilter:['hidden']});\n"
+            "  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(refit); setTimeout(refit,300);\n"
+            # full screen on a phone: the sheet goes down to its handle (and the browser goes full screen where it can)
+            "  window.sheetMini=function(){ var z=document.getElementById('zall');\n"
+            "    if(cur!=='min'){ snap('min'); z.setAttribute('aria-pressed','true');\n"
+            "      var de=document.documentElement; if(de.requestFullscreen&&!document.fullscreenElement)de.requestFullscreen().catch(function(){}); }\n"
+            "    else { snap('peek'); z.setAttribute('aria-pressed','false'); if(document.fullscreenElement&&document.exitFullscreen)document.exitFullscreen().catch(function(){}); } };\n"
+            "  function zallLabel(){ var z=document.getElementById('zall'); if(!z)return; z.setAttribute('aria-label',mq.matches?'Full screen':'Show the whole apartment'); z.title=mq.matches?'Full screen: hide the controls':'Whole apartment'; }\n"
+            "  zallLabel(); if(mq.addEventListener)mq.addEventListener('change',zallLabel);\n"
+            "  function closeSoon(){ if(mq.matches&&cur==='half')setTimeout(function(){ if(cur==='half')snap('peek'); },350); }\n"
+            "  panelEl.addEventListener('click',function(e){ if(e.target.closest('.tabp .bt button, .tabp .plans button, #views button'))closeSoon(); });\n"
+            "  panelEl.addEventListener('change',function(e){ if(e.target.tagName==='SELECT')closeSoon(); });\n"
+            "  document.getElementById('layout').addEventListener('click',closeSoon);\n"
+            "  stage.addEventListener('pointerdown',function(){ if(mq.matches&&cur==='half')snap('peek'); });\n", s)
+    s = rep("document.getElementById('zall').addEventListener('click',function(){goto('overview');});",
+            "document.getElementById('zall').addEventListener('click',function(){ if(window.matchMedia('(max-width:760px)').matches&&window.sheetMini){ window.sheetMini(); return; } goto('overview'); });", s)
+    # opening another tab from the peek opens the sheet; back on Go, the peek fits the rooms again
+    s = rep("[].forEach.call(document.querySelectorAll('.tabs button'),function(b){ b.addEventListener('click',function(){ window.sheetOpen(); }); });",
+            "[].forEach.call(document.querySelectorAll('.tabs button'),function(b){ b.addEventListener('click',function(){ if(b.getAttribute('data-tab')!=='go')window.sheetOpen(); else if(cur==='peek')setTimeout(function(){snap('peek');},0); }); });", s)
     s = rep("var k='peek'; try{ k=localStorage.getItem('azad-3d-sheet')||'peek'; }catch(e){} snap(k);", "snap('peek');", s)
+    # on a phone the sheet has three heights: just its handle (full screen), the bar (plans, tabs, rooms) and open,
+    # at most 45 % of the screen. Tapping the handle opens and closes it; it closes by itself after a choice, or when
+    # you touch the model.
+    s = rep("function hOf(k){ var H=appEl.clientHeight; return k==='full'?Math.round(H*.86):k==='half'?Math.round(H*.5):peekH(); }",
+            "function hOf(k){ var H=appEl.clientHeight; if(k==='min')return g.offsetHeight; if(mq.matches)return k==='peek'?peekH():Math.max(peekH(),Math.round(H*.45)-14);"
+            " return k==='full'?Math.round(H*.86):k==='half'?Math.round(H*.5):peekH(); }", s)
+    s = rep("function setH(px){ appEl.style.setProperty('--sh',Math.round(Math.max(peekH(),Math.min(appEl.clientHeight*.9,px)))+'px'); resize(); dirty=true; }",
+            "function setH(px){ var lo=mq.matches?g.offsetHeight:peekH(), hi=mq.matches?Math.max(peekH(),appEl.clientHeight*.45-14):appEl.clientHeight*.9;"
+            " appEl.style.setProperty('--sh',Math.round(Math.max(lo,Math.min(hi,px)))+'px'); resize(); dirty=true; }", s)
+    s = rep("if(!d.moved){ snap(cur==='peek'?'half':cur==='half'?'full':'peek'); return; }",
+            "if(!d.moved){ snap(mq.matches?(cur==='half'?'peek':'half'):(cur==='peek'?'half':cur==='half'?'full':'peek')); return; }", s)
+    s = rep("if(e.key==='Enter'||e.key===' '){ snap(cur==='peek'?'half':cur==='half'?'full':'peek'); e.preventDefault(); }",
+            "if(e.key==='Enter'||e.key===' '){ snap(mq.matches?(cur==='half'?'peek':'half'):(cur==='peek'?'half':cur==='half'?'full':'peek')); e.preventDefault(); }", s)
+    # a tap on the handle moves the sheet under the finger: the click that follows must not land on what is now there
+    s = rep("  g.addEventListener('pointerup',function(){ if(!drag)return; var d=drag; drag=null;",
+            "  var gripT=0; document.addEventListener('click',function(e){ if(performance.now()-gripT<500&&!g.contains(e.target)){ e.preventDefault(); e.stopPropagation(); } },true);\n"
+            "  g.addEventListener('pointerup',function(){ if(!drag)return; var d=drag; drag=null; gripT=performance.now();", s)
+    s = rep("window.sheetOpen=function(){ if(mq.matches&&cur==='peek')snap('half'); };",
+            "window.sheetOpen=function(){ if(mq.matches&&cur!=='half')snap('half'); };", s)
     # a tall screen held upright: wide views widen sideways, but the up-down angle stops at 90 degrees (no fisheye)
     s = rep("function eyeFov(){ return 2*Math.atan(trueHalfTan()/EYEZ/Math.max(camera.aspect,0.2))*180/Math.PI; }",
             "function eyeFov(){ return Math.min(90,2*Math.atan(trueHalfTan()/EYEZ/Math.max(camera.aspect,0.2))*180/Math.PI); }", s)

@@ -44,9 +44,11 @@ by `tools/build_pages.py`) under a forest-green gradient, drifting slowly under 
 visitors who ask their system for reduced motion.
 
 On a phone the 3D page is cut down to its main job, looking round the flat: the model fills the screen, from nearly
-overhead on the overview; under it sit only the plan switch and a row of rooms to swipe through; over it only the room
-you are in, the small plan, 1:1 and Whole apartment. The other controls are a pull-up of the sheet away
-(`PHONE_CSS` in `tools/build_3d.py`).
+overhead on the overview. The controls sit in a sheet with three heights: a bar with the plan switch, the tabs and the
+Go tab's row of rooms; open, at most 45 % of the screen (tap the handle, or a tab); and just its handle (swipe down, or
+the full-screen button). The sheet closes back to the bar after a choice, or when you touch the model. Over the model
+only the room you are in, the small plan, 1:1, full screen and, standing, the thumb pad to walk with
+(`PHONE_CSS` and the phone section of `tools/build_3d.py`).
 
 The 3D page opens from above (Overview) with no furniture and no sun path; the Furniture, Sun path, Shutters and
 Neighbours switches turn them on. Every room view opens at 34 % zoom; 1:1 is true size.
