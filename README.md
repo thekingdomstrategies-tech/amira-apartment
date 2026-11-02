@@ -50,7 +50,7 @@ the full-screen button). The sheet closes back to the bar after a choice, or whe
 only the room you are in, the small plan, 1:1, full screen and, standing, the thumb pad to walk with
 (`PHONE_CSS` and the phone section of `tools/build_3d.py`).
 
-The 3D page opens from above (Overview) with no furniture and no sun path; the Furniture, Sun path, Shutters and
+The 3D page opens from above (Overview) with no furniture, no doors and no sun path; the Furniture, Sun path, Shutters and
 Neighbours switches turn them on. Every room view opens at 34 % zoom; 1:1 is true size.
 
 ## Where the numbers come from

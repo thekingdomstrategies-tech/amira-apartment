@@ -138,8 +138,9 @@ def main():
     s = rep("setKey('fu',LAYOUT==='existing'?'none':'all',false);", "", s)
     s = rep("var state={chg:'on',sp:'on',", "var state={chg:'on',sp:'off',", s)
     s = rep(",sh:'open',gs:'pergola',aw:'out',fu:'all',", ",sh:'open',gs:'none',aw:'out',fu:'none',", s)
-    s = rep("var userSet={}, prevD='open', prevGs='pergola';", "var userSet={}, prevD='open', prevGs='none';", s)
-    s = rep("press('wm',state.wm); press('look',state.look);", "press('wm',state.wm); press('look',state.look); press('sp',state.sp); press('fu',state.fu);", s)
+    s = rep("var userSet={}, prevD='open', prevGs='pergola';", "var userSet={}, prevD='none', prevGs='none';", s)
+    s = rep("isl:'design',k:'open',p:'open',d:'open',", "isl:'design',k:'open',p:'open',d:'none',", s)   # no door leaves until you ask for them
+    s = rep("press('wm',state.wm); press('look',state.look);", "press('wm',state.wm); press('look',state.look); press('sp',state.sp); press('fu',state.fu); press('d',state.d);", s)
     s = rep("goto(VIEWS[h0]?h0:ALL.preview?'overview':'entrance');", "goto(VIEWS[h0]?h0:'overview');", s)
     s = rep("'Bare rooms: no furniture, doors or garden shade. Pick All or Built-in to furnish.'", "'No furniture. Pick All or Built-in to furnish the rooms.'", s)
     # the Garden shade control goes; its summary in the Light tab too

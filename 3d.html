@@ -879,7 +879,7 @@ function clearModel(){
 }
 
 // ---------- states (needed by the material factory, so declared before the first build)
-var state={chg:'on',sp:'off',isl:'design',k:'open',p:'open',d:'open',v:'now',season:'mar',hour:12,cut:'full',up:'on',sh:'open',gs:'none',aw:'out',fu:'none',fl:'stone',dim:'off',
+var state={chg:'on',sp:'off',isl:'design',k:'open',p:'open',d:'none',v:'now',season:'mar',hour:12,cut:'full',up:'on',sh:'open',gs:'none',aw:'out',fu:'none',fl:'stone',dim:'off',
            wm:Q.get('walls')==='solid'?'solid':Q.get('walls')==='glass'?'glass':'auto',look:Q.get('look')==='model'?'model':'natural'};
 progress(.3,'Building the rooms…'); await tick();
 buildModel();
@@ -1478,7 +1478,7 @@ function applyState(){
 }
 // smart switches: no furniture means bare rooms (no doors, no garden shade); furnishing brings them back.
 // Picking a model sets a matching furniture state until you choose furniture yourself.
-var userSet={}, prevD='open', prevGs='none';
+var userSet={}, prevD='none', prevGs='none';
 function press(key,val){state[key]=val;[].forEach.call(document.querySelectorAll('.bt[data-state="'+key+'"] button'),function(x){x.setAttribute('aria-pressed',x.getAttribute('data-v')===val?'true':'false');});}
 function setKey(key,val,user){
   var was=state[key]; if(user)userSet[key]=true;
@@ -1490,7 +1490,7 @@ function setKey(key,val,user){
   var key=grp.getAttribute('data-state');
   [].forEach.call(grp.querySelectorAll('button'),function(b){b.addEventListener('click',function(){ setKey(key,b.getAttribute('data-v'),true); if(key==='dim')makeLabels(); applyState(); });});
 });
-press('wm',state.wm); press('look',state.look); press('sp',state.sp); press('fu',state.fu);
+press('wm',state.wm); press('look',state.look); press('sp',state.sp); press('fu',state.fu); press('d',state.d);
 var SEASON_SHORT={jun:'21 Jun',mar:'21 Mar',dec:'21 Dec'};
 function summarize(){
   var fin=[state.fl==='wood'?'Oak floors':'Porcelain floors', {open:'doors open',closed:'doors closed',none:'no doors'}[state.d]];
