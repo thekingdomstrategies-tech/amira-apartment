@@ -109,6 +109,23 @@ footer a{color:inherit}
 .seg button:focus-visible{outline:2px solid var(--lime);outline-offset:-2px}
 .sheet{background:#fff;border:1px solid var(--line);padding:clamp(6px,1.5vw,18px);position:relative}
 .sheet svg{display:block;width:100%;height:auto}
+.sheet{overflow:auto;-webkit-overflow-scrolling:touch}.sheetin{width:100%}
+.pmeta{margin:6px 0 0;font:500 12.5px var(--font);letter-spacing:.04em;color:var(--muted)}.pmeta b{color:var(--head);font-weight:600}
+.ztools{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;padding:12px 14px;background:var(--sheet);border:1px solid var(--line);border-bottom:0}
+.zopt{display:flex;align-items:center;gap:8px}.zopt>span{font:600 10.5px var(--font);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.zopt .seg button{padding:8px 11px}
+.zbg{fill:#FBFAF8}.zroom,.zterr{stroke:none}.zterr{stroke:#8DAA7E;stroke-width:2;stroke-dasharray:8 6}
+.zwall{fill:#1C3B28}.zfacade{fill:#C9CEC8}
+.zwin{fill:#FFFFFF;stroke:#7F9BB0;stroke-width:1.5}.zwinl{stroke:#7F9BB0;stroke-width:1.5}
+.zleaf{stroke:#3B4A41;stroke-width:2.5}.zswing{fill:none;stroke:#6E7A73;stroke-width:1.5;stroke-dasharray:6 5}
+.zf{fill:rgba(255,255,255,.55);stroke:#9AA19C;stroke-width:1.4}.zrug{fill:none;stroke:#B9BFB9;stroke-width:1.2;stroke-dasharray:4 4}
+.zdim line{stroke:#5E89A6;stroke-width:1.6}.zdim text{font:500 20px var(--font);fill:#4A7896;text-anchor:middle}
+.zname{font:700 29px var(--font);letter-spacing:.06em;text-transform:uppercase;fill:#1F2421;text-anchor:middle;pointer-events:none}
+.zsize,.zarea{font:500 23px var(--font);fill:#55605A;text-anchor:middle;pointer-events:none}
+.zarea{display:none}.areas .zarea{display:inline}.nosizes .zsize{display:none}.nosizes.areas .zarea{transform:translateY(-28px)}
+.nofurn .zfurn{display:none}.nodims .zdim{display:none}
+.znorth circle{fill:#FFFFFF;stroke:#1F2421;stroke-width:2}.znorth path{fill:#1F2421}.znorth text{font:700 26px var(--font);fill:#1F2421;text-anchor:middle}
+.zscale .zsb1{fill:#1F2421}.zscale .zsb0{fill:#FFFFFF;stroke:#1F2421;stroke-width:1.5}.zscale text{font:500 21px var(--font);fill:#55605A;text-anchor:middle}
 .room{fill:transparent;stroke:none;cursor:pointer;transition:fill .15s}
 .room:hover,.room.on{fill:rgba(90,140,91,.30)}
 .room:focus-visible{outline:none;fill:rgba(90,140,91,.40);stroke:#5A8C5B;stroke-width:4}

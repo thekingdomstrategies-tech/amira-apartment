@@ -5,8 +5,9 @@ a 3D walkthrough of each with the real sun. The site reuses the
 [AZAD apartment site](https://github.com/kamelshenouda/azad) and its 3D viewer, pointed at this apartment.
 
 - `index.html`: overview, key facts, the three plans compared room by room, what is still to confirm
-- `plan.html`: for each plan, the architect's two sheets (furnished and empty) and the traced model, every room
-  clickable, and a room schedule; `plan.html?plan=o1` opens option 1
+- `plan.html`: for each plan, a colour-zoned drawing of the model (rooms coloured by what they are, walls, windows,
+  door swings, furniture, room sizes, areas, dimensions, north and a scale, with a zoom), the architect's two sheets
+  (furnished and empty), every room clickable, and a room schedule; `plan.html?plan=o1` opens option 1
 - `3d.html`: the AZAD walkthrough with this apartment's walls, windows, doors, furniture, lighting and viewpoints, with
   a plan button each for as built, option 1 and option 2; `3d.html?plan=o2` opens option 2
 
