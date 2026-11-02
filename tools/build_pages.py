@@ -7,13 +7,15 @@ cm, so the drawings, the clickable rooms and the 3D model share one set of coord
 
 Usage: python3 tools/build_pages.py   ->  index.html, plan.html, img/plan-<sheet>-<empty|furnished>.jpg, img/plan-thumb.jpg
 """
-import html, json, os, subprocess, sys, tempfile
+import html, json, math, os, subprocess, sys, tempfile
 
 from PIL import Image
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import model  # noqa: E402
 from extract_walls import CM_PER_PT, X0, Y0, X1, Y1, parse_svg, facade_offset  # noqa: E402
+from build_3d import SITE  # noqa: E402
+SITE_FACING = SITE['facing']   # the bearing the top of the plan faces
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PX_PER_CM = 2
@@ -175,6 +177,23 @@ footer a{color:inherit}
 .seg button:focus-visible{outline:2px solid var(--lime);outline-offset:-2px}
 .sheet{background:#fff;border:1px solid var(--line);padding:clamp(6px,1.5vw,18px);position:relative}
 .sheet svg{display:block;width:100%;height:auto}
+.sheet{overflow:auto;-webkit-overflow-scrolling:touch}.sheetin{width:100%}
+.pmeta{margin:6px 0 0;font:500 12.5px var(--font);letter-spacing:.04em;color:var(--muted)}.pmeta b{color:var(--head);font-weight:600}
+.ztools{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;padding:12px 14px;background:var(--sheet);border:1px solid var(--line);border-bottom:0}
+.zopt{display:flex;align-items:center;gap:8px}.zopt>span{font:600 10.5px var(--font);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.zopt .seg button{padding:8px 11px}
+.zbg{fill:#FBFAF8}.zroom,.zterr{stroke:none}.zterr{stroke:#8DAA7E;stroke-width:2;stroke-dasharray:8 6}
+.zwall{fill:#1C3B28}.zfacade{fill:#C9CEC8}
+.zwin{fill:#FFFFFF;stroke:#7F9BB0;stroke-width:1.5}.zwinl{stroke:#7F9BB0;stroke-width:1.5}
+.zleaf{stroke:#3B4A41;stroke-width:2.5}.zswing{fill:none;stroke:#6E7A73;stroke-width:1.5;stroke-dasharray:6 5}
+.zf{fill:rgba(255,255,255,.55);stroke:#9AA19C;stroke-width:1.4}.zrug{fill:none;stroke:#B9BFB9;stroke-width:1.2;stroke-dasharray:4 4}
+.zdim line{stroke:#5E89A6;stroke-width:1.6}.zdim text{font:500 20px var(--font);fill:#4A7896;text-anchor:middle}
+.zname{font:700 29px var(--font);letter-spacing:.06em;text-transform:uppercase;fill:#1F2421;text-anchor:middle;pointer-events:none}
+.zsize,.zarea{font:500 23px var(--font);fill:#55605A;text-anchor:middle;pointer-events:none}
+.zarea{display:none}.areas .zarea{display:inline}.nosizes .zsize{display:none}.nosizes.areas .zarea{transform:translateY(-28px)}
+.nofurn .zfurn{display:none}.nodims .zdim{display:none}
+.znorth circle{fill:#FFFFFF;stroke:#1F2421;stroke-width:2}.znorth path{fill:#1F2421}.znorth text{font:700 26px var(--font);fill:#1F2421;text-anchor:middle}
+.zscale .zsb1{fill:#1F2421}.zscale .zsb0{fill:#FFFFFF;stroke:#1F2421;stroke-width:1.5}.zscale text{font:500 21px var(--font);fill:#55605A;text-anchor:middle}
 .room{fill:transparent;stroke:none;cursor:pointer;transition:fill .15s}
 .room:hover,.room.on{fill:rgba(90,140,91,.30)}
 .room:focus-visible{outline:none;fill:rgba(90,140,91,.40);stroke:#5A8C5B;stroke-width:4}
@@ -253,23 +272,30 @@ PLAN_BODY = r'''<body>
 <nav aria-label="Site"><a class="here" href="plan.html" aria-current="page">Plan</a><a href="3d.html" id="to3d">3D</a></nav></div></div></header>
 <div class="wrap"><main>
 <section>
-  <div class="ptitle"><div><div class="eyebrow">The architect's plans, to scale</div><h1 id="ptitle">Plan</h1></div>
+  <div class="ptitle"><div><div class="eyebrow">The architect's plans, to scale</div><h1 id="ptitle">Plan</h1>
+  <p class="pmeta">Rooms <b id="parea"></b> m² · Top of the plan faces <b>%(facing)s</b></p></div>
   <div class="segs">
   <div class="seg" id="plans" role="group" aria-label="Plan">%(plans)s</div>
   <div class="seg" id="draw" role="group" aria-label="Drawing">
-    <button type="button" data-k="furnished" aria-pressed="true">Furnished</button>
+    <button type="button" data-k="zones" aria-pressed="true">Zones</button>
+    <button type="button" data-k="furnished" aria-pressed="false">Furnished</button>
     <button type="button" data-k="empty" aria-pressed="false">Empty</button>
-    <button type="button" data-k="model" aria-pressed="false">Model</button>
   </div></div></div>
-  <div class="sheet" id="sheet">
+  <div class="ztools" id="ztools">
+    <div class="zopt" data-o="furn"><span>Furniture</span><div class="seg"><button type="button" data-v="1" aria-pressed="true">Shown</button><button type="button" data-v="0" aria-pressed="false">Hidden</button></div></div>
+    <div class="zopt" data-o="sizes"><span>Room sizes</span><div class="seg"><button type="button" data-v="1" aria-pressed="true">On</button><button type="button" data-v="0" aria-pressed="false">Off</button></div></div>
+    <div class="zopt" data-o="areas"><span>Areas</span><div class="seg"><button type="button" data-v="0" aria-pressed="true">Off</button><button type="button" data-v="1" aria-pressed="false">On</button></div></div>
+    <div class="zopt" data-o="dims"><span>Dimensions</span><div class="seg"><button type="button" data-v="1" aria-pressed="true">On</button><button type="button" data-v="0" aria-pressed="false">Off</button></div></div>
+    <div class="zopt zoomopt" data-o="zoom"><span>Zoom</span><div class="seg"><button type="button" data-v="1" aria-pressed="true">1×</button><button type="button" data-v="2" aria-pressed="false">2×</button><button type="button" data-v="3" aria-pressed="false">3×</button></div></div>
+  </div>
+  <div class="sheet" id="sheet"><div class="sheetin" id="sheetin">
     <svg viewBox="0 0 %(vw)d %(vh)d" role="img" aria-label="Floor plan of the apartment; each room can be selected">
       <image id="bg" href="%(furn)s" x="0" y="0" width="%(vw)d" height="%(vh)d"/>
       %(models)s
       %(overlays)s
     </svg>
-    <div class="tip" id="tip" hidden></div>
-  </div>
-  <p class="note">Furnished and Empty are the architect's two sheets for each plan, turned so the room names read upright. Model is what the 3D walkthrough is built from: the walls traced from the empty sheet, at 1:50, to the centimetre. Hover or tap a room for its size, or <a id="walk" href="3d.html">walk through this plan in 3D</a>.</p>
+  </div><div class="tip" id="tip" hidden></div></div>
+  <p class="note">Zones is the plan as the 3D walkthrough is built: the walls traced from the architect's empty sheet at 1:50, to the centimetre, each room coloured by what it is. Furnished and Empty are the architect's own two sheets, turned so the room names read upright. Hover or tap a room for its size, or <a id="walk" href="3d.html">walk through this plan in 3D</a>.</p>
 </section>
 <section>
   <div class="sh"><div class="eyebrow">Room schedule</div><h2>Every room, measured</h2>
@@ -280,7 +306,7 @@ PLAN_BODY = r'''<body>
 %(foot)s
 <script>
 (function(){
-  var D=%(data)s, P='existing', V='furnished';
+  var D=%(data)s, P='existing', V='zones', O={furn:'1',sizes:'1',areas:'0',dims:'1',zoom:'1'};
   var bg=document.getElementById('bg'), tip=document.getElementById('tip'), sheet=document.getElementById('sheet');
   function store(k,v){try{localStorage.setItem(k,v)}catch(e){}} function read(k){try{return localStorage.getItem(k)}catch(e){return null}}
   function each(sel,f){[].forEach.call(document.querySelectorAll(sel),f);}
@@ -288,24 +314,31 @@ PLAN_BODY = r'''<body>
   function on(i,el){
     each('.rooms[data-p="'+P+'"] rect',function(r){r.classList.toggle('on',+r.getAttribute('data-i')===i);});
     each('.sched[data-p="'+P+'"] tbody tr',function(t){t.classList.toggle('on',+t.getAttribute('data-i')===i);});
-    if(i<0||!el){tip.hidden=true;return;} var r=D[P].rooms[i], b=el.getBoundingClientRect(), s=sheet.getBoundingClientRect();
-    tip.innerHTML='<b>'+r.n+'</b> · '+r.d+' · '+r.a; tip.style.left=(b.left+b.width/2-s.left)+'px'; tip.style.top=(b.top+b.height/2-s.top)+'px'; tip.hidden=false; }
+    if(i<0||!el){tip.hidden=true;return;} var r=D[P].rooms[i], b=el.getBoundingClientRect(), s=sheet.getBoundingClientRect(); b={left:b.left+0,top:b.top+0,width:b.width,height:b.height};
+    tip.innerHTML='<b>'+r.n+'</b> · '+r.d+' · '+r.a; tip.style.left=(b.left+b.width/2-s.left+sheet.scrollLeft)+'px'; tip.style.top=(b.top+b.height/2-s.top+sheet.scrollTop)+'px'; tip.hidden=false; }
   function render(){
     each('#plans button',function(b){b.setAttribute('aria-pressed',b.getAttribute('data-p')===P?'true':'false');});
     each('#draw button',function(b){b.setAttribute('aria-pressed',b.getAttribute('data-k')===V?'true':'false');});
-    each('.mdl',function(g){hide(g,V!=='model'||g.getAttribute('data-p')!==P);});
+    each('.zones',function(g){hide(g,V!=='zones'||g.getAttribute('data-p')!==P);});
+    document.getElementById('ztools').hidden=false; each('.zopt:not(.zoomopt)',function(z){ z.hidden=V!=='zones'; });
+    each('.zopt',function(z){ var k=z.getAttribute('data-o'); each('.zopt[data-o="'+k+'"] button',function(b){ b.setAttribute('aria-pressed',b.getAttribute('data-v')===O[k]?'true':'false'); }); });
+    sheet.classList.toggle('nofurn',O.furn==='0'); sheet.classList.toggle('nosizes',O.sizes==='0'); sheet.classList.toggle('areas',O.areas==='1'); sheet.classList.toggle('nodims',O.dims==='0');
+    document.getElementById('sheetin').style.width=(100*+O.zoom)+'%%'; sheet.classList.toggle('zoomed',O.zoom!=='1');
+    document.getElementById('parea').textContent=D[P].area;
     each('.rooms',function(g){hide(g,g.getAttribute('data-p')!==P);});
     each('.sched',function(t){hide(t,t.getAttribute('data-p')!==P);});
-    bg.style.display=V==='model'?'none':''; if(V!=='model')bg.setAttribute('href',D[P].img[V]);
+    bg.style.display=V==='zones'?'none':''; if(V!=='zones')bg.setAttribute('href',D[P].img[V]);
     document.getElementById('ptitle').textContent=D[P].name;
     var u='3d.html?plan='+P; document.getElementById('walk').href=u; document.getElementById('to3d').href=u;
-    on(-1); store('creektown-plan-view',V); store('creektown-plan',P);
+    on(-1); store('creektown-plan-view',V); store('creektown-plan',P); store('creektown-plan-opts',JSON.stringify(O));
     try{ history.replaceState(null,'',P==='existing'?location.pathname:'?plan='+P); }catch(e){}
   }
   each('#plans button',function(b){b.addEventListener('click',function(){P=b.getAttribute('data-p');render();});});
   each('#draw button',function(b){b.addEventListener('click',function(){V=b.getAttribute('data-k');render();});});
+  each('.zopt button',function(b){b.addEventListener('click',function(){ O[b.closest('.zopt').getAttribute('data-o')]=b.getAttribute('data-v'); render(); });});
+  try{ var o0=JSON.parse(read('creektown-plan-opts')||'{}'); Object.keys(O).forEach(function(k){ if(typeof o0[k]==='string')O[k]=o0[k]; }); }catch(e){}
   var q=/[?&]plan=(\w+)/.exec(location.search), p0=(q&&q[1])||read('creektown-plan'), v0=read('creektown-plan-view');
-  if(p0&&D[p0])P=p0; if(v0&&/^(furnished|empty|model)$/.test(v0))V=v0;
+  if(p0&&D[p0])P=p0; if(v0&&/^(furnished|empty|zones)$/.test(v0))V=v0;
   each('.rooms rect',function(el){ var i=+el.getAttribute('data-i');
     el.addEventListener('mouseenter',function(){on(i,el);}); el.addEventListener('mouseleave',function(){on(-1);});
     el.addEventListener('focus',function(){on(i,el);}); el.addEventListener('blur',function(){on(-1);});
@@ -326,6 +359,137 @@ SCHED = '''<table class="sched" data-p="%(key)s"%(hidden)s><thead><tr><th>Room</
   <tr><td>With the terrace</td><td class="hide-s"></td><td></td><td class="n">%(total2).1f</td></tr></tfoot></table>'''
 
 
+
+# ---------------------------------------------------------------- the zoned plan: the model drawn as an architect's
+# coloured plan. Walls, windows and doors come from the 3D model itself (model.build), so it shows exactly what you walk.
+ZONE_FILL = {'Kitchen': '#ECE8F3', 'Bathroom': '#DDEAF2', 'bath': '#DDEAF2', 'Terrace': '#E2EED9', 'Storage': '#F1EADB',
+             "Maid's room": '#F1EADB', 'pri': '#E4EEE2', 'pub': '#F5EADD', 'cir': '#EDEBE7', 'wetz': '#DDEAF2', 'ser': '#F1EADB'}
+
+
+def zone_fill(name, zone):
+    if name in ZONE_FILL: return ZONE_FILL[name]
+    if 'bath' in name.lower(): return ZONE_FILL['bath']
+    if name == 'Master bedroom': return '#DDEBDC'
+    return ZONE_FILL.get(zone, '#EEECE8')
+
+
+def zones_svg(key, W, H):
+    k = PX_PER_CM
+    lay = model.LAYOUTS[key]
+    built = model.build(key)
+    rows, total, _ = schedule(key)
+    zone_of = {}
+    for n, r, zn in lay['rooms']:
+        zone_of.setdefault(n, zn)
+    f = lambda v: '%g' % round(v * k, 1)
+    rect = lambda b, cls, extra='': '<rect class="%s" x="%s" y="%s" width="%s" height="%s"%s/>' % (
+        cls, f(b[0]), f(b[1]), f(b[2] - b[0]), f(b[3] - b[1]), extra)
+    g = ['<g class="zones" data-p="%s" hidden="">' % key, '<rect class="zbg" x="0" y="0" width="%d" height="%d"/>' % (W * k, H * k)]
+
+    # the rooms, filled by what they are
+    tr = model.TERRACE[1]
+    g.append(rect(tr, 'zterr', ' fill="%s"' % ZONE_FILL['Terrace']))
+    for n, r, zn in lay['rooms']:
+        g.append(rect(r, 'zroom', ' fill="%s"' % zone_fill(n, zn)))
+
+    # furniture, from above: the 3D model's pieces (legs and slivers left out), lowest first
+    furn = []
+    for it in built['items']:
+        if not it.get('f'): continue
+        if it['t'] == 'b':
+            b = it['b']
+            if min(b[3] - b[0], b[4] - b[1]) < 8 or b[5] - b[2] < 1.5: continue
+            furn.append((b[5], rect([b[0], b[1], b[3], b[4]], 'zf')))
+        elif it['t'] == 'c' and it['r'] >= 15:
+            cls = 'zrug' if it['z'][1] <= 3 else 'zf'
+            furn.append((it['z'][1], '<circle class="%s" cx="%s" cy="%s" r="%s"/>' % (cls, f(it['c'][0]), f(it['c'][1]), f(it['r']))))
+    g.append('<g class="zfurn">' + ''.join(e for _, e in sorted(furn, key=lambda t: t[0])) + '</g>')
+
+    # walls (full height) and the facade band, as the 3D model has them: openings already cut
+    for it in built['items']:
+        if it.get('g') != 'wall' or it['b'][2] != 0: continue
+        b = it['b']
+        if b[5] >= 200: g.append(rect([b[0], b[1], b[3], b[4]], 'zwall'))
+        elif b[5] == model.PARAPET: g.append(rect([b[0], b[1], b[3], b[4]], 'zfacade'))
+
+    # windows and the terrace doors: a pale pane with a line along it
+    for pc in built['pieces']:
+        if pc['n'] not in ('Window', 'Terrace doors'): continue
+        b = pc['b']; along_x = (b[3] - b[0]) > (b[4] - b[1])
+        if along_x:
+            cy = (b[1] + b[4]) / 2
+            g.append(rect([b[0], cy - 6, b[3], cy + 6], 'zwin'))
+            g.append('<line class="zwinl" x1="%s" y1="%s" x2="%s" y2="%s"/>' % (f(b[0]), f(cy), f(b[3]), f(cy)))
+        else:
+            cx = (b[0] + b[3]) / 2
+            g.append(rect([cx - 6, b[1], cx + 6, b[4]], 'zwin'))
+            g.append('<line class="zwinl" x1="%s" y1="%s" x2="%s" y2="%s"/>' % (f(cx), f(b[1]), f(cx), f(b[4])))
+
+    # doors: the leaf open at 90 degrees and its swing, as on the architect's plans
+    mids = {pc['n']: pc['b'] for pc in built['pieces']}
+    for n, o, axis, hinge, swing, m in lay['doors']:
+        if n not in mids: continue
+        b = mids[n]
+        a0, a1 = (o[0] + 3, o[2] - 3) if axis == 'x' else (o[1] + 3, o[3] - 3)
+        mid = (b[1] + b[4]) / 2 if axis == 'x' else (b[0] + b[3]) / 2
+        face = mid + swing * 6
+        L = a1 - a0
+        hp, far = (a0, a1) if hinge == 0 else (a1, a0)
+        P = (lambda u, v: (u, v)) if axis == 'x' else (lambda u, v: (v, u))
+        Hh, E, C = P(hp, face), P(hp, face + swing * L), P(far, face)
+        cross = (E[0] - Hh[0]) * (C[1] - Hh[1]) - (E[1] - Hh[1]) * (C[0] - Hh[0])
+        g.append('<line class="zleaf" x1="%s" y1="%s" x2="%s" y2="%s"/>' % (f(Hh[0]), f(Hh[1]), f(E[0]), f(E[1])))
+        g.append('<path class="zswing" d="M%s %s A%s %s 0 0 %d %s %s"/>' % (f(E[0]), f(E[1]), f(L), f(L), 1 if cross > 0 else 0, f(C[0]), f(C[1])))
+
+    # dimension lines inside the larger rooms: the width along the top, the depth down the left
+    by_name = {r['n']: r for r in rows}
+    seen = set()
+    for n, r, zn in lay['rooms']:
+        if n in seen: continue
+        seen.add(n)
+        w, d = r[2] - r[0], r[3] - r[1]
+        if w < 200 or d < 200: continue
+        y = r[1] + 22; x = r[0] + 22
+        g.append('<g class="zdim">'
+                 '<line x1="%s" y1="%s" x2="%s" y2="%s"/><line x1="%s" y1="%s" x2="%s" y2="%s"/><line x1="%s" y1="%s" x2="%s" y2="%s"/>'
+                 '<text x="%s" y="%s">%.2f</text>'
+                 '<line x1="%s" y1="%s" x2="%s" y2="%s"/><line x1="%s" y1="%s" x2="%s" y2="%s"/><line x1="%s" y1="%s" x2="%s" y2="%s"/>'
+                 '<text x="%s" y="%s" transform="rotate(-90 %s %s)">%.2f</text></g>' % (
+                     f(r[0] + 4), f(y), f(r[2] - 4), f(y), f(r[0] + 4), f(y - 7), f(r[0] + 4), f(y + 7), f(r[2] - 4), f(y - 7), f(r[2] - 4), f(y + 7),
+                     f((r[0] + r[2]) / 2), f(y - 6), w / 100,
+                     f(x), f(r[1] + 4), f(x), f(r[3] - 4), f(x - 7), f(r[1] + 4), f(x + 7), f(r[1] + 4), f(x - 7), f(r[3] - 4), f(x + 7), f(r[3] - 4),
+                     f(x - 6), f((r[1] + r[3]) / 2), f(x - 6), f((r[1] + r[3]) / 2), d / 100))
+
+    # the room names, sizes and areas
+    measured = set()
+    for lab, rn, x, y in lay['labels']:
+        g.append('<text class="zname" x="%s" y="%s">%s</text>' % (f(x), f(y), html.escape(lab)))
+        rm = by_name.get(rn)
+        if rm and rn not in measured:
+            measured.add(rn)
+            g.append('<text class="zsize" x="%s" y="%s">%.2f × %.2f</text>' % (f(x), f(y + 16), rm['w'], rm['d']))
+            g.append('<text class="zarea" x="%s" y="%s">%.1f m²</text>' % (f(x), f(y + 30), rm['a']))
+
+    # north and the scale
+    fac = SITE_FACING
+    cx, cy = 1530, 1190
+    g.append('<g class="znorth" transform="translate(%s %s)"><circle r="%s"/><path d="M0 %s L%s %s L0 %s L%s %s Z" transform="rotate(%g)"/>'
+             '<text x="%s" y="%s">N</text></g>' % (f(cx), f(cy), f(28), f(-22), f(10), f(13), f(6), f(-10), f(13), (360 - fac) % 360, f(42 * math.sin(math.radians((360 - fac) % 360))), f(-42 * math.cos(math.radians((360 - fac) % 360)) + (9 if math.cos(math.radians((360 - fac) % 360)) < 0 else 0))))
+    x0, y0 = 60, 1222
+    ticks = [(0, '0'), (100, '1'), (200, '2'), (500, '5 m')]
+    sb = ['<g class="zscale">', '<rect x="%s" y="%s" width="%s" height="%s" class="zsb1"/>' % (f(x0), f(y0), f(100), f(7)),
+          '<rect x="%s" y="%s" width="%s" height="%s" class="zsb0"/>' % (f(x0 + 100), f(y0), f(100), f(7)),
+          '<rect x="%s" y="%s" width="%s" height="%s" class="zsb1"/>' % (f(x0 + 200), f(y0), f(300), f(7))]
+    sb += ['<text x="%s" y="%s">%s</text>' % (f(x0 + t), f(y0 - 8), lbl) for t, lbl in ticks]
+    g.append(''.join(sb) + '</g>')
+    g.append('</g>')
+    return ''.join(g)
+
+
+def compass_name(b):
+    return '%d° %s' % (b, ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'][round(b / 22.5) % 16])
+
+
 def plan_page(imgs, W, H):
     k = PX_PER_CM
 
@@ -344,28 +508,17 @@ def plan_page(imgs, W, H):
             lab = '%s, %.2f by %.2f m, %.1f square metres' % (rm['n'], rm['w'], rm['d'], rm['a'])
             ov += [rect_el(r, i, lab) for r in [rm['r']] + rm['extra']]
         overlays.append('<g class="rooms" data-p="%s"%s>%s</g>' % (key, hidden, ''.join(ov)))
-        g = ['<g class="mdl" data-p="%s" hidden="">' % key, '<rect class="mfloor" x="0" y="0" width="%d" height="%d"/>' % (W * k, H * k)]
-        for w in model.walls_of(key):
-            g.append('<rect class="%s" x="%g" y="%g" width="%g" height="%g"/>' % (
-                'wall' if w[4] == 'wall' else 'facade', w[0] * k, w[1] * k, (w[2] - w[0]) * k, (w[3] - w[1]) * k))
-        measured = set()
-        for lab, rn, x, y in lay['labels']:
-            g.append('<text class="mlbl" x="%g" y="%g">%s</text>' % (x * k, y * k, html.escape(lab)))
-            rm = next((r for r in rows if r['n'] == rn), None)
-            if rm and rn not in measured:   # a second label for one room (the dressing area) carries no size
-                measured.add(rn)
-                g.append('<text class="mdim" x="%g" y="%g">%.2f × %.2f</text>' % (x * k, y * k + 26, rm['w'], rm['d']))
-        g.append('</g>')
+        g = [zones_svg(key, W, H)]
         models.append(''.join(g))
         trs = ''.join('<tr data-i="%d"><td>%s</td><td class="hide-s">%s</td><td class="n">%.2f × %.2f%s</td><td class="n">%.1f</td></tr>' % (
             i, html.escape(r['n']), r['zone'], r['w'], r['d'], ' +' if r['extra'] else '', r['a']) for i, r in enumerate(rows))
         tables.append(SCHED % dict(key=key, hidden=hidden, trs=trs, total=total, total2=total + outdoor))
         data[key] = dict(rooms=[dict(n=r['n'], d='%.2f × %.2f m' % (r['w'], r['d']), a='%.1f m²' % r['a']) for r in rows],
-                         img=imgs[key], name=lay['name'])
+                         img=imgs[key], name=lay['name'], area='%.0f' % total)
 
     plans = ''.join('<button type="button" data-p="%s" aria-pressed="%s">%s <small>%s</small></button>' % (
         key, 'true' if key == 'existing' else 'false', *model.LAYOUTS[key]['button']) for key in model.ORDER)
-    body = PLAN_BODY % dict(name=NAME, vw=W * k, vh=H * k, furn=imgs['existing']['furnished'], models='\n      '.join(models),
+    body = PLAN_BODY % dict(facing=compass_name(SITE_FACING), name=NAME, vw=W * k, vh=H * k, furn=imgs['existing']['furnished'], models='\n      '.join(models),
                             overlays='\n      '.join(overlays), tables='\n  '.join(tables), plans=plans, foot=FOOT,
                             data=json.dumps(data, ensure_ascii=False))
     page = HEAD % dict(title='%s · Plan' % NAME, css=CSS,
