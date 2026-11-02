@@ -21,6 +21,28 @@ NAME = 'Creektown Apartment'
 # bottom, i.e. north up, and on them that side faces down the page: south, within about 15 degrees.
 SITE = dict(lat=30.0740, lon=31.4870, facing=180)
 
+# Phones: one job, looking round the flat. The model gets the screen; the sheet below holds only the plan switch and a
+# row of rooms to swipe through, with every other control a pull-up away. Nothing sits over the model but the room
+# you are in, Whole apartment and 1:1.
+PHONE_CSS = (
+    '@media (max-width:760px){'
+    '.lbl,.status,#zhome,#zmeas,#zin,#zout,.hud>svg,.hud>span:not(#hudroom),.joy{display:none!important}'
+    '.hud{left:10px!important;right:auto!important;top:10px!important;padding:6px 10px!important;font-size:12.5px!important;max-width:calc(100% - 130px)}'
+    '.hud #hudroom{border-right:0!important;padding-right:0!important}.hud:has(#hudroom:empty){display:none!important}'
+    '.minimap{width:96px!important;height:88px!important;top:10px!important}'
+    '.zoomui{gap:8px!important}.zoomui button{width:44px!important;height:44px!important}'
+    '.panel>.sitenav{padding-top:0!important}.panel>.sitenav a{min-height:34px!important}'
+    '.panel .plans{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:4px!important;margin:2px 16px 0!important}'
+    '.panel .plans button{min-height:40px;padding:6px 4px!important;border-radius:10px!important}.panel .plans button small{display:none!important}'
+    '#views.vstrip{flex:none!important;display:flex!important;flex-wrap:nowrap!important;overflow-x:auto;gap:8px!important;padding:10px 16px 12px!important;margin:0!important;'
+    'scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;scrollbar-width:none;grid-template-columns:none!important}'
+    '#views.vstrip::-webkit-scrollbar{display:none}'
+    '#views.vstrip button{flex:none!important;width:auto!important;min-height:42px;padding:0 16px!important;border-radius:999px!important;white-space:nowrap;scroll-snap-align:start;grid-column:auto!important}'
+    '#views.vstrip button[hidden]{display:none!important}#views.vstrip kbd{display:none}'
+    '#tab-go .hint{display:none}'
+    '}'
+)
+
 # The Creek Town palette, measured from the vector fills of the compound's brochure; text panels use a slightly deeper
 # leaf so white text keeps a 4.5:1 contrast.
 BRAND = dict(forest='#1C3B28', leaf='#5A8C5B', panel='#4C7D4D', lime='#8DBA6A')
@@ -37,6 +59,7 @@ BRAND_CSS = (
     '.phead .eyebrow{color:#3E6E40;letter-spacing:.16em}'
     '@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .phead .eyebrow{color:#9CCB80}}'
     ':root[data-theme="dark"] .phead .eyebrow{color:#9CCB80}'
+    + PHONE_CSS
 )
 
 
@@ -54,6 +77,9 @@ def rep(old, new, s, count=1):
     return s.replace(old, new) if count == 0 else s.replace(old, new, count)
 
 
+PHONE_OVERVIEW = ([1520, 600, 2750], [800, 590, 0])
+
+
 def views_js():
     out = []
     for k, _, v, _ in model.VIEWS:
@@ -63,7 +89,9 @@ def views_js():
         parts.append('msg:%s' % json.dumps(v['msg']))
         out.append('  %s:{%s}' % (k, ','.join(parts)))
     # the walkthrough's spots are AZAD-only (hidden here) but the code still looks some of them up
-    return 'var VIEWS={\n' + ',\n'.join(out) + '\n};'
+    return ('var VIEWS={\n' + ',\n'.join(out) + '\n};\n'
+            "if(window.matchMedia('(max-width:760px)').matches&&innerHeight>innerWidth){ VIEWS.overview.pos=%s; VIEWS.overview.look=%s; }"
+            "   // a phone held upright: from nearly overhead, the flat's length up the screen" % (json.dumps(PHONE_OVERVIEW[0]), json.dumps(PHONE_OVERVIEW[1])))
 
 
 def bprint_svg(ALL, outline):
@@ -149,6 +177,19 @@ def main():
             "tm.castShadow=cm.castShadow=true; tm.receiveShadow=cm.receiveShadow=true; tm.userData=cm.userData={fixed:1}; grp.add(tm); grp.add(cm); }"
             "grp.visible=false; scene.add(grp); return grp;})();   // the compound below the windows\n")
     s = rep("var LAWN=(function(){", surr + "var LAWN=(function(){", s)
+
+    # ---------------- phones (see PHONE_CSS)
+    s = rep("(function(){                                  // phone: pull the controls up or down; tap the handle to step",
+            "(function(){ var mq=window.matchMedia('(max-width:760px)'), v=document.getElementById('views'), home=v.parentNode, next=v.nextSibling, plans=document.getElementById('layout');"
+            " function place(){ if(mq.matches){ plans.parentNode.insertBefore(v,plans.nextSibling); v.classList.add('vstrip'); } else { home.insertBefore(v,next); v.classList.remove('vstrip'); } }"
+            " place(); if(mq.addEventListener)mq.addEventListener('change',place); })();   // phone: the rooms in a row under the plan switch\n"
+            "(function(){                                  // phone: pull the controls up or down; tap the handle to step", s)
+    s = rep("function peekH(){ var t=panelEl.querySelector('.tabs'); return t?Math.round(t.offsetTop+t.offsetHeight+16):190; }",
+            "function peekH(){ var t=(mq.matches&&panelEl.querySelector('#views.vstrip'))||panelEl.querySelector('.tabs'); return t?Math.round(t.offsetTop+t.offsetHeight+(mq.matches?1:8)):190; }", s)
+    s = rep("var k='peek'; try{ k=localStorage.getItem('azad-3d-sheet')||'peek'; }catch(e){} snap(k);", "snap('peek');", s)
+    # a tall screen held upright: wide views widen sideways, but the up-down angle stops at 90 degrees (no fisheye)
+    s = rep("function eyeFov(){ return 2*Math.atan(trueHalfTan()/EYEZ/Math.max(camera.aspect,0.2))*180/Math.PI; }",
+            "function eyeFov(){ return Math.min(90,2*Math.atan(trueHalfTan()/EYEZ/Math.max(camera.aspect,0.2))*180/Math.PI); }", s)
     s = rep("p.n!=='Window'&&p.n!=='Garden doors'", "p.n!=='Window'&&p.n!=='Terrace doors'", s, 0)
     s = rep("It reaches the garden glass.':'The garden glass is in shade.'", "It reaches the main windows.':'The main windows are in shade.'", s)
     s = rep("['top','garden side'],['bottom','entrance side']", "['top','window side'],['bottom','entrance side']", s)

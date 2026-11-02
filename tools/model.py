@@ -368,6 +368,7 @@ def build(key):
         box([r[0], r[1], H - 1, r[2], r[3], H], 'ceiling', g='ceiling')
     tn, tr = TERRACE
     box([tr[0], tr[1], 0, tr[2], tr[3], 1], 'oak', g='floor')
+    box([tr[0], tr[1], H - 1, tr[2], tr[3], H], 'ceiling', g='ceiling')   # the terrace sits under the floor above
     rects = room_rects(key)
     rooms, named = [], set()
     for n, rn, x, y in lay['labels']:
