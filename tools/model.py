@@ -45,6 +45,23 @@ FLOOR_M = {'pub': 'porcelain', 'cir': 'porcelain', 'pri': 'oakfloor', 'wetz': 's
 OUTLINE = [[195, 10], [1590, 10], [1590, 915], [1410, 915], [1410, 1150], [950, 1150], [950, 815], [455, 815],
            [455, 1160], [10, 1160], [10, 262], [195, 262]]
 
+# ---------------------------------------------------------------- the building round the apartment
+# The apartment is on the 5th floor, its windows looking over a big garden (the top of the plan). The brochure's
+# apartment buildings have a ground floor, five typical floors and a set-back penthouse level, so this is the top typical
+# floor, with one storey above. A storey is taken as 3.10 m floor to floor (to be confirmed).
+FLOOR_NO = 5
+STOREY = 310
+ELEV = FLOOR_NO * STOREY          # the apartment's floor above the garden, cm
+# what the Neighbours switch shows (massing) and lets cast shade; z is relative to the apartment's floor
+CONTEXT = [
+    dict(name='the floors below', p=OUTLINE, z=[-ELEV, -2]),
+    dict(name='the rest of the building, beside the reception', p=[[1593, 10], [2700, 10], [2700, 1162], [1593, 1162]], z=[-ELEV, STOREY]),
+    dict(name='the rest of the building, behind the bedrooms', p=[[10, 1163], [2700, 1163], [2700, 1900], [10, 1900]], z=[-ELEV, STOREY]),
+    dict(name='the stair core', p=[[1413, 918], [1592, 918], [1592, 1160], [1413, 1160]], z=[-ELEV, STOREY]),
+    dict(name='the buildings across the garden', p=[[-1500, -7500], [3200, -7500], [3200, -5500], [-1500, -5500]], z=[-ELEV, 2 * STOREY]),
+]
+GARDEN = [[-3000, -5400], [4500, -5400], [4500, -40], [-3000, -40]]   # the lawn below the windows, at ground level
+
 # ---------------------------------------------------------------- the three plans
 # doors: name, rect, axis, hinge end (0 = low end, 1 = high end), swing (+1/-1 across the wall), leaf material
 # openings: name, rect, axis, head height (no leaf)
@@ -285,6 +302,24 @@ def build(key):
         frame_and_glass(n, o, axis, sill, head, panes, *spans[n], 'aluminium, dark grey')
     for n, o, axis in SLIDERS:
         frame_and_glass(n, o, axis, 0, WIN_HEAD, 2, *spans[n], 'sliding, aluminium, dark grey', 'slide')
+
+    # rolling shutters outside every window and the terrace doors (the Shutters switch): half-down or closed
+    def indoors(x, y):
+        return any(r[0] <= x <= r[2] and r[1] <= y <= r[3] for _, r, _ in lay['rooms'])
+
+    def shutter(o, axis, sill, head, t0, t1):
+        a0, a1 = (o[0], o[2]) if axis == 'x' else (o[1], o[3])
+        c = (a0 + a1) / 2
+        low_in = indoors(c, t0 - 40) if axis == 'x' else indoors(t0 - 40, c)
+        face, out = (t1, 1) if low_in else (t0, -1)        # the face with no room behind it
+        f0, f1 = sorted((face + out * 1, face + out * 3))
+        for z0, v in (((sill + head) / 2, 'sh-half'), (sill, 'sh-closed')):
+            box([a0 - 3, f0, z0, a1 + 3, f1, head + 4] if axis == 'x' else [f0, a0 - 3, z0, f1, a1 + 3, head + 4], 'shutter', v=v)
+
+    for n, o, axis, sill, head, panes in WINDOWS:
+        shutter(o, axis, sill, head, *spans[n])
+    for n, o, axis in SLIDERS:
+        shutter(o, axis, 0, WIN_HEAD, *spans[n])
 
     # doors: a 4 cm leaf, open at 90 degrees or closed in the wall (the Doors switch)
     for n, o, axis, hinge, swing, m in doors:
@@ -662,29 +697,30 @@ def lighting(lay):
 
 # ---------------------------------------------------------------- viewpoints (eye height 165 cm)
 EYE, SIT = 165, 120
+ZOOM = .34      # every room view opens at 34 %: wide, to take in the room (1:1 is true size)
 TRUE = ' Press 1:1 for true size.'
 VIEWS = [   # key, button, view, plans it belongs to (None: all); z below 1 widens the view, as AZAD's room views do
     ('overview', 'Overview', dict(pos=[1750, 1900, 1350], look=[800, 600, 0], mode='overview', msg='Overview. Drag to orbit.'), None),
-    ('entrance', 'Front door', dict(pos=[1310, 1050, EYE], look=[1330, 600, 120], z=.6, msg='Just inside the front door, wider than life.' + TRUE), None),
-    ('dining', 'Dining', dict(pos=[1240, 870, EYE], look=[1440, 620, 85], z=.55, msg='By the dining table for six, wider than life.' + TRUE), ['existing']),
-    ('dining1', 'Dining', dict(pos=[1330, 900, EYE], look=[1100, 720, 85], z=.55, msg='Towards the dining table and the kitchen windows, wider than life.' + TRUE), ['o1']),
-    ('dining2', 'Dining', dict(pos=[1280, 870, EYE], look=[1440, 620, 85], z=.55, msg='By the dining table, with the kitchen island behind you, wider than life.' + TRUE), ['o2']),
-    ('reception', 'Reception', dict(pos=[1290, 470, EYE], look=[1040, 170, 95], z=.55, msg='Across the reception to the window and the sofa, wider than life.' + TRUE), None),
-    ('living', 'Living', dict(pos=[1530, 470, EYE], look=[1310, 230, 100], z=.55, msg='The living area, wider than life.' + TRUE), ['existing', 'o2']),
-    ('living1', 'Living', dict(pos=[1300, 600, EYE], look=[1545, 300, 100], z=.55, msg='The living area and the TV wall, wider than life.' + TRUE), ['o1']),
-    ('terrace', 'Terrace', dict(pos=[1450, 330, EYE], look=[1450, 60, 110], z=.6, msg='From the living area out to the terrace, wider than life.' + TRUE), None),
-    ('kitchen', 'Kitchen', dict(pos=[1190, 940, EYE], look=[1040, 650, 95], z=.55, msg='The kitchen, wider than life: hob on the far wall, sink under the window.' + TRUE), ['existing']),
-    ('kitchen1', 'Kitchen', dict(pos=[810, 570, EYE], look=[810, 150, 95], z=.55, msg='From the corridor into the kitchen, wider than life: the sink run on the left, the hob on the right.' + TRUE), ['o1']),
-    ('kitchen2', 'Kitchen', dict(pos=[1340, 990, EYE], look=[1050, 720, 90], z=.55, msg='Across the island into the kitchen, wider than life.' + TRUE), ['o2']),
-    ('corridor', 'Corridor', dict(pos=[960, 555, EYE], look=[440, 555, 120], z=.7, msg='Down the bedroom corridor.'), None),
-    ('master', 'Master bedroom', dict(pos=[640, 470, EYE], look=[900, 250, 90], z=.55, msg='Master bedroom from the door, wider than life.' + TRUE), ['existing']),
-    ('master1', 'Master bedroom', dict(pos=[505, 330, EYE], look=[230, 600, 80], z=.55, msg='From the dressing area into the master bedroom, wider than life.' + TRUE), ['o1']),
-    ('master2', 'Master bedroom', dict(pos=[690, 470, EYE], look=[900, 250, 90], z=.55, msg='Master bedroom from the door, wider than life.' + TRUE), ['o2']),
-    ('bed1', 'Bedroom 1', dict(pos=[415, 670, EYE], look=[110, 400, 90], z=.55, msg='Bedroom 1 from the wardrobe corner, wider than life.' + TRUE), ['existing', 'o2']),
-    ('bed2', 'Bedroom 2', dict(pos=[400, 760, EYE], look=[150, 1000, 80], z=.55, msg='Bedroom 2, wider than life.' + TRUE), None),
-    ('bath', 'Bathroom', dict(pos=[590, 640, EYE], look=[720, 780, 90], z=.5, msg='Bathroom 1, wider than life.' + TRUE), ['existing']),
-    ('bath1', 'Bathroom', dict(pos=[845, 635, EYE], look=[680, 770, 90], z=.5, msg='The shared bathroom from the door, wider than life.' + TRUE), ['o1']),
-    ('bath2', 'Bathroom', dict(pos=[895, 745, EYE], look=[660, 690, 90], z=.5, msg='The shared bathroom, wider than life: the shower at the far end.' + TRUE), ['o2']),
+    ('entrance', 'Front door', dict(pos=[1310, 1050, EYE], look=[1330, 600, 120], z=ZOOM, msg='Just inside the front door, wider than life.' + TRUE), None),
+    ('dining', 'Dining', dict(pos=[1240, 870, EYE], look=[1440, 620, 85], z=ZOOM, msg='By the dining table for six, wider than life.' + TRUE), ['existing']),
+    ('dining1', 'Dining', dict(pos=[1330, 900, EYE], look=[1100, 720, 85], z=ZOOM, msg='Towards the dining table and the kitchen windows, wider than life.' + TRUE), ['o1']),
+    ('dining2', 'Dining', dict(pos=[1280, 870, EYE], look=[1440, 620, 85], z=ZOOM, msg='By the dining table, with the kitchen island behind you, wider than life.' + TRUE), ['o2']),
+    ('reception', 'Reception', dict(pos=[1290, 470, EYE], look=[1040, 170, 95], z=ZOOM, msg='Across the reception to the window and the sofa, wider than life.' + TRUE), None),
+    ('living', 'Living', dict(pos=[1530, 470, EYE], look=[1310, 230, 100], z=ZOOM, msg='The living area, wider than life.' + TRUE), ['existing', 'o2']),
+    ('living1', 'Living', dict(pos=[1300, 600, EYE], look=[1545, 300, 100], z=ZOOM, msg='The living area and the TV wall, wider than life.' + TRUE), ['o1']),
+    ('terrace', 'Terrace', dict(pos=[1450, 330, EYE], look=[1450, 60, 110], z=ZOOM, msg='From the living area out to the terrace, wider than life.' + TRUE), None),
+    ('kitchen', 'Kitchen', dict(pos=[1190, 940, EYE], look=[1040, 650, 95], z=ZOOM, msg='The kitchen, wider than life: hob on the far wall, sink under the window.' + TRUE), ['existing']),
+    ('kitchen1', 'Kitchen', dict(pos=[810, 570, EYE], look=[810, 150, 95], z=ZOOM, msg='From the corridor into the kitchen, wider than life: the sink run on the left, the hob on the right.' + TRUE), ['o1']),
+    ('kitchen2', 'Kitchen', dict(pos=[1340, 990, EYE], look=[1050, 720, 90], z=ZOOM, msg='Across the island into the kitchen, wider than life.' + TRUE), ['o2']),
+    ('corridor', 'Corridor', dict(pos=[960, 555, EYE], look=[440, 555, 120], z=ZOOM, msg='Down the bedroom corridor.'), None),
+    ('master', 'Master bedroom', dict(pos=[640, 470, EYE], look=[900, 250, 90], z=ZOOM, msg='Master bedroom from the door, wider than life.' + TRUE), ['existing']),
+    ('master1', 'Master bedroom', dict(pos=[505, 330, EYE], look=[230, 600, 80], z=ZOOM, msg='From the dressing area into the master bedroom, wider than life.' + TRUE), ['o1']),
+    ('master2', 'Master bedroom', dict(pos=[690, 470, EYE], look=[900, 250, 90], z=ZOOM, msg='Master bedroom from the door, wider than life.' + TRUE), ['o2']),
+    ('bed1', 'Bedroom 1', dict(pos=[415, 670, EYE], look=[110, 400, 90], z=ZOOM, msg='Bedroom 1 from the wardrobe corner, wider than life.' + TRUE), ['existing', 'o2']),
+    ('bed2', 'Bedroom 2', dict(pos=[400, 760, EYE], look=[150, 1000, 80], z=ZOOM, msg='Bedroom 2, wider than life.' + TRUE), None),
+    ('bath', 'Bathroom', dict(pos=[590, 640, EYE], look=[720, 780, 90], z=ZOOM, msg='Bathroom 1, wider than life.' + TRUE), ['existing']),
+    ('bath1', 'Bathroom', dict(pos=[845, 635, EYE], look=[680, 770, 90], z=ZOOM, msg='The shared bathroom from the door, wider than life.' + TRUE), ['o1']),
+    ('bath2', 'Bathroom', dict(pos=[895, 745, EYE], look=[660, 690, 90], z=ZOOM, msg='The shared bathroom, wider than life: the shower at the far end.' + TRUE), ['o2']),
 ]
 
 
@@ -699,7 +735,7 @@ def all_data(azad_all):
                 ["Film", "Everything off except a low wash in the living area."],
                 ["Night path", "Corridor downlights 5 %, everything else off."],
                 ["All off", "One press by the front door as you leave."]],
-        preview=False, fcat=azad_all.get('fcat', []), fin=[], furnish={}, context=[]), OUTLINE
+        preview=False, fcat=azad_all.get('fcat', []), fin=[], furnish={}, context=CONTEXT), OUTLINE
 
 
 if __name__ == '__main__':

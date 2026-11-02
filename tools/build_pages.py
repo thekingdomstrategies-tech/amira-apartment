@@ -51,6 +51,28 @@ def render_plans():
     return out, W, H
 
 
+HERO_PAGE = 53     # the brochure's apartment-building render, behind the overview's header
+
+
+def hero_image():
+    """The Creek Town apartment buildings (brochure page 53) for the header: the page's own labels taken out."""
+    with tempfile.TemporaryDirectory() as td:
+        base = os.path.join(td, 'hero')
+        subprocess.run(['pdftoppm', '-r', '160', '-png', '-singlefile', '-f', str(HERO_PAGE), '-l', str(HERO_PAGE),
+                        os.path.join(ROOT, 'source', 'creek_town_brochure.pdf'), base], check=True, stderr=subprocess.DEVNULL)
+        im = Image.open(base + '.png').convert('RGB')
+    W, H = im.size
+    # the running header "CREEK TOWN" sits in the sky at the top left: cover it with the sky just right of it
+    k = W / 2709
+    box = tuple(round(v * k) for v in (70, 66, 236, 106))
+    patch = im.crop((box[2] + 10, box[1], box[2] + 10 + (box[2] - box[0]), box[3]))
+    im.paste(patch, box[:2])
+    im = im.crop((0, 0, W, round(H * .905)))          # the page numbers along the bottom edge
+    for w, q, name in ((2400, 74, 'hero-building.jpg'), (1200, 74, 'hero-building-s.jpg')):
+        im.resize((w, round(w * im.size[1] / im.size[0])), Image.LANCZOS).save(
+            os.path.join(ROOT, 'img', name), quality=q, optimize=True, progressive=True)
+
+
 CSS = r'''
 /* Creek Town brand (from the compound brochure): forest and leaf green on white, Poppins, heavy uppercase headings,
    a widely spaced light wordmark, large faded section numerals, square edges. */
@@ -74,15 +96,36 @@ h1,h2,h3{font-family:var(--font);margin:0;text-wrap:balance;color:var(--head)}
 .bar .wrap{display:flex;justify-content:space-between;align-items:center;gap:12px;padding-block:20px;font:600 11px var(--font);letter-spacing:.12em;text-transform:uppercase}
 .bar a{text-decoration:none;margin-left:24px}
 /* the cover: forest green, the wordmark centred-left */
-.hero{background:var(--forest);color:var(--on-dark)}
+.hero{position:relative;overflow:hidden;isolation:isolate;background:var(--forest);color:var(--on-dark)}
+/* the compound's apartment buildings (brochure page 53) under a forest-green gradient: the text side stays deep green,
+   the buildings show through on the right; the photo drifts slowly and a soft light moves over it */
+.hero-bg{position:absolute;inset:0 0 0 30%;z-index:-3;background:#1C3B28 url(img/hero-building.jpg) 46% 40%/cover no-repeat;
+  transform-origin:50% 45%;animation:hero-drift 46s ease-in-out infinite alternate;will-change:transform;
+  -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 22%);mask-image:linear-gradient(90deg,transparent 0,#000 22%)}
+@media (max-width:900px){.hero-bg{inset:0;background-image:url(img/hero-building-s.jpg);background-position:48% 40%;-webkit-mask-image:none;mask-image:none}}
+.hero::before{content:"";position:absolute;inset:0;z-index:-2;
+  background:linear-gradient(96deg,rgba(28,59,40,.98) 0%,rgba(28,59,40,.96) 33%,rgba(28,59,40,.72) 47%,rgba(28,59,40,.30) 68%,rgba(28,59,40,.08) 100%),
+             linear-gradient(0deg,rgba(28,59,40,.9) 0%,rgba(28,59,40,0) 30%),
+             linear-gradient(180deg,rgba(28,59,40,.55) 0%,rgba(28,59,40,0) 22%)}
+.hero-light{position:absolute;inset:-25%;z-index:-1;pointer-events:none;mix-blend-mode:soft-light;
+  background:radial-gradient(32% 40% at 72% 30%,rgba(255,238,205,.45),rgba(255,238,205,0) 70%),
+             radial-gradient(30% 38% at 40% 78%,rgba(141,186,106,.45),rgba(141,186,106,0) 70%);
+  animation:hero-light 26s ease-in-out infinite alternate}
+@keyframes hero-drift{0%{transform:scale(1.06) translate3d(-1.2%,.6%,0)}100%{transform:scale(1.16) translate3d(1.6%,-1.4%,0)}}
+@keyframes hero-light{0%{transform:translate3d(-7%,-3%,0) rotate(-4deg);opacity:.75}100%{transform:translate3d(7%,4%,0) rotate(6deg);opacity:1}}
+.hero .copy>*{animation:hero-in .9s cubic-bezier(.2,.7,.2,1) both}
+.hero .copy>:nth-child(2){animation-delay:.08s}.hero .copy>:nth-child(3){animation-delay:.16s}.hero .copy>:nth-child(4){animation-delay:.24s}
+@keyframes hero-in{from{opacity:0;transform:translate3d(0,14px,0)}to{opacity:1;transform:none}}
+@media (max-width:900px){.hero::before{background:linear-gradient(180deg,rgba(28,59,40,.82) 0%,rgba(28,59,40,.9) 45%,rgba(28,59,40,.97) 100%)}}
+@media (prefers-reduced-motion:reduce){.hero-bg,.hero-light,.hero .copy>*{animation:none}.hero-bg{transform:scale(1.06)}}
 .hero .bar{color:var(--on-dark2)}.hero .bar a{color:var(--on-dark);opacity:.85}.hero .bar a:hover{opacity:1;color:var(--lime)}
 .hero .copy{padding-block:clamp(56px,10vw,132px) clamp(56px,8vw,96px);display:grid;gap:20px;justify-items:start}
-.wm{display:grid;gap:10px;color:var(--on-dark)}
+.wm{display:grid;gap:10px;color:var(--on-dark);text-shadow:0 2px 28px rgba(8,22,14,.55)}
 .wm .w1{font:300 clamp(34px,6.4vw,86px)/1 var(--font);letter-spacing:.32em;text-transform:uppercase;margin-right:-.32em}
 .wm .w1 b{display:inline-block;font-weight:600;letter-spacing:.06em;font-size:.52em;vertical-align:.18em}
 .wm .w2{font:400 clamp(12px,1.3vw,15px)/1 var(--font);letter-spacing:.42em;text-transform:uppercase;color:var(--on-dark2)}
 .hero .eyebrow{color:var(--lime)}
-.hero p{margin:0;max-width:58ch;font-size:clamp(15px,1.4vw,18px);font-weight:300;color:var(--on-dark2)}
+.hero p{margin:0;max-width:50ch;font-size:clamp(15px,1.4vw,18px);font-weight:300;color:var(--on-dark2)}
 .cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:10px}
 .btn{display:inline-flex;align-items:center;gap:8px;font:600 12px var(--font);letter-spacing:.12em;text-transform:uppercase;padding:14px 22px;text-decoration:none}
 .btn.solid{background:#fff;color:var(--forest)}.btn.ghost{border:1.5px solid rgba(255,255,255,.7);color:#fff}
@@ -175,7 +218,7 @@ HEAD = '''<!doctype html>
 '''
 
 FOOT = '''<footer><div class="wrap"><span>%s</span><span>Drawings: the architect's plans, 2 Sep 2026</span>
-<span>Built on the <a href="https://github.com/kamelshenouda/azad">AZAD</a> site and 3D viewer</span></div></footer>
+</div></footer>
 ''' % NAME
 
 
@@ -354,16 +397,17 @@ OPTIONS = {
 
 INDEX_BODY = '''<body>
 <header class="hero">
-  <div class="bar"><div class="wrap"><span>About %(tot)d m² inside + terrace</span><nav aria-label="Site"><a href="plan.html">Plan</a><a href="3d.html">3D</a></nav></div></div>
+  <div class="hero-bg" aria-hidden="true"></div><div class="hero-light" aria-hidden="true"></div>
+  <div class="bar"><div class="wrap"><span>5th floor · about %(tot)d m² · over a big garden</span><nav aria-label="Site"><a href="plan.html">Plan</a><a href="3d.html">3D</a></nav></div></div>
   <div class="copy wrap">
     <div class="eyebrow">Creek Town · New Cairo · interior architecture</div>
     <h1 class="wm" aria-label="Creektown Apartment, New Cairo"><span class="w1">Creektown <b>Apartment</b></span><span class="w2">New Cairo</span></h1>
-    <p>Amira's new apartment: three bedrooms, a maid's room and an open reception, living and dining onto a terrace, and the architect's two options for reworking it. Measured from the drawings and built as a 3D model you can walk through with the real sun.</p>
+    <p>Monica's &amp; Amira's new apartment: three bedrooms, a maid's room and an open reception, living and dining onto a terrace, and the architect's two options for reworking it. Measured from the drawings and built as a 3D model you can walk through with the real sun.</p>
     <div class="cta"><a class="btn solid" href="plan.html">See the plans</a><a class="btn ghost" href="3d.html">Walk through them</a></div>
   </div>
 </header>
 <div class="factsband"><div class="wrap"><div class="facts" aria-label="Key facts">
-  <div><span>Size</span><b>About %(tot).0f m² net + %(ter).1f m² terrace</b><small>Floor area between walls, from the drawings at 1:50</small></div>
+  <div><span>Size</span><b>About %(tot).0f m² net + %(ter).1f m² terrace</b><small>5th floor, looking over a big garden; floor area between walls, from the drawings at 1:50</small></div>
   <div><span>As built</span><b>Master suite · %(nb)d bedrooms in all</b><small>3 bathrooms · maid's room · kitchen</small></div>
   <div><span>Options</span><b>Two bedrooms or three</b><small>Option 1 trades a bedroom for a master suite and a galley kitchen; option 2 opens up the kitchen</small></div>
   <div><span>Status</span><b>Choosing the layout</b><small>As built and both options, each with the architect's furniture</small></div>
@@ -392,6 +436,7 @@ INDEX_BODY = '''<body>
   <ul class="list">
     <li><b>Which way it faces</b><span>The sheets have no north arrow. The 3D sun assumes the window wall (the top of the plan) faces due south; one compass reading on site fixes it.</span></li>
     <li><b>Ceiling height</b><span>Taken as 2.80 m to the slab. Any beams and dropped ceilings still need measuring.</span></li>
+    <li><b>The building round it</b><span>The 3D model puts the apartment on the 5th floor, 15.5 m above the garden (3.10 m a storey), with one penthouse level above, as in the brochure's apartment buildings. The Neighbours switch shows the rest of the block and the buildings across the garden, and lets them cast shade.</span></li>
     <li><b>Window sills and heads</b><span>Main windows from 0.90 to 2.25 m, bathroom and kitchen windows higher. The terrace has full-height sliding doors.</span></li>
     <li><b>The concrete band outside</b><span>Drawn on the facade outside the bedrooms and the reception; shown in 3D as a low planter or parapet, to be confirmed.</span></li>
     <li><b>Option 1: dressing area and kitchen</b><span>The empty sheet draws no wall between them, and no door to the master bathroom. The 3D model puts a partition where the furnished sheet draws a line, and leaves the bathroom doorway open.</span></li>
@@ -433,7 +478,7 @@ def index_page(totals):
         cmp_head=''.join('<th class="n">%s</th>' % model.LAYOUTS[key]['button'][0] for key in model.ORDER),
         cmp_foot=''.join('<td class="n">%.1f</td>' % totals[key] for key in model.ORDER))
     page = HEAD % dict(title=NAME, css=CSS,
-                       desc='Amira\'s Creektown apartment in New Cairo: the plans to scale, as built and two layout options, and a 3D walkthrough with the real sun.') + body
+                       desc='Monica\'s and Amira\'s Creektown apartment in New Cairo: the plans to scale, as built and two layout options, and a 3D walkthrough with the real sun.') + body
     open(os.path.join(ROOT, 'index.html'), 'w', encoding='utf-8').write(page)
 
 
@@ -451,6 +496,7 @@ DESC = {
 
 
 def main():
+    hero_image()
     imgs, W, H = render_plans()
     totals = plan_page(imgs, W, H)
     index_page(totals)
