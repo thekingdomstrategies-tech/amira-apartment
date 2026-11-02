@@ -37,7 +37,7 @@ def rep(old, new, s, count=1):
 
 def views_js():
     out = []
-    for k, _, v in model.VIEWS:
+    for k, _, v, _ in model.VIEWS:
         parts = ['pos:%s' % json.dumps(v['pos']).replace(' ', ''), 'look:%s' % json.dumps(v['look']).replace(' ', '')]
         if 'mode' in v: parts.append("mode:'%s'" % v['mode'])
         if 'z' in v: parts.append('z:%s' % v['z'])
@@ -47,14 +47,19 @@ def views_js():
     return 'var VIEWS={\n' + ',\n'.join(out) + '\n};'
 
 
-def bprint_svg(L, outline):
-    walls = [it['b'] for it in L['items'] if it.get('g') == 'wall' and it['b'][2] == 0 and it['b'][5] >= 90]
-    rects = ''.join('<rect x="%g" y="%g" width="%g" height="%g" style="--i:%d"/>' % (b[0], b[1], b[3] - b[0], b[4] - b[1], i)
-                    for i, b in enumerate(sorted(walls, key=lambda b: (b[1], b[0]))))
-    s = L['site']
+def bprint_svg(ALL, outline):
+    """The plan drawn while the model loads: one group of walls per plan, the chosen one shown."""
+    groups = []
+    for key in model.ORDER:
+        L = ALL['layouts'][key]
+        walls = [it['b'] for it in L['items'] if it.get('g') == 'wall' and it['b'][2] == 0 and it['b'][5] >= 90]
+        rects = ''.join('<rect x="%g" y="%g" width="%g" height="%g" style="--i:%d"/>' % (b[0], b[1], b[3] - b[0], b[4] - b[1], i)
+                        for i, b in enumerate(sorted(walls, key=lambda b: (b[1], b[0]))))
+        groups.append('<g data-l="%s">%s</g>' % (key, rects))
+    s = ALL['layouts']['existing']['site']
     d = 'M' + ' L'.join('%g %g' % (x, y) for x, y in outline) + ' Z'
     return ('<svg class="bprint" id="bprint" viewBox="%g %g %g %g" aria-hidden="true"><path class="bgarden" d="%s" style="opacity:.25"/>'
-            '<g data-l="existing">%s</g></svg>' % (s[0] + 100, s[1] + 100, s[2] - s[0] - 200, s[3] - s[1] - 200, d, rects))
+            '%s</svg>' % (s[0] + 100, s[1] + 100, s[2] - s[0] - 200, s[3] - s[1] - 200, d, ''.join(groups)))
 
 
 def main():
@@ -66,7 +71,6 @@ def main():
     m = re.search(r'\nvar ALL=(\{.*?\});\n', src, re.S)
     azad_all = json.loads(m.group(1))
     ALL, outline = model.all_data(azad_all)
-    L = ALL['layouts']['existing']
     s = src[:m.start()] + '\nvar ALL=' + json.dumps(ALL, separators=(',', ':'), ensure_ascii=False) + ';\n' + src[m.end():]
 
     # ---------------- the code: site, viewpoints, front door, floors above, north arrow
@@ -90,34 +94,45 @@ def main():
     s = s.replace("localStorage.setItem('azad-3d-plan',k)", "localStorage.setItem('creektown-3d-plan',k)")
     s = s.replace("||'p1'; }catch(e){}", "||'existing'; }catch(e){}")
     s = s.replace("'azad-3d-tab'", "'creektown-3d-tab'")
+    # AZAD's four plans (existing, p1, c, d) become this site's three
+    keys = '|'.join(model.ORDER)
+    s = rep("""document.querySelector('#bprint g[data-l="p1"]')""", """document.querySelector('#bprint g[data-l="existing"]')""", s)
+    s = rep("/v1~(existing|p1|c|d)~/", "/v1~(%s)~/" % keys, s)
+    s = rep("/[?&]plan=(existing|p1|c|d)/", "/[?&]plan=(%s)/" % keys, s)
+    s = rep("var LAYOUT_ORDER=['existing','p1','c','d']", "var LAYOUT_ORDER=%s" % json.dumps(model.ORDER).replace('"', "'").replace(' ', ''), s)
+    s = rep("LAYOUT_ORDER[(LAYOUT_ORDER.indexOf(LAYOUT)+1)%4]", "LAYOUT_ORDER[(LAYOUT_ORDER.indexOf(LAYOUT)+1)%LAYOUT_ORDER.length]", s)
+    s = rep("['existing','p1','c','d'].forEach(function(L){ db.doc('furnish/'+L)", "LAYOUT_ORDER.forEach(function(L){ db.doc('furnish/'+L)", s)
+    s = rep("(LAYOUT==='existing'?'The original walls, furnished with a typical layout for comparison.'",
+            "(LAYOUT==='existing'?'As built, with the architect\\'s furniture.':LAYOUT==='o1'?'Option 1, two bedrooms, with the architect\\'s furniture.':LAYOUT==='o2'?'Option 2, three bedrooms, with the architect\\'s furniture.'", s)
 
     # ---------------- the page: names, the plans offered, the viewpoints, the mini-plan
     s = sub1(r'<title>[^<]*</title>', '<title>%s 3D</title>' % NAME, s)
     s = sub1(r'<meta name="description" content="[^"]*">',
-             '<meta name="description" content="Walk-through 3D model of the Creektown apartment, as built with the architect\'s furniture, in true measurements from the plans.">', s)
+             '<meta name="description" content="Walk-through 3D model of the Creektown apartment: as built and the architect\'s two layout options, furnished, in true measurements from the plans.">', s)
     s = rep('aria-label="AZAD Apartment: home">← <span class="hn">AZAD Apartment</span>',
             'aria-label="%s: home">← <span class="hn">%s</span>' % (NAME, NAME), s)
     s = sub1(r'<a href="renders.html">Renders</a>\s*<a href="package.html">Package</a>', '', s)
     s = rep('<div class="eyebrow">AZAD Apartment · 3D</div>', '<div class="eyebrow">%s · 3D</div>' % NAME, s)
+    plans = ''.join('<button type="button" data-v="%s" aria-pressed="%s" title="%s">%s<small>%s</small></button>' % (
+        k, 'true' if k == 'existing' else 'false', html.escape(model.LAYOUTS[k]['title']), *model.LAYOUTS[k]['button']) for k in model.ORDER)
     s = sub1(r'<div class="plans" id="layout" role="group" aria-label="Plan">.*?</div>',
-             '<div class="plans" id="layout" role="group" aria-label="Plan"><button type="button" data-v="existing" aria-pressed="true" '
-             'title="The apartment as drawn by the architect, with the furniture layout">As built<small>with furniture</small></button></div>', s, re.S)
+             '<div class="plans" id="layout" role="group" aria-label="Plan">%s</div>' % plans, s, re.S)
     btns = []
-    for k, label, _ in model.VIEWS:
+    for k, label, _, only in model.VIEWS:
         if k == 'overview':
             btns.append('<button type="button" class="wide" data-view="overview" aria-pressed="true"><span>Overview</span><kbd class="sk" data-k="0"></kbd></button>')
         else:
-            btns.append('<button type="button" data-view="%s">%s</button>' % (k, html.escape(label)))
+            btns.append('<button type="button" data-view="%s"%s>%s</button>' % (k, ' data-only="%s"' % ' '.join(only) if only else '', html.escape(label)))
     s = sub1(r'<div class="rooms" id="views">.*?</div>', '<div class="rooms" id="views">\n        ' + '\n        '.join(btns) + '\n      </div>', s, re.S)
-    s = sub1(r'<svg class="bprint" id="bprint".*?</svg>', bprint_svg(L, outline), s, re.S)
+    s = sub1(r'<svg class="bprint" id="bprint".*?</svg>', bprint_svg(ALL, outline), s, re.S)
     s = sub1(r'<img class="lprev" alt="" src="data:image/[^"]*">', '', s)
     s = s.replace('AZAD Apartment', NAME)
-    # one plan only: AZAD's side-by-side comparison page is not part of this site (the code still looks the link up)
+    # AZAD's side-by-side comparison page is not part of this site (the code still looks the link up)
     s = rep('<div class="app">', '<style>#cmplink{display:none!important}</style>\n<div class="app">', s)
 
     out = os.path.join(ROOT, '3d.html')
     open(out, 'w', encoding='utf-8').write(s)
-    print('%s: %d items, %d KB' % (os.path.relpath(out, ROOT), len(L['items']), len(s) // 1024))
+    print('%s: %s, %d KB' % (os.path.relpath(out, ROOT), ', '.join('%s %d items' % (k, len(ALL['layouts'][k]['items'])) for k in model.ORDER), len(s) // 1024))
 
 
 if __name__ == '__main__':
