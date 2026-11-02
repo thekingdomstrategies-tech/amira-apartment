@@ -2632,8 +2632,8 @@ function loop(now){
 var rig=new T.Group(); scene.add(rig); rig.add(camera);
 // ---------- shared views: a link that puts the next person exactly here. On the public site the link is this page's
 // own address; inside Claude it is the artifact's link (whose #anchor carries the same letters, digits, ~ . and -).
-var ON_SITE=/github\.io$|^azad\.|^localhost$|^127\.0\.0\.1$/.test(location.hostname);   // the public site: GitHub Pages or its own azad. domain; not the artifact
-var SITE_BASE=ON_SITE?location.origin+location.pathname:'https://claude.ai/artifact/YYed4rFH6uPK6D7AeG1ZNP';
+var ON_SITE=true;   // always the public site: this one has no claude.ai artifact
+var SITE_BASE=location.origin+location.pathname;
 document.getElementById('cmplink').hidden=!ON_SITE;   // the compare page lives on the public site, next to this one
 function camToken(){ var r=function(v){ return Math.round(v*10)/10; }, c=camera.position, t=controls.target;
   if(mode==='eye'){ var d=t.clone().sub(c).normalize();
