@@ -20,6 +20,24 @@ NAME = 'Creektown Apartment'
 # yet (the drawings carry no north arrow), so 180 (top edge facing due south) is a placeholder: set it once confirmed.
 SITE = dict(lat=30.0280, lon=31.4590, facing=180)
 
+# The Creek Town palette, measured from the vector fills of the compound's brochure; text panels use a slightly deeper
+# leaf so white text keeps a 4.5:1 contrast.
+BRAND = dict(forest='#1C3B28', leaf='#5A8C5B', panel='#4C7D4D', lime='#8DBA6A')
+BRAND_CSS = (
+    ':root{--paper:#F4F5F3;--sheet:#FFFFFF;--ink:#1F2421;--ink2:#404040;--muted:#5F6461;--line:#DADBDC;'
+    '--accent:#1C3B28;--accent-ink:#FFFFFF;--oak:#A87A4B;'
+    '--display:"Poppins","Helvetica Neue",Arial,sans-serif;--mono:"Poppins","Helvetica Neue",Arial,sans-serif;'
+    '--glass:rgba(255,255,255,.66);--btn-line:rgba(28,59,40,.14)}'
+    '@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--paper:#0E1711;--sheet:#15231A;--ink:#E3E8E3;'
+    '--ink2:#BAC3BB;--muted:#94A095;--line:#26382C;--accent:#9CCB80;--accent-ink:#0E1711;--glass:rgba(14,23,17,.62)}}'
+    ':root[data-theme="dark"]{--paper:#0E1711;--sheet:#15231A;--ink:#E3E8E3;--ink2:#BAC3BB;--muted:#94A095;'
+    '--line:#26382C;--accent:#9CCB80;--accent-ink:#0E1711;--glass:rgba(14,23,17,.62)}'
+    '.phead .ptitle{font-weight:700;text-transform:uppercase;letter-spacing:-.005em}'
+    '.phead .eyebrow{color:#3E6E40;letter-spacing:.16em}'
+    '@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .phead .eyebrow{color:#9CCB80}}'
+    ':root[data-theme="dark"] .phead .eyebrow{color:#9CCB80}'
+)
+
 
 def sub1(pattern, repl, s, flags=0):
     """re.sub that must hit exactly once, so a template change is noticed instead of silently skipped."""
@@ -133,6 +151,14 @@ def main():
     s = sub1(r"var SITE_BASE=ON_SITE\?location\.origin\+location\.pathname:'[^']*';", "var SITE_BASE=location.origin+location.pathname;", s)
     # AZAD's side-by-side comparison page is not part of this site (the code still looks the link up)
     s = rep('<div class="app">', '<style>#cmplink{display:none!important}</style>\n<div class="app">', s)
+
+    # ---------------- the Creek Town brand (the compound brochure) over AZAD's theme: Poppins, forest and leaf green.
+    # AZAD's stylesheet runs on a few colour and font tokens; a later block of the same specificity overrides them.
+    s = sub1(r'<link rel="stylesheet" href="https://fonts\.googleapis\.com/css2\?family=Montserrat[^"]*">',
+             '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">', s)
+    s = rep('#2E5A74', BRAND['forest'], s, 0)        # AZAD's blue, also written out in a few badges and focus rings
+    s = rep('0x2E5A74', '0x' + BRAND['leaf'][1:], s, 0)   # and in the 3D markers (walk-to dots, tape measure)
+    s = rep('<div class="app">', '<style>%s</style>\n<div class="app">' % BRAND_CSS, s)
 
     out = os.path.join(ROOT, '3d.html')
     open(out, 'w', encoding='utf-8').write(s)
