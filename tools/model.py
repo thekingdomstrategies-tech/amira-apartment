@@ -52,15 +52,30 @@ OUTLINE = [[195, 10], [1590, 10], [1590, 915], [1410, 915], [1410, 1150], [950, 
 FLOOR_NO = 5
 STOREY = 310
 ELEV = FLOOR_NO * STOREY          # the apartment's floor above the garden, cm
-# what the Neighbours switch shows (massing) and lets cast shade; z is relative to the apartment's floor
-CONTEXT = [
-    dict(name='the floors below', p=OUTLINE, z=[-ELEV, -2]),
-    dict(name='the rest of the building, beside the reception', p=[[1593, 10], [2700, 10], [2700, 1162], [1593, 1162]], z=[-ELEV, STOREY]),
-    dict(name='the rest of the building, behind the bedrooms', p=[[10, 1163], [2700, 1163], [2700, 1900], [10, 1900]], z=[-ELEV, STOREY]),
-    dict(name='the stair core', p=[[1413, 918], [1592, 918], [1592, 1160], [1413, 1160]], z=[-ELEV, STOREY]),
-    dict(name='the buildings across the garden', p=[[-1500, -7500], [3200, -7500], [3200, -5500], [-1500, -5500]], z=[-ELEV, 2 * STOREY]),
-]
-GARDEN = [[-3000, -5400], [4500, -5400], [4500, -40], [-3000, -40]]   # the lawn below the windows, at ground level
+# what the Neighbours switch shows (massing) and lets cast shade; z is relative to the apartment's floor.
+# E07 itself: this unit, its mirror twin beside it and the two units behind; the rest of the compound comes from the
+# brochure's masterplan (tools/surroundings.py -> data/surroundings.json).
+SURROUND = json.load(open(os.path.join(ROOT, 'data', 'surroundings.json')))
+BLOCK_TOP, PENTHOUSE_TOP, SHOP_TOP = STOREY, 2 * STOREY, -ELEV + 3 * 340
+
+
+def _rect(b):
+    return [[b[0], b[1]], [b[2], b[1]], [b[2], b[3]], [b[0], b[3]]]
+
+
+def _penthouse(b, k=.62):    # the set-back top level: the middle of the roof
+    cx, cy, hx, hy = (b[0] + b[2]) / 2, (b[1] + b[3]) / 2, (b[2] - b[0]) * k / 2, (b[3] - b[1]) * k / 2
+    return [round(cx - hx), round(cy - hy), round(cx + hx), round(cy + hy)]
+
+
+CONTEXT = (
+    [dict(name='the floors below', p=OUTLINE, z=[-ELEV, -2]),
+     dict(name='E07: the flat next door', p=_rect([1593, 10, 3170, 1162]), z=[-ELEV, BLOCK_TOP]),
+     dict(name='E07: the flats behind', p=_rect([10, 1163, 3170, 2310]), z=[-ELEV, BLOCK_TOP])]
+    + [dict(name='an apartment building', p=_rect(b), z=[-ELEV, BLOCK_TOP]) for b in SURROUND['blocks']]
+    + [dict(name='an apartment building, penthouse level', p=_rect(_penthouse(b)), z=[BLOCK_TOP, PENTHOUSE_TOP]) for b in SURROUND['blocks']]
+    + [dict(name='the shops along the Suez Road', p=_rect(b), z=[-ELEV, SHOP_TOP]) for b in SURROUND['shops']])
+GARDEN = [[-30000, -30000], [30000, -30000], [30000, 30000], [-30000, 30000]]   # the lawn under the compound, at ground level
 
 # ---------------------------------------------------------------- the three plans
 # doors: name, rect, axis, hinge end (0 = low end, 1 = high end), swing (+1/-1 across the wall), leaf material
@@ -708,7 +723,8 @@ VIEWS = [   # key, button, view, plans it belongs to (None: all); z below 1 wide
     ('reception', 'Reception', dict(pos=[1290, 470, EYE], look=[1040, 170, 95], z=ZOOM, msg='Across the reception to the window and the sofa, wider than life.' + TRUE), None),
     ('living', 'Living', dict(pos=[1530, 470, EYE], look=[1310, 230, 100], z=ZOOM, msg='The living area, wider than life.' + TRUE), ['existing', 'o2']),
     ('living1', 'Living', dict(pos=[1300, 600, EYE], look=[1545, 300, 100], z=ZOOM, msg='The living area and the TV wall, wider than life.' + TRUE), ['o1']),
-    ('terrace', 'Terrace', dict(pos=[1450, 330, EYE], look=[1450, 60, 110], z=ZOOM, msg='From the living area out to the terrace, wider than life.' + TRUE), None),
+    ('terrace', 'Terrace', dict(pos=[1450, 120, EYE], look=[1150, -3200, -1000], z=ZOOM, msg='On the terrace, looking down over the pool garden, wider than life.' + TRUE), None),
+    ('poolview', 'Pool view', dict(pos=[1148, 130, EYE], look=[1148, -3500, -1150], z=ZOOM, msg='At the reception window: the view down over the pool garden, with the neighbouring buildings either side, wider than life.' + TRUE), None),
     ('kitchen', 'Kitchen', dict(pos=[1190, 940, EYE], look=[1040, 650, 95], z=ZOOM, msg='The kitchen, wider than life: hob on the far wall, sink under the window.' + TRUE), ['existing']),
     ('kitchen1', 'Kitchen', dict(pos=[810, 570, EYE], look=[810, 150, 95], z=ZOOM, msg='From the corridor into the kitchen, wider than life: the sink run on the left, the hob on the right.' + TRUE), ['o1']),
     ('kitchen2', 'Kitchen', dict(pos=[1340, 990, EYE], look=[1050, 720, 90], z=ZOOM, msg='Across the island into the kitchen, wider than life.' + TRUE), ['o2']),
@@ -735,7 +751,8 @@ def all_data(azad_all):
                 ["Film", "Everything off except a low wash in the living area."],
                 ["Night path", "Corridor downlights 5 %, everything else off."],
                 ["All off", "One press by the front door as you leave."]],
-        preview=False, fcat=azad_all.get('fcat', []), fin=[], furnish={}, context=CONTEXT), OUTLINE
+        preview=False, fcat=azad_all.get('fcat', []), fin=[], furnish={}, context=CONTEXT,
+        surround=dict(ground=-ELEV, water=SURROUND['water'], roads=SURROUND['roads'], trees=SURROUND['trees'])), OUTLINE
 
 
 if __name__ == '__main__':

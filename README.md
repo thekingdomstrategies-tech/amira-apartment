@@ -60,6 +60,7 @@ facade band, which no option changes; all three plans then share one set of coor
 | Step | Script | Output |
 | --- | --- | --- |
 | Trace the walls from each empty sheet | `tools/extract_walls.py` | `data/walls_<sheet>.json` |
+| The compound round building E07, from the brochure's masterplan | `tools/surroundings.py` | `data/surroundings.json` |
 | Each plan's doors, rooms, furniture, lights, viewpoints | `tools/model.py` | (imported by the two below) |
 | The 3D page from AZAD's viewer | `tools/build_3d.py --azad PATH` | `3d.html` |
 | Plan images, plan page and overview | `tools/build_pages.py` | `plan.html`, `index.html`, `img/plan-<sheet>-*.jpg` |
@@ -73,12 +74,16 @@ and Pillow, and poppler's `pdftocairo` and `pdftoppm`. `img/3d-thumb.jpg` is a s
 
 These are stand-ins in the model until they are checked on site or with the architect:
 
-- **Orientation.** The drawings have no north arrow. The sun assumes the top of the plan (the reception and master
-  bedroom windows) faces due south: `SITE.facing` in `tools/build_3d.py`.
-- **The building.** The apartment is on the 5th floor, looking over a big garden. The model puts its floor 15.5 m above
-  the garden (3.10 m a storey) with one penthouse level above, after the brochure's apartment buildings (ground floor,
-  five typical floors, a set-back penthouse level). The rest of the block, the stair core and the buildings across the
-  garden are simple massing (`CONTEXT` in `tools/model.py`), shown and casting shade with the 3D page's Neighbours switch.
+- **The unit and its outlook.** Unit E07-53 is the brochure's 165 m² three-bedroom unit (page 93), on the 5th floor
+  of building E07, on its pool side, the building at the head of the middle apartment cluster's pool. Its floor is
+  taken as 15.5 m above the garden (3.10 m a storey), with the penthouse level above. On the brochure's maps (the Suez
+  Road at the top, Rehab at the bottom) the pool side faces south (`SITE.facing`, within about 15°). The compound
+  model marks the unit at the left end of the pool side, which with the brochure's layout would make it the mirror
+  image of the drawings: to check on site.
+- **The surroundings.** `tools/surroundings.py` reads the brochure's masterplan (page 7) into
+  `data/surroundings.json`: the other apartment buildings (as E07-sized blocks with a penthouse level), the shops
+  along the road, the pools, roads and trees, scaled from E07's roof and turned so E07's pool side matches the plan.
+  The 3D page shows them standing, with the Neighbours switch, and lets the buildings cast shade.
 - **Heights.** 2.80 m floor to slab; main windows 0.90 to 2.25 m, bathroom windows 1.50 to 2.10 m, kitchen windows 1.05
   to 2.10 m; doors 2.10 m (front door 2.20 m). All in `tools/model.py`.
 - **The concrete band outside the facade** is drawn as a 95 cm planter or parapet.
