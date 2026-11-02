@@ -21,6 +21,31 @@ plain HTML with relative links, so any static server works too (for example `pyt
 needs one DNS record at kamelnabil.com's DNS provider: a `CNAME` for `amira` pointing to
 `thekingdomstrategies-tech.github.io`. `.nojekyll` tells Pages to serve the files as they are.
 
+## Design
+
+The pages follow the Creek Town brand, taken from the compound's brochure (`source/creek_town_brochure.pdf`):
+Poppins throughout, heavy uppercase headings, a widely spaced light wordmark, large faded section numerals, square
+edges, and the brochure's colours, measured from its vector fills:
+
+| Role | Colour |
+| --- | --- |
+| Forest green: the cover, footer, selected buttons | `#1C3B28` |
+| Leaf green: rules, numerals, plan highlights | `#5A8C5B` |
+| Leaf panel: green panels carrying white text (a touch deeper than the brochure's leaf, for 4.5:1 contrast) | `#4C7D4D` |
+| Lime: accents on the forest green | `#8DBA6A` |
+| Text and fine print | `#404040`, `#6B6E6F` |
+
+The overview and plan pages take it from the stylesheet in `tools/build_pages.py`. The 3D page keeps AZAD's viewer and
+overrides its colour and font tokens (`BRAND_CSS` in `tools/build_3d.py`). Both have a dark theme. The compound's logo
+and crest are not used; the wordmark is set in type.
+
+The overview's header is the compound's apartment-building render (brochure page 53, `img/hero-building*.jpg`, made
+by `tools/build_pages.py`) under a forest-green gradient, drifting slowly under a moving soft light; it holds still for
+visitors who ask their system for reduced motion.
+
+The 3D page opens from above (Overview) with no furniture and no sun path; the Furniture, Sun path, Shutters and
+Neighbours switches turn them on. Every room view opens at 34 % zoom; 1:1 is true size.
+
 ## Where the numbers come from
 
 `source/` holds the architect's files: `Creektown_apartment.dwg` and, for each plan, an empty and a furnished sheet
@@ -50,6 +75,10 @@ These are stand-ins in the model until they are checked on site or with the arch
 
 - **Orientation.** The drawings have no north arrow. The sun assumes the top of the plan (the reception and master
   bedroom windows) faces due south: `SITE.facing` in `tools/build_3d.py`.
+- **The building.** The apartment is on the 5th floor, looking over a big garden. The model puts its floor 15.5 m above
+  the garden (3.10 m a storey) with one penthouse level above, after the brochure's apartment buildings (ground floor,
+  five typical floors, a set-back penthouse level). The rest of the block, the stair core and the buildings across the
+  garden are simple massing (`CONTEXT` in `tools/model.py`), shown and casting shade with the 3D page's Neighbours switch.
 - **Heights.** 2.80 m floor to slab; main windows 0.90 to 2.25 m, bathroom windows 1.50 to 2.10 m, kitchen windows 1.05
   to 2.10 m; doors 2.10 m (front door 2.20 m). All in `tools/model.py`.
 - **The concrete band outside the facade** is drawn as a 95 cm planter or parapet.

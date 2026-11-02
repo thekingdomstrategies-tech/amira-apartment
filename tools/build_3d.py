@@ -20,6 +20,24 @@ NAME = 'Creektown Apartment'
 # yet (the drawings carry no north arrow), so 180 (top edge facing due south) is a placeholder: set it once confirmed.
 SITE = dict(lat=30.0280, lon=31.4590, facing=180)
 
+# The Creek Town palette, measured from the vector fills of the compound's brochure; text panels use a slightly deeper
+# leaf so white text keeps a 4.5:1 contrast.
+BRAND = dict(forest='#1C3B28', leaf='#5A8C5B', panel='#4C7D4D', lime='#8DBA6A')
+BRAND_CSS = (
+    ':root{--paper:#F4F5F3;--sheet:#FFFFFF;--ink:#1F2421;--ink2:#404040;--muted:#5F6461;--line:#DADBDC;'
+    '--accent:#1C3B28;--accent-ink:#FFFFFF;--oak:#A87A4B;'
+    '--display:"Poppins","Helvetica Neue",Arial,sans-serif;--mono:"Poppins","Helvetica Neue",Arial,sans-serif;'
+    '--glass:rgba(255,255,255,.66);--btn-line:rgba(28,59,40,.14)}'
+    '@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--paper:#0E1711;--sheet:#15231A;--ink:#E3E8E3;'
+    '--ink2:#BAC3BB;--muted:#94A095;--line:#26382C;--accent:#9CCB80;--accent-ink:#0E1711;--glass:rgba(14,23,17,.62)}}'
+    ':root[data-theme="dark"]{--paper:#0E1711;--sheet:#15231A;--ink:#E3E8E3;--ink2:#BAC3BB;--muted:#94A095;'
+    '--line:#26382C;--accent:#9CCB80;--accent-ink:#0E1711;--glass:rgba(14,23,17,.62)}'
+    '.phead .ptitle{font-weight:700;text-transform:uppercase;letter-spacing:-.005em}'
+    '.phead .eyebrow{color:#3E6E40;letter-spacing:.16em}'
+    '@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .phead .eyebrow{color:#9CCB80}}'
+    ':root[data-theme="dark"] .phead .eyebrow{color:#9CCB80}'
+)
+
 
 def sub1(pattern, repl, s, flags=0):
     """re.sub that must hit exactly once, so a template change is noticed instead of silently skipped."""
@@ -80,9 +98,37 @@ def main():
     s = rep('door=P(1455,1420,0)', 'door=P(%d,%d,0)' % tuple(door), s)
     s = sub1(r'var UPPER=\(function\(\)\{var o=\[\[.*?\]\];', 'var UPPER=(function(){var o=%s;' % json.dumps(outline).replace(' ', ''), s)
     s = rep('var p=P(950,1720,1)', 'var p=P(1700,1240,1)', s)
-    # AZAD's as-built plan opens with bare rooms; this one opens furnished, as the architect drew it
-    s = rep("if(!userSet.fu)setKey('fu',k==='existing'?'none':'all',false);", "if(!userSet.fu)setKey('fu','all',false);", s)
-    s = rep("setKey('fu',LAYOUT==='existing'?'none':'all',false);", "setKey('fu','all',false);", s)
+    # ---------------- how the page opens: from above (Overview), no furniture (the doors stay), no sun path, no garden
+    # shade (there is no garden at this level). Furniture starts at None in the state itself: switching to None hides
+    # the doors as well, which is AZAD's choice for its bare rooms but not wanted here.
+    s = rep("if(!userSet.fu)setKey('fu',k==='existing'?'none':'all',false);", "", s)
+    s = rep("setKey('fu',LAYOUT==='existing'?'none':'all',false);", "", s)
+    s = rep("var state={chg:'on',sp:'on',", "var state={chg:'on',sp:'off',", s)
+    s = rep(",sh:'open',gs:'pergola',aw:'out',fu:'all',", ",sh:'open',gs:'none',aw:'out',fu:'none',", s)
+    s = rep("var userSet={}, prevD='open', prevGs='pergola';", "var userSet={}, prevD='open', prevGs='none';", s)
+    s = rep("press('wm',state.wm); press('look',state.look);", "press('wm',state.wm); press('look',state.look); press('sp',state.sp); press('fu',state.fu);", s)
+    s = rep("goto(VIEWS[h0]?h0:ALL.preview?'overview':'entrance');", "goto(VIEWS[h0]?h0:'overview');", s)
+    s = rep("'Bare rooms: no furniture, doors or garden shade. Pick All or Built-in to furnish.'", "'No furniture. Pick All or Built-in to furnish the rooms.'", s)
+    # the Garden shade control goes; its summary in the Light tab too
+    s = sub1(r'<div class="ctl"><div class="cl"><span>Garden shade</span></div><div class="bt" data-state="gs">.*?</div></div>\s*', '', s, re.S)
+    s = rep("var gsl={pergola:'pergola',awning:'shades '+state.aw,none:'no garden shade'}[state.gs];", "", s)
+    s = rep("textContent, gsl, 'shutters '+state.sh]", "textContent, 'shutters '+state.sh]", s)
+
+    # ---------------- the apartment on the 5th floor, over the garden. Standing, the ground and a lawn are 15.5 m below
+    # the floor and the Neighbours switch shows the building round it; from above it stays a model on its plinth.
+    E = model.ELEV / 100
+    s = rep("// the five floors above: they cast shade but are not drawn, so the rooms stay visible",
+            "// the floor above (the penthouse level): it casts shade but is not drawn, so the rooms stay visible", s)
+    s = rep("var g=new T.ExtrudeGeometry(sh,{depth:16,bevelEnabled:false}); g.rotateX(Math.PI/2);   // from 19 m down to the slab at 3 m",
+            "var g=new T.ExtrudeGeometry(sh,{depth:%g,bevelEnabled:false}); g.rotateX(Math.PI/2);   // one storey, from the slab up" % (model.STOREY / 100), s)
+    s = rep("m.position.y=19; m.castShadow=true;", "m.position.y=%g; m.castShadow=true;" % (2 * model.STOREY / 100), s)
+    lawn = ("var LAWN=(function(){var o=%s; var sh=new T.Shape(); o.forEach(function(q,i){if(i===0)sh.moveTo(q[0]*S,q[1]*S);else sh.lineTo(q[0]*S,q[1]*S);});"
+            "var g=new T.ShapeGeometry(sh); g.rotateX(Math.PI/2); g.translate(0,-%g+.01,0); worldUV(g,TEXM.grass);"
+            "var m=new T.Mesh(g,M.grass); m.receiveShadow=true; m.visible=false; m.userData={mk:'grass',site:1,fixed:1}; scene.add(m); return m;})();   // the big garden, %g m below\n"
+            % (json.dumps(model.GARDEN).replace(' ', ''), E, E))
+    s = rep("staticFloors.push(grass);\n", "staticFloors.push(grass);\n" + lawn, s)
+    s = rep("cshadow.visible=ov; land.material=ov?studioMat:landMat; land.position.y=ov?-.006-PLINTH-.001:-.02;",
+            "cshadow.visible=ov; land.material=ov?studioMat:landMat; land.position.y=ov?-.006-PLINTH-.001:-%g-.02; pave.visible=ov; LAWN.visible=!ov;" % E, s)
     s = rep("p.n!=='Window'&&p.n!=='Garden doors'", "p.n!=='Window'&&p.n!=='Terrace doors'", s, 0)
     s = rep("It reaches the garden glass.':'The garden glass is in shade.'", "It reaches the main windows.':'The main windows are in shade.'", s)
     s = rep("['top','garden side'],['bottom','entrance side']", "['top','window side'],['bottom','entrance side']", s)
@@ -133,6 +179,14 @@ def main():
     s = sub1(r"var SITE_BASE=ON_SITE\?location\.origin\+location\.pathname:'[^']*';", "var SITE_BASE=location.origin+location.pathname;", s)
     # AZAD's side-by-side comparison page is not part of this site (the code still looks the link up)
     s = rep('<div class="app">', '<style>#cmplink{display:none!important}</style>\n<div class="app">', s)
+
+    # ---------------- the Creek Town brand (the compound brochure) over AZAD's theme: Poppins, forest and leaf green.
+    # AZAD's stylesheet runs on a few colour and font tokens; a later block of the same specificity overrides them.
+    s = sub1(r'<link rel="stylesheet" href="https://fonts\.googleapis\.com/css2\?family=Montserrat[^"]*">',
+             '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">', s)
+    s = rep('#2E5A74', BRAND['forest'], s, 0)        # AZAD's blue, also written out in a few badges and focus rings
+    s = rep('0x2E5A74', '0x' + BRAND['leaf'][1:], s, 0)   # and in the 3D markers (walk-to dots, tape measure)
+    s = rep('<div class="app">', '<style>%s</style>\n<div class="app">' % BRAND_CSS, s)
 
     out = os.path.join(ROOT, '3d.html')
     open(out, 'w', encoding='utf-8').write(s)
