@@ -16,8 +16,10 @@ a 3D walkthrough of each with the real sun. The site reuses the
 | Option 1 | `o1` | `option_1_*.pdf` | 2 bedrooms: a master suite with a dressing area, a galley kitchen in the old master bedroom, one shared bathroom, storage |
 | Option 2 | `o2` | `option_2_*.pdf` | 3 bedrooms, one shared bathroom, a kitchen with an island that takes in the maid's room |
 
-Open `index.html` through any static server (for example `python3 -m http.server`) or publish the folder on GitHub
-Pages; the site is plain HTML with relative links.
+The site is published with GitHub Pages from `main` at **https://amira.kamelnabil.com/** (the `CNAME` file), and is
+plain HTML with relative links, so any static server works too (for example `python3 -m http.server`). The domain
+needs one DNS record at kamelnabil.com's DNS provider: a `CNAME` for `amira` pointing to
+`thekingdomstrategies-tech.github.io`. `.nojekyll` tells Pages to serve the files as they are.
 
 ## Where the numbers come from
 

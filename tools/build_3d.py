@@ -127,6 +127,10 @@ def main():
     s = sub1(r'<svg class="bprint" id="bprint".*?</svg>', bprint_svg(ALL, outline), s, re.S)
     s = sub1(r'<img class="lprev" alt="" src="data:image/[^"]*">', '', s)
     s = s.replace('AZAD Apartment', NAME)
+    # share links: AZAD points them at its own claude.ai artifact unless it runs on GitHub Pages or azad.*; this site
+    # has no artifact, so a link always points back to wherever the page is served (amira.kamelnabil.com, github.io)
+    s = sub1(r"var ON_SITE=/[^;]*;[^\n]*", "var ON_SITE=true;   // always the public site: this one has no claude.ai artifact", s)
+    s = sub1(r"var SITE_BASE=ON_SITE\?location\.origin\+location\.pathname:'[^']*';", "var SITE_BASE=location.origin+location.pathname;", s)
     # AZAD's side-by-side comparison page is not part of this site (the code still looks the link up)
     s = rep('<div class="app">', '<style>#cmplink{display:none!important}</style>\n<div class="app">', s)
 
