@@ -98,15 +98,17 @@ These are stand-ins in the model until they are checked on site or with the arch
 - **The concrete band outside the facade** is drawn as a 95 cm planter or parapet.
 - **Furniture** follows each furnished sheet as simple blocks; kitchens are simplified. Where an option draws a dining
   table alone, chairs are added.
-- **Option 1, dressing area and kitchen.** The empty sheet draws no wall between them and no door to the master
-  bathroom. The model adds a partition where the furnished sheet draws a line, and leaves the bathroom doorway open.
+- **Option 1, dressing area and kitchen.** The empty sheet draws the wall between them in outline, without hatching:
+  a 15 cm partition, 1.92 m from the dressing area's far wall, added by hand. It draws no door to the master bathroom,
+  so the model leaves that doorway open.
 - **Doors and partitions the sheets leave out.** Option 1's bathroom door has no swing drawn, so it is hinged on the
   vanity side. Option 2's bathroom wall to the corridor is drawn without hatching, so it is added by hand
   (`extra_walls` in `tools/model.py`).
 - **Option 3.** Built from Amira's hand drawings of option 1. Wall C (the bathroom's end wall by the shoe cabinet)
-  moves 50 cm, in line with the kitchen / dressing wall, so the corridor runs 5.89 m at 1.10 m; the bathroom opens off
+  moves 50 cm, in line with the front of the wardrobe across the corridor, so the corridor runs 5.89 m at 1.10 m; the bathroom opens off
   it by an 80 cm sliding door; the bathroom and dining light-well windows become solid wall (the storage one stays).
-  With the 60 cm wardrobe column beside it, the master suite door is a 70 cm opening: to confirm on site. The kitchen
+  The master wardrobe is an L: 70 and 60 along the window wall, the corner, then 60, 60, 60, 70 and 80 down the
+  kitchen wall; the bathroom counter runs from the shower glass to the far wall, with the WC in the corner. The kitchen
   shows a 95 cm hob or a 60 cm one (the Hob switch). Colours are placeholders until chosen: warm-white kitchen doors
   with a pale stone worktop, and a lighter oak for the moved wardrobe. The plan page's Furnished and Empty sheets for
   option 3 are the architect's option 1 sheets; Zones is Amira's layout.

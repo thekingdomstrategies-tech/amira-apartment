@@ -555,7 +555,7 @@ OPTIONS = {
     ]),
     'o3': ("Amira's layout", [
         'Option 1\'s plan, furnished from Amira\'s own drawings with her furniture and measures.',
-        'The corridor is 5.89 m long and 1.10 m wide: the bathroom wall moves 50 cm, in line with the kitchen wall, and a 55 cm shoe cabinet sits at its end.',
+        'The corridor is 5.89 m long and 1.10 m wide: the bathroom wall moves 50 cm, and a 55 cm shoe cabinet sits at its end.',
         'The shared bathroom opens off the corridor by a sliding door: shower, a counter with the basin and washing machine, and the WC; its light-well windows are closed.',
         'A kitchen of two runs in the old master bedroom, open to the corridor, with a small counter and two stools; a 95 or a 60 cm hob.',
         'A 2.80 sofa, a TV wall unit, dining for eight with a sideboard, and a piano corner.',
@@ -607,7 +607,7 @@ INDEX_BODY = '''<body>
     <li><b>The view and the building round it</b><span>The 3D model puts the apartment on the 5th floor, 15.5 m above the pool garden (3.10 m a storey), with the penthouse level above. Standing, the Neighbours switch shows the compound round E07 from the brochure's masterplan: the other buildings, the pools, roads, trees and the shops along the road, to scale and casting shade. They are simple shapes, not a photograph; Pool view and Terrace show the outlook.</span></li>
     <li><b>Window sills and heads</b><span>Main windows from 0.90 to 2.25 m, bathroom and kitchen windows higher. The terrace has full-height sliding doors.</span></li>
     <li><b>The concrete band outside</b><span>Drawn on the facade outside the bedrooms and the reception; shown in 3D as a low planter or parapet, to be confirmed.</span></li>
-    <li><b>Option 1: dressing area and kitchen</b><span>The empty sheet draws no wall between them, and no door to the master bathroom. The 3D model puts a partition where the furnished sheet draws a line, and leaves the bathroom doorway open.</span></li>
+    <li><b>Option 1: dressing area and kitchen</b><span>The empty sheet draws the wall between them in outline only, without hatching; the model takes it as a 15 cm partition, which leaves the dressing area 1.92 m wide and the kitchen 3.12 m. The sheet draws no door to the master bathroom, so the doorway is left open.</span></li>
     <li><b>Doors and chairs the sheets leave out</b><span>Option 1's bathroom door has no swing drawn, so it is hinged on the vanity side; dining chairs are added where the options draw the table alone.</span></li>
   </ul>
 </section>
