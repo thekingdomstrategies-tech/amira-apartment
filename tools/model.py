@@ -242,6 +242,24 @@ def walls_of(key):
     return [w[:4] + [w[4]] for w in walls] + [list(r) + ['wall'] for r, _ in lay['extra_walls']]
 
 
+_CLEAN = {}
+
+
+def clean_walls_of(key):
+    """walls_of(key) cleaned into straight shapes (tools/clean_walls.py): the traced cells' hairline gaps, chips,
+    notches and steps are gone, so the 3D walls and the plan drawing are the same clean walls. Openings are cut after
+    this, as before, so doors and windows keep their lintels and sills."""
+    if key not in _CLEAN:
+        import clean_walls
+        ws = walls_of(key)
+        W = int(max(w[2] for w in ws)) + 40; Hh = int(max(w[3] for w in ws)) + 40
+        out = []
+        for kind in ('wall', 'facade'):
+            out += [r + [kind] for r in clean_walls.clean([w[:4] for w in ws if w[4] == kind], W, Hh)]
+        _CLEAN[key] = out
+    return _CLEAN[key]
+
+
 def room_rects(key):
     """{room name: [rect, ...]} in the order the plan lists them, plus the terrace."""
     out = {}
@@ -253,7 +271,7 @@ def room_rects(key):
 
 def build(key):
     lay = LAYOUTS[key]
-    solid = [dict(r=w[:4], kind=w[4]) for w in walls_of(key)]
+    solid = [dict(r=w[:4], kind=w[4]) for w in clean_walls_of(key)]
     items, pieces = [], []
 
     def box(b, m, **kw):
