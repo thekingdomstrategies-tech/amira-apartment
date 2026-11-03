@@ -13,6 +13,7 @@ from PIL import Image
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import model  # noqa: E402
+import clean_walls  # noqa: E402
 from extract_walls import CM_PER_PT, X0, Y0, X1, Y1, parse_svg, facade_offset  # noqa: E402
 from build_3d import SITE  # noqa: E402
 SITE_FACING = SITE['facing']   # the bearing the top of the plan faces
@@ -405,12 +406,15 @@ def zones_svg(key, W, H):
             furn.append((it['z'][1], '<circle class="%s" cx="%s" cy="%s" r="%s"/>' % (cls, f(it['c'][0]), f(it['c'][1]), f(it['r']))))
     g.append('<g class="zfurn">' + ''.join(e for _, e in sorted(furn, key=lambda t: t[0])) + '</g>')
 
-    # walls (full height) and the facade band, as the 3D model has them: openings already cut
-    for it in built['items']:
-        if it.get('g') != 'wall' or it['b'][2] != 0: continue
-        b = it['b']
-        if b[5] >= 200: g.append(rect([b[0], b[1], b[3], b[4]], 'zwall'))
-        elif b[5] == model.PARAPET: g.append(rect([b[0], b[1], b[3], b[4]], 'zfacade'))
+    # walls (full height) and the facade band, as the 3D model has them (openings already cut), cleaned into straight
+    # shapes (tools/clean_walls.py) and drawn as one path each, so no seams show between the traced pieces
+    walls = [[it['b'][0], it['b'][1], it['b'][3], it['b'][4]] for it in built['items']
+             if it.get('g') == 'wall' and it['b'][2] == 0 and it['b'][5] >= 200]
+    facade = [[it['b'][0], it['b'][1], it['b'][3], it['b'][4]] for it in built['items']
+              if it.get('g') == 'wall' and it['b'][2] == 0 and it['b'][5] == model.PARAPET]
+    clear = [o for _, o, *_ in lay['doors'] + lay['openings']] + [w[1] for w in model.WINDOWS] + [w[1] for w in model.SLIDERS]
+    g.append('<path class="zfacade" d="%s"/>' % clean_walls.path(clean_walls.clean(facade, W, H), k))
+    g.append('<path class="zwall" d="%s"/>' % clean_walls.path(clean_walls.clean(walls, W, H, clear), k))
 
     # windows and the terrace doors: a pale pane with a line along it
     for pc in built['pieces']:
