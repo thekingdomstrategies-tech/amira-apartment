@@ -1,21 +1,22 @@
 # Creektown Apartment
 
-Amira's new apartment in Creek Town, New Cairo: the architect's plans to scale (as built, and two layout options), and
+Amira's new apartment in Creek Town, New Cairo: the architect's plans to scale (as built, and two layout options), Amira's own layout, and
 a 3D walkthrough of each with the real sun. The site reuses the
 [AZAD apartment site](https://github.com/kamelshenouda/azad) and its 3D viewer, pointed at this apartment.
 
-- `index.html`: overview, key facts, the three plans compared room by room, what is still to confirm
+- `index.html`: overview, key facts, the four plans compared room by room, what is still to confirm
 - `plan.html`: for each plan, a colour-zoned drawing of the model (rooms coloured by what they are, walls, windows,
   door swings, furniture, room sizes, areas, dimensions, north and a scale, with a zoom), the architect's two sheets
   (furnished and empty), every room clickable, and a room schedule; `plan.html?plan=o1` opens option 1
 - `3d.html`: the AZAD walkthrough with this apartment's walls, windows, doors, furniture, lighting and viewpoints, with
-  a plan button each for as built, option 1 and option 2; `3d.html?plan=o2` opens option 2
+  a plan button each for as built, option 1, option 2 and option 3; `3d.html?plan=o2` opens option 2
 
 | Plan | Key | Sheets | In short |
 | --- | --- | --- | --- |
 | As built | `existing` | `original_*.pdf` | 3 bedrooms, 3 bathrooms, closed kitchen, maid's room |
 | Option 1 | `o1` | `option_1_*.pdf` | 2 bedrooms: a master suite with a dressing area, a galley kitchen in the old master bedroom, one shared bathroom, storage |
 | Option 2 | `o2` | `option_2_*.pdf` | 3 bedrooms, one shared bathroom, a kitchen with an island that takes in the maid's room |
+| Option 3 | `o3` | Amira's hand drawings (on `option_1_*.pdf`) | Option 1 with Amira's furniture and measures, a 5.89 m corridor, a sliding bathroom door, the light-well windows of the bathroom and dining closed |
 
 The site is published with GitHub Pages from `main` at **https://amira.kamelnabil.com/** (the `CNAME` file), and is
 plain HTML with relative links, so any static server works too (for example `python3 -m http.server`). The domain
@@ -102,3 +103,10 @@ These are stand-ins in the model until they are checked on site or with the arch
 - **Doors and partitions the sheets leave out.** Option 1's bathroom door has no swing drawn, so it is hinged on the
   vanity side. Option 2's bathroom wall to the corridor is drawn without hatching, so it is added by hand
   (`extra_walls` in `tools/model.py`).
+- **Option 3.** Built from Amira's hand drawings of option 1. Wall C (the bathroom's end wall by the shoe cabinet)
+  moves 50 cm, in line with the kitchen / dressing wall, so the corridor runs 5.89 m at 1.10 m; the bathroom opens off
+  it by an 80 cm sliding door; the bathroom and dining light-well windows become solid wall (the storage one stays).
+  With the 60 cm wardrobe column beside it, the master suite door is a 70 cm opening: to confirm on site. The kitchen
+  shows a 95 cm hob or a 60 cm one (the Hob switch). Colours are placeholders until chosen: warm-white kitchen doors
+  with a pale stone worktop, and a lighter oak for the moved wardrobe. The plan page's Furnished and Empty sheets for
+  option 3 are the architect's option 1 sheets; Zones is Amira's layout.

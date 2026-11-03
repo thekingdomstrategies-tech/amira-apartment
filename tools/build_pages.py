@@ -206,7 +206,8 @@ footer a{color:inherit}
 .segs{display:flex;flex-wrap:wrap;gap:10px}
 .seg small{font-weight:500;letter-spacing:.02em;text-transform:none;opacity:.8}
 /* the three plans: leaf-green cards, as the brochure's unit-type panels */
-.opts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.opts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
+@media (max-width:1240px){.opts{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .opt{background:var(--panel);color:#fff;padding:22px 22px 20px;display:grid;gap:10px;align-content:start}
 .opt .n{font:600 10.5px var(--font);letter-spacing:.18em;text-transform:uppercase;color:#fff;opacity:.9}
 .opt h3{font:700 21px/1.15 var(--font);text-transform:uppercase;color:#fff}
@@ -296,7 +297,7 @@ PLAN_BODY = r'''<body>
       %(overlays)s
     </svg>
   </div><div class="tip" id="tip" hidden></div></div>
-  <p class="note">Zones is the plan as the 3D walkthrough is built: the walls traced from the architect's empty sheet at 1:50, to the centimetre, each room coloured by what it is. Furnished and Empty are the architect's own two sheets, turned so the room names read upright. Hover or tap a room for its size, or <a id="walk" href="3d.html">walk through this plan in 3D</a>.</p>
+  <p class="note">Zones is the plan as the 3D walkthrough is built: the walls traced from the architect's empty sheet at 1:50, to the centimetre, each room coloured by what it is. Furnished and Empty are the architect's own two sheets, turned so the room names read upright. Option 3 is Amira's layout, drawn in Zones only; its two sheets are the architect's option 1. Hover or tap a room for its size, or <a id="walk" href="3d.html">walk through this plan in 3D</a>.</p>
 </section>
 <section>
   <div class="sh"><div class="eyebrow">Room schedule</div><h2>Every room, measured</h2>
@@ -412,7 +413,7 @@ def zones_svg(key, W, H):
              if it.get('g') == 'wall' and it['b'][2] == 0 and it['b'][5] >= 200]
     facade = [[it['b'][0], it['b'][1], it['b'][3], it['b'][4]] for it in built['items']
               if it.get('g') == 'wall' and it['b'][2] == 0 and it['b'][5] == model.PARAPET]
-    clear = [o for _, o, *_ in lay['doors'] + lay['openings']] + [w[1] for w in model.WINDOWS] + [w[1] for w in model.SLIDERS]
+    clear = [o for _, o, *_ in lay['doors'] + lay['openings']] + [w[1] for w in model.windows_of(lay)] + [w[1] for w in model.SLIDERS]
     g.append('<path class="zfacade" d="%s"/>' % clean_walls.path(clean_walls.clean(facade, W, H), k))
     cw = clean_walls.clean(walls, W, H, clear)
     g.append('<path class="zwallbed" d="%s"/>' % clean_walls.path(cw, k))          # the wall's true footprint, pale
@@ -528,7 +529,7 @@ def plan_page(imgs, W, H):
                             overlays='\n      '.join(overlays), tables='\n  '.join(tables), plans=plans, foot=FOOT,
                             data=json.dumps(data, ensure_ascii=False))
     page = HEAD % dict(title='%s · Plan' % NAME, css=CSS,
-                       desc='The architect\'s plans of the Creektown apartment: as built and two layout options, furnished and empty, with every room measured.') + body
+                       desc='The architect\'s plans of the Creektown apartment: as built, two layout options and Amira\'s layout, furnished and empty, with every room measured.') + body
     open(os.path.join(ROOT, 'plan.html'), 'w', encoding='utf-8').write(page)
     return totals
 
@@ -552,6 +553,13 @@ OPTIONS = {
         'The two corridor bathrooms become one, with a shower and the washing machine.',
         'The kitchen takes in the maid\'s room and opens onto the dining area, with an island and three stools.',
     ]),
+    'o3': ("Amira's layout", [
+        'Option 1\'s plan, furnished from Amira\'s own drawings with her furniture and measures.',
+        'The corridor is 5.89 m long and 1.10 m wide: the bathroom wall moves 50 cm, in line with the kitchen wall, and a 55 cm shoe cabinet sits at its end.',
+        'The shared bathroom opens off the corridor by a sliding door: shower, a counter with the basin and washing machine, and the WC; its light-well windows are closed.',
+        'A kitchen of two runs in the old master bedroom, open to the corridor, with a small counter and two stools; a 95 or a 60 cm hob.',
+        'A 2.80 sofa, a TV wall unit, dining for eight with a sideboard, and a piano corner.',
+    ]),
 }
 
 INDEX_BODY = '''<body>
@@ -561,26 +569,26 @@ INDEX_BODY = '''<body>
   <div class="copy wrap">
     <div class="eyebrow">Creek Town · New Cairo · interior architecture</div>
     <h1 class="wm" aria-label="Creektown Apartment, New Cairo"><span class="w1">Creektown <b>Apartment</b></span><span class="w2">New Cairo</span></h1>
-    <p>Monica's &amp; Amira's new apartment: three bedrooms, a maid's room and an open reception, living and dining onto a terrace, and the architect's two options for reworking it. Measured from the drawings and built as a 3D model you can walk through with the real sun.</p>
+    <p>Monica's &amp; Amira's new apartment: three bedrooms, a maid's room and an open reception, living and dining onto a terrace, the architect's two options for reworking it, and Amira's own layout. Measured from the drawings and built as a 3D model you can walk through with the real sun.</p>
     <div class="cta"><a class="btn solid" href="plan.html">See the plans</a><a class="btn ghost" href="3d.html">Walk through them</a></div>
   </div>
 </header>
 <div class="factsband"><div class="wrap"><div class="facts" aria-label="Key facts">
   <div><span>Size</span><b>About %(tot).0f m² net + %(ter).1f m² terrace</b><small>5th floor, looking over a big garden; floor area between walls, from the drawings at 1:50</small></div>
   <div><span>As built</span><b>Master suite · %(nb)d bedrooms in all</b><small>3 bathrooms · maid's room · kitchen</small></div>
-  <div><span>Options</span><b>Two bedrooms or three</b><small>Option 1 trades a bedroom for a master suite and a galley kitchen; option 2 opens up the kitchen</small></div>
+  <div><span>Options</span><b>Two bedrooms or three</b><small>Option 1 trades a bedroom for a master suite and a galley kitchen; option 2 opens up the kitchen; option 3 is Amira's furnishing of option 1</small></div>
   <div><span>Status</span><b>Choosing the layout</b><small>As built and both options, each with the architect's furniture</small></div>
 </div></div></div>
 <div class="wrap"><main>
 <section>
   <div class="sh"><div class="eyebrow">The project</div><h2>Explore</h2><p>Every view is drawn from the same centimetre model, traced from the architect's plans.</p></div>
   <div class="cards">
-    <a class="card" href="plan.html"><div class="thumb"><img src="img/plan-thumb.jpg" alt="The furnished floor plan" loading="lazy"></div><div class="body"><div class="n">01 · Plan</div><h3>Layouts, to scale</h3><p>As built and both options: the architect's sheets, furnished and empty, and the traced model; every room measured.</p></div></a>
-    <a class="card" href="3d.html"><div class="thumb"><img src="img/3d-thumb.jpg" alt="The 3D model from above" loading="lazy"></div><div class="body"><div class="n">02 · 3D</div><h3>Walk it freely</h3><p>Switch between the three plans, from above or standing in any room; furnished or empty; the sun at any hour; true size on screen or in a VR headset.</p></div></a>
+    <a class="card" href="plan.html"><div class="thumb"><img src="img/plan-thumb.jpg" alt="The furnished floor plan" loading="lazy"></div><div class="body"><div class="n">01 · Plan</div><h3>Layouts, to scale</h3><p>As built, both options and Amira's layout: the architect's sheets, furnished and empty, and the traced model; every room measured.</p></div></a>
+    <a class="card" href="3d.html"><div class="thumb"><img src="img/3d-thumb.jpg" alt="The 3D model from above" loading="lazy"></div><div class="body"><div class="n">02 · 3D</div><h3>Walk it freely</h3><p>Switch between the four plans, from above or standing in any room; furnished or empty; the sun at any hour; true size on screen or in a VR headset.</p></div></a>
   </div>
 </section>
 <section>
-  <div class="sh"><div class="eyebrow">The layout</div><h2>Three plans</h2><p>The architect's two options rework the inside of the same shell: the facade, windows, terrace and front door stay as built.</p></div>
+  <div class="sh"><div class="eyebrow">The layout</div><h2>Four plans</h2><p>The architect's two options rework the inside of the same shell: the facade, windows, terrace and front door stay as built. Option 3 is Option 1 as Amira drew it, with her furniture and one change to the corridor.</p></div>
   <div class="opts">%(cards)s</div>
   <table class="cmp"><thead><tr><th>Room, m²</th>%(cmp_head)s</tr></thead><tbody>%(cmp_rows)s</tbody>
   <tfoot><tr><td>Inside, net</td>%(cmp_foot)s</tr></tfoot></table>
@@ -638,7 +646,7 @@ def index_page(totals):
         cmp_head=''.join('<th class="n">%s</th>' % model.LAYOUTS[key]['button'][0] for key in model.ORDER),
         cmp_foot=''.join('<td class="n">%.1f</td>' % totals[key] for key in model.ORDER))
     page = HEAD % dict(title=NAME, css=CSS,
-                       desc='Monica\'s and Amira\'s Creektown apartment in New Cairo: the plans to scale, as built and two layout options, and a 3D walkthrough with the real sun.') + body
+                       desc='Monica\'s and Amira\'s Creektown apartment in New Cairo: the plans to scale, as built, the architect\'s two layout options and Amira\'s, and a 3D walkthrough with the real sun.') + body
     open(os.path.join(ROOT, 'index.html'), 'w', encoding='utf-8').write(page)
 
 

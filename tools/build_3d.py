@@ -33,7 +33,7 @@ PHONE_CSS = (
     '.minimap{width:96px!important;height:88px!important;top:10px!important}'
     '.zoomui{gap:8px!important}.zoomui button{width:44px!important;height:44px!important}'
     '.panel>.sitenav{padding-top:0!important}.panel>.sitenav a{min-height:34px!important}'
-    '.panel .plans{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:4px!important;margin:2px 16px 0!important}'
+    '.panel .plans{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:4px!important;margin:2px 16px 0!important}'
     '.panel .plans button{min-height:40px;padding:6px 4px!important;border-radius:10px!important}.panel .plans button small{display:none!important}'
     '#tab-go{padding-top:10px!important;grid-auto-rows:max-content}#tab-go #views{min-height:48px!important}'
     '#tab-go #views{flex:none!important;display:flex!important;flex-wrap:nowrap!important;overflow-x:auto;gap:8px!important;padding:0 16px 2px!important;margin:0 -16px!important;'
@@ -270,12 +270,19 @@ def main():
     s = rep("LAYOUT_ORDER[(LAYOUT_ORDER.indexOf(LAYOUT)+1)%4]", "LAYOUT_ORDER[(LAYOUT_ORDER.indexOf(LAYOUT)+1)%LAYOUT_ORDER.length]", s)
     s = rep("['existing','p1','c','d'].forEach(function(L){ db.doc('furnish/'+L)", "LAYOUT_ORDER.forEach(function(L){ db.doc('furnish/'+L)", s)
     s = rep("(LAYOUT==='existing'?'The original walls, furnished with a typical layout for comparison.'",
-            "(LAYOUT==='existing'?'As built, with the architect\\'s furniture.':LAYOUT==='o1'?'Option 1, two bedrooms, with the architect\\'s furniture.':LAYOUT==='o2'?'Option 2, three bedrooms, with the architect\\'s furniture.'", s)
+            "(LAYOUT==='existing'?'As built, with the architect\\'s furniture.':LAYOUT==='o1'?'Option 1, two bedrooms, with the architect\\'s furniture.':LAYOUT==='o2'?'Option 2, three bedrooms, with the architect\\'s furniture.':LAYOUT==='o3'?'Option 3, Amira\\'s layout: her furniture and measures.'", s)
+    # Option 3 offers two hobs; AZAD's island switch (state.isl, design / trial) chooses between them
+    s = rep('<div class="ctl" data-only="p1"><div class="cl"><span>Kitchen island</span></div><div class="bt" data-state="isl">'
+            '<button type="button" data-v="design" aria-pressed="true" title="Your design: the island with the oak L bar, and the oak table for 8 in the reception">Design</button>'
+            '<button type="button" data-v="trial" aria-pressed="false" title="From your photo of 13 Oct: a square stone island, with a stone table for 8 carrying on from its end">Trial: stone table</button>',
+            '<div class="ctl" data-only="o3"><div class="cl"><span>Hob</span></div><div class="bt" data-state="isl">'
+            '<button type="button" data-v="design" aria-pressed="true" title="A 95 cm hob, five burners">95 cm</button>'
+            '<button type="button" data-v="trial" aria-pressed="false" title="A 60 cm hob, four burners, with worktop either side">60 cm</button>', s)
 
     # ---------------- the page: names, the plans offered, the viewpoints, the mini-plan
     s = sub1(r'<title>[^<]*</title>', '<title>%s 3D</title>' % NAME, s)
     s = sub1(r'<meta name="description" content="[^"]*">',
-             '<meta name="description" content="Walk-through 3D model of the Creektown apartment: as built and the architect\'s two layout options, furnished, in true measurements from the plans.">', s)
+             '<meta name="description" content="Walk-through 3D model of the Creektown apartment: as built and the architect\'s two layout options and Amira\'s, furnished, in true measurements from the plans.">', s)
     s = rep('aria-label="AZAD Apartment: home">← <span class="hn">AZAD Apartment</span>',
             'aria-label="%s: home">← <span class="hn">%s</span>' % (NAME, NAME), s)
     s = sub1(r'<a href="renders.html">Renders</a>\s*<a href="package.html">Package</a>', '', s)
