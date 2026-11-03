@@ -16,7 +16,7 @@ a 3D walkthrough of each with the real sun. The site reuses the
 | As built | `existing` | `original_*.pdf` | 3 bedrooms, 3 bathrooms, closed kitchen, maid's room |
 | Option 1 | `o1` | `option_1_*.pdf` | 2 bedrooms: a master suite with a dressing area, a galley kitchen in the old master bedroom, one shared bathroom, storage |
 | Option 2 | `o2` | `option_2_*.pdf` | 3 bedrooms, one shared bathroom, a kitchen with an island that takes in the maid's room |
-| Option 3 | `o3` | Amira's hand drawings (on `option_1_*.pdf`) | Option 1 with Amira's furniture and measures, a 5.89 m corridor, a sliding bathroom door, the light-well windows of the bathroom and dining closed |
+| Option 3 | `o3` | Amira's hand drawings (on `option_1_*.pdf`) | Option 1 with Amira's own furniture and measures, a corridor closed by a door at its end, a sliding bathroom door, one light-well window kept in the bathroom |
 
 The site is published with GitHub Pages from `main` at **https://amira.kamelnabil.com/** (the `CNAME` file), and is
 plain HTML with relative links, so any static server works too (for example `python3 -m http.server`). The domain
@@ -105,10 +105,16 @@ These are stand-ins in the model until they are checked on site or with the arch
   vanity side. Option 2's bathroom wall to the corridor is drawn without hatching, so it is added by hand
   (`extra_walls` in `tools/model.py`).
 - **Option 3.** Built from Amira's hand drawings of option 1. Wall C (the bathroom's end wall by the shoe cabinet)
-  moves 50 cm, in line with the front of the wardrobe across the corridor, so the corridor runs 5.89 m at 1.10 m; the bathroom opens off
-  it by an 80 cm sliding door; the bathroom and dining light-well windows become solid wall (the storage one stays).
-  The master wardrobe is an L: 70 and 60 along the window wall, the corner, then 60, 60, 60, 70 and 80 down the
-  kitchen wall; the bathroom counter runs from the shower glass to the far wall, with the WC in the corner. The kitchen
-  shows a 95 cm hob or a 60 cm one (the Hob switch). Colours are placeholders until chosen: warm-white kitchen doors
-  with a pale stone worktop, and a lighter oak for the moved wardrobe. The plan page's Furnished and Empty sheets for
-  option 3 are the architect's option 1 sheets; Zones is Amira's layout.
+  moves 50 cm, in line with the front of the wardrobe across the corridor. A new wall with a door closes the
+  corridor's end, under the end of the kitchen wall, so the corridor is 5.75 × 1.10 m inside. The bathroom opens off
+  it by an 80 cm sliding door, and keeps one of its two light-well windows, over the washing machine; the other, and
+  the dining one, become solid wall (the storage window stays). The master wardrobe is an L: 70 and 60 along the window
+  wall, the corner, then 60, 60, 60, 70 and 80 down the kitchen wall; the bathroom counter runs from the shower glass
+  to the far wall, with the WC in the corner. The kitchen shows a 95 cm hob or a 60 cm one (the Hob switch). The
+  plan page's Furnished and Empty sheets for option 3 are the architect's option 1 sheets; Zones is Amira's layout.
+- **Amira's furniture** (`tools/home_pieces.py`) is drawn from her photos in the colours they have today: the kitchen's
+  grey painted frame-and-panel doors (arched and glazed wall units) and grey granite, the mahogany wall unit (raised
+  panels, the carved band of diamonds, fluted trims, brass handles) and its dressing table and mirror, the mahogany
+  bed, the taupe 2.00 sofa and grey 1.40 sofa with rolled arms, the two poufs, the new beige 2.80 sofa with white
+  piping, and the black upright piano. Repainting the kitchen or lightening the wall unit is still to decide. Pieces
+  without a photo (dining table and chairs, sideboard, TV wall unit, bedroom 2, bedside tables) stay simple blocks.

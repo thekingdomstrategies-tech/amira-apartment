@@ -555,10 +555,10 @@ OPTIONS = {
     ]),
     'o3': ("Amira's layout", [
         'Option 1\'s plan, furnished from Amira\'s own drawings with her furniture and measures.',
-        'The corridor is 5.89 m long and 1.10 m wide: the bathroom wall moves 50 cm, and a 55 cm shoe cabinet sits at its end.',
-        'The shared bathroom opens off the corridor by a sliding door: shower, a counter with the basin and washing machine, and the WC; its light-well windows are closed.',
+        'The corridor is closed by a door at its end, 5.75 m by 1.10 m inside: the bathroom wall moves 50 cm, and a 55 cm shoe cabinet sits at its end.',
+        'The shared bathroom opens off the corridor by a sliding door: shower, a counter with the basin and washing machine, and the WC; one of its two light-well windows stays.',
         'A kitchen of two runs in the old master bedroom, open to the corridor, with a small counter and two stools; a 95 or a 60 cm hob.',
-        'A 2.80 sofa, a TV wall unit, dining for eight with a sideboard, and a piano corner.',
+        'Her own furniture in 3D, from her photos: the grey kitchen, the mahogany wall unit and bed, her sofas and poufs, the new 2.80 sofa and the piano.',
     ]),
 }
 

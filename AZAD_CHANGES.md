@@ -231,5 +231,7 @@ These are Creektown-only, listed so they are not ported by mistake:
 - the brand (Poppins, forest and leaf greens, the Creektown wordmark), and the AZAD-credit footer removal;
 - `CNAME` `amira.kamelnabil.com`, `.nojekyll`, and the Vercel DNS record;
 - the site latitude, longitude and facing, the 5th-floor height, and E07's surroundings;
+- Amira's furniture from her photos (`tools/home_pieces.py`, and its materials in `tools/build_3d.py`), though its
+  helpers for panelled and glazed doors, drawers and sofas could be lifted into AZAD's furnisher;
 - the four Creektown plans, their furniture, rooms and views, and the hero photo;
 - "Monica's & Amira's" copy and the to-confirm notes.
