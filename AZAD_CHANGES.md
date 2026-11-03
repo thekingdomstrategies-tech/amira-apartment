@@ -134,7 +134,12 @@ visible only standing with Neighbours on (`SURR.visible=!ov&&state.up==='on'` in
 `ALL.surround = {ground, water:[rects], roads:[rects], trees:[[x,y,'palm'|'round',scale]]}`, read from a masterplan
 image by `tools/surroundings.py` (see 7.3).
 
-**4.5 A ceiling over a covered terrace,** so it does not look open to the sky when the floor above covers it.
+**4.5 Clean, straight walls in 3D.** The traced wall cells go through `clean_walls.clean()` (see section 5) before
+the openings are cut (`clean_walls_of()` in `tools/model.py`), so doors and windows keep their lintels and sills. As
+built, the full-height wall pieces go from 167 to 97, without hairline seams, chips or steps. Useful for AZAD only if its
+walls are traced cell by cell; walls drawn from a survey are already clean.
+
+**4.6 A ceiling over a covered terrace,** so it does not look open to the sky when the floor above covers it.
 
 ---
 
