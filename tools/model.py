@@ -221,6 +221,7 @@ LAYOUTS['o3'] = dict(
         ('Master bedroom door', [454, 480, 548, 506],  'x', 1, -1, 'white'),
         ('Bedroom 2 door',      [418, 700, 448, 786],  'y', 0, -1, 'white'),
         ('Storage door',        [1205, 972, 1242, 1052], 'y', 1, -1, 'white'),
+        ('Corridor door',       [1015, 518, 1030, 598], 'y', 1, -1, 'white'),   # in the new wall at the corridor's end
         FRONT_DOOR,
     ],
     openings=[('Master bath opening', [418, 163, 448, 242], 'y', DOOR_HEAD),
@@ -232,19 +233,20 @@ LAYOUTS['o3'] = dict(
         ([573, 620, 588, 815], H),         # the bathroom's wall to the shoe cabinet (C): moved 50 cm, 15 cm thick,
                                            # in line with the front of the wardrobe column across the corridor
         ([573, 790, 667, 815], H),         # the bathroom's wall to the light well, under the moved wall
-        ([667, 790, 741, 815], H),         # the bathroom windows onto the light well, closed (cement board)
-        ([813, 790, 887, 815], H),
+        ([667, 790, 741, 815], H),         # the bathroom's first light-well window, closed (cement board); the second stays
+        ([1015, 498, 1030, 620], H),       # the new wall closing the corridor's end, under the kitchen wall's end,
+        ([965, 608, 1030, 620], H),        # and the bathroom's corridor wall carried on to it; a door in it
         ([955, 830, 977, 940], H),         # the old kitchen window onto the light well, closed
     ],
     remove_walls=[[618, 616, 640, 792]],   # the bathroom's old wall to the corridor's bedroom-2 entry
-    closed_windows=['Bathroom window', 'Guest bath window', 'Kitchen window'],
+    closed_windows=['Bathroom window', 'Kitchen window'],
     rooms=[
         ('Master bathroom', [252, 62, 430, 305],  'wetz'),
         ('Master bedroom',  [67, 318, 430, 686],  'pri'),
         ('Master bedroom',  [440, 88, 632, 490],  'pri'),     # the dressing area
         ('Kitchen',         [647, 88, 959, 490],  'ser'),
         ('Bedroom 2',       [67, 694, 430, 1062], 'pri'),
-        ('Corridor',        [440, 498, 1029, 608], 'cir'),    # 5.89 m to the end of the kitchen wall, 1.10 m wide
+        ('Corridor',        [440, 498, 1015, 608], 'cir'),    # 5.75 m to the new end wall, 1.10 m wide
         ('Corridor',        [440, 608, 573, 792], 'cir'),
         ('Bathroom',        [588, 620, 965, 790], 'wetz'),
         ('Storage',         [978, 972, 1216, 1132], 'ser'),
@@ -776,66 +778,27 @@ def furnish_o2(F):
 
 
 def furnish_o3(F):
-    """Amira's own drawing of Option 1 (five photos of her plan and an elevation of the TV wall, Nov 2026)."""
+    """Amira's own drawing of Option 1 (five photos of her plan and an elevation of the TV wall, Nov 2026), with her
+    furniture drawn from her photos (tools/home_pieces.py)."""
+    import home_pieces as hp
     box, B, L = F.box, F.B, F.L
-    KD, WT = 'white', 'quartz'          # kitchen doors and worktop: warm white and pale stone, until she chooses
+    KD = 'white'                        # new built-in units (shoe cabinet, bathroom, storage): white, until chosen
 
-    def base(n, x0, y0, x1, y1, h=88, m=KD):   # a base unit under the worktop
-        box([x0, y0, 0, x1, y1, h], m, **B)
-
-    def top(x0, y0, x1, y1):                   # worktop
-        box([x0, y0, 88, x1, y1, 92], WT, **B)
-
-    def wall_unit(x0, y0, x1, y1, z0=145, z1=215):
-        box([x0, y0, z0, x1, y1, z1], KD, **B)
-
-    # ---------------- master bedroom (Option 1's bedroom 1)
-    F.bed('Master bed', 147, 486, 307, 686, 'b')                          # 1.60 x 2.00, headboard on bedroom 2's wall
-    F.bedside(67, 641, 147, 686); F.bedside(307, 641, 387, 686)           # new bedside tables, 80 cm
-    F.piece('Bedside table', [67, 641, 0, 147, 686, 50], '80 cm'); F.piece('Bedside table', [307, 641, 0, 387, 686, 50], '80 cm')
-    # the dressing table on the master bathroom's wall: hanging TV 42 | table 128 | mirror 60 x 93
-    box([222, 318, 100, 262, 322, 160], 'black', **L); F.piece('Hanging TV', [222, 318, 100, 262, 322, 160], '42 cm')
-    F.block('Dressing table', [262, 318, 390, 363], 75, 'oak', mt='from the bedroom wall unit, 128 cm')
-    box([370, 318, 95, 430, 320, 188], 'glass', g='glass', f='loose'); F.piece('Mirror', [370, 318, 95, 430, 320, 188], '60 x 93')
+    # ---------------- master bedroom (Option 1's bedroom 1): her mahogany bed, headboard on bedroom 2's wall; new
+    # bedside tables, 80 cm; the wall unit's dressing table on the master bathroom's wall: hanging TV 42 | table 128 |
+    # mirror 60 x 93, and a stool
+    hp.mahogany_bed(F, 147, 486, 307, 686)
+    F.bedside(67, 641, 147, 686); F.bedside(307, 641, 387, 686)
+    F.piece('Bedside table', [67, 641, 0, 147, 686, 50], '80 cm, new'); F.piece('Bedside table', [307, 641, 0, 387, 686, 50], '80 cm, new')
+    hp.dressing_table(F)
     F.side_table(326, 392, 20, 45)                                         # the stool
-    # the master wardrobe, an L in the dressing area: 2 units (70 | 60) along the window wall, the corner, then 5 units
-    # (60, 60, 60, 70, 80) down the kitchen wall, from the bedroom wall unit (seven of its eight 60 cm doors, trims
-    # filling the rest), lighter oak
-    runs = [[440, 88, 510, 148], [510, 88, 572, 148],                          # 70 | 60 (the 60 with a 2 cm trim)
-            [572, 148, 632, 208], [572, 208, 632, 268], [572, 268, 632, 328], [572, 328, 632, 398], [572, 398, 632, 478]]
-    for r in runs:
-        box([r[0] + .5, r[1] + .5, 0, r[2] - .5, r[3] - .5, 240], 'oak', **B)
-    box([572, 88, 0, 632, 148, 240], 'oak', **B)                            # the corner, closed
-    box([572, 478, 0, 632, 486, 240], 'oak', **B)                           # trim
-    F.piece('Wardrobe', [440, 88, 0, 632, 486, 240], 'the bedroom wall unit: 70 | 60, the corner, then 60, 60, 60, 70, 80; 7 doors, lighter oak')
+    # the master wardrobe: her mahogany wall unit, an L in the dressing area
+    hp.master_wardrobe(F)
 
-    # ---------------- kitchen (Option 1's master bedroom), two runs
-    # left run, on the dressing wall, from the window: dishwasher 70, sink 100, oven tower 65, fridge 90, glass cabinet 80
-    x0, x1 = 647, 707
-    base('DW', x0, 88, x1, 156, m='steel'); top(x0, 88, x1, 156); wall_unit(x0, 88, 682, 156)
-    F.piece('Dishwasher', [x0, 88, 0, x1, 156, 88], '70 cm, wall unit above')
-    base('Sink', x0, 156, x1, 256); top(x0, 156, x1, 256); F.sink(659, 176, 699, 236); wall_unit(x0, 156, 682, 256)
-    F.piece('Sink unit', [x0, 156, 0, x1, 256, 92], '100 cm, wall unit above')
-    box([x0, 256, 0, x1, 321, 215], KD, **B)                                # oven tower: oven, microwave above
-    box([x1, 263, 80, x1 + 1, 314, 140], 'black', **B); box([x1, 263, 150, x1 + 1, 314, 185], 'black', **B)
-    F.piece('Oven tower', [x0, 256, 0, x1, 321, 215], '65 cm: built-in oven, microwave above')
-    F.fridge(x0, 321, x1 + 10, 411); box([x0, 321, 185, x1, 411, 215], KD, **B)   # a bigger fridge, 90 x 70; lift-up unit
-    box([x0, 411, 0, x1, 486, 215], KD, **B); box([x1, 416, 100, x1 + 1, 481, 205], 'glass', g='glass', f='built')
-    F.piece('Glass cabinet', [x0, 411, 0, x1, 486, 215], '80 cm, tall')
-    # right run, on the reception wall, from the window: tall unit 60, 90, hob, 90, filler 5, small counter 70
-    x0, x1 = 899, 959
-    box([x0, 88, 0, x1, 148, 215], KD, **B); F.piece('Tall unit', [x0, 88, 0, x1, 148, 215], '60 cm')
-    base('B90', x0, 148, x1, 238); top(x0, 148, x1, 238); wall_unit(924, 148, x1, 238)
-    base('Hob', x0, 238, x1, 333); top(x0, 238, x1, 333); wall_unit(924, 238, x1, 333, 160, 215)
-    box([x0 + 8, 240, 92, x1 - 8, 331, 93], 'black', v='i-design', f='built')        # built-in hob, 95 cm
-    box([x0 + 8, 255, 92, x1 - 8, 315, 93], 'black', v='i-trial', f='built')         # or a 60 cm hob
-    F.piece('Hob', [x0, 238, 88, x1, 333, 93], 'built-in, 95 or 60 cm (the Hob switch in View)')
-    base('B90b', x0, 333, x1, 423); top(x0, 333, x1, 428); wall_unit(924, 333, x1, 428)
-    top(x0, 428, x1, 498); wall_unit(924, 428, x1, 498)                      # the small counter 70, wall unit above
-    box([914, 438, 0, x1, 498, 88], KD, **B)                                 # the 45 drawer unit, facing the corridor
-    F.piece('Drawer unit', [914, 438, 0, x1, 498, 88], '45 cm, faces the corridor, under the small counter')
+    # ---------------- kitchen (Option 1's master bedroom): her units, two runs
+    hp.kitchen_left(F)
+    hp.kitchen_right(F)
     F.stool(868, 448); F.stool(868, 486)
-    F.piece('Kitchen', [647, 88, 0, 959, 498, 215], 'warm-white doors, pale stone worktop, wall units 35 deep')
 
     # ---------------- corridor: the shoe cabinet against the moved wall, 55 deep; the bathroom's sliding door
     F.block('Shoe cabinet', [518, 625, 573, 785], 110, KD, built=True, mt='55 deep')
@@ -866,11 +829,11 @@ def furnish_o3(F):
 
     # ---------------- living: the new 2.80 sofa (three pieces, arms on the end ones, reclining) 10 cm off the kitchen
     # wall, the coffee table on a 2.00 x 3.00 rug; two poufs on a second rug; the TV wall unit; the plant opposite
-    F.sofa('Sofa, 2.80 reclining', 981, 110, 1091, 390, 'l')
+    hp.showroom_sofa(F, 'Sofa, 2.80 reclining', 981, 110, 1091, 390, 'l', 'new, from the showroom: three pieces, beige, white piping')
     box([1095, 100, 1, 1295, 400, 2], 'rug', f='loose')
     F.block('Coffee table', [1155, 190, 1235, 310], 38, mt='80 x 120')
     box([1320, 220, 1, 1500, 460, 2], 'rug', f='loose')
-    F.block('Pouf', [1385, 275, 1430, 320], 42, 'fabric'); F.block('Pouf', [1385, 360, 1430, 405], 42, 'fabric')
+    hp.pouf(F, 1385, 275, 1430, 320); hp.pouf(F, 1385, 360, 1430, 405)
     F.extra.append(dict(t='c', c=[1300, 110], r=22, z=[0, 45], m='ceramic', f='loose'))
     F.extra.append(dict(t='s', c=[1300, 110], r=40, sy=1.3, z=95, m='leaf', f='loose'))
     F.piece('Plant', [1278, 88, 0, 1322, 132, 150])
@@ -886,7 +849,7 @@ def furnish_o3(F):
     box([X0, 492, 0, X1, 494, 240], 'oak', **B); box([X0, 540, 0, X1, 542, 240], 'oak', **B)
     F.piece('TV unit', [X0, 212, 0, X1, 542, 240], '50 + 2.30 + 50, 2.40 high')
     # the 2.00 sofa at right angles to the TV, a 60 x 60 side table beside it and a 60 x 1.00 console behind it
-    F.sofa('Sofa, 2.00', 1110, 445, 1310, 530, 'b')
+    hp.rolled_sofa(F, 'Sofa, 2.00', 1110, 445, 1310, 530, 'b', 'taupe', 2, mt='hers, 2.00 x 85')
     F.block('Side table', [1045, 450, 1105, 510], 50)
     F.block('Console', [1160, 535, 1260, 595], 80, mt='60 x 1.00')
 
@@ -900,11 +863,11 @@ def furnish_o3(F):
     F.pendant(1185, 745); F.pendant(1185, 825)
     # the piano corner: the 1.40 sofa on the right wall, a nest of two round tables, a rug; the black upright piano
     box([1360, 570, 1, 1555, 760, 2], 'rug', f='loose')
-    F.sofa('Sofa, 1.40', 1474, 585, 1559, 725, 'r')
+    hp.rolled_sofa(F, 'Sofa, 1.40', 1474, 585, 1559, 725, 'r', 'sgrey', 1, accents='mustard', throw=True, mt='hers, 1.40 x 85')
     F.side_table(1420, 640, 30, 45); F.side_table(1398, 690, 22, 40)
     F.piece('Nest of tables', [1376, 610, 0, 1450, 712, 45], 'round, 60 and 45 cm')
-    F.block('Piano', [1405, 815, 1555, 885], 125, 'black', mt='upright, 1.50 x 70')
-    F.block('Piano stool', [1450, 775, 1510, 808], 48, 'black')
+    hp.upright_piano(F, 1405, 815, 1555, 885)
+    F.block('Piano stool', [1450, 775, 1510, 808], 48, 'piano')
 
     # ---------------- storage (the maid's room): dryer 65 | cabinet 1.00 for the ladder, broom and cleaning tools |
     # deep freezer 75; cleaning products on shelves above the dryer
@@ -971,6 +934,8 @@ VIEWS = [   # key, button, view, plans it belongs to (None: all); z below 1 wide
     ('dining3', 'Dining', dict(pos=[1340, 960, EYE], look=[1150, 650, 85], z=ZOOM, msg='The dining table for eight and the 2.20 sideboard, wider than life.' + TRUE), ['o3']),
     ('piano3', 'Piano corner', dict(pos=[1270, 640, EYE], look=[1500, 790, 80], z=ZOOM, msg='The piano corner: the 1.40 sofa, the nest of tables and the piano, wider than life.' + TRUE), ['o3']),
     ('bath3', 'Bathroom', dict(pos=[935, 705, EYE], look=[620, 745, 90], z=ZOOM, msg='The bathroom from the WC: the counter with the basin and washing machine, and the shower, wider than life.' + TRUE), ['o3']),
+    ('wardrobe3', 'Wardrobe', dict(pos=[460, 470, EYE], look=[600, 150, 140], z=ZOOM, msg='Her mahogany wall unit as the master wardrobe, wider than life.' + TRUE), ['o3']),
+    ('door3', 'Corridor door', dict(pos=[520, 553, EYE], look=[1030, 558, 105], z=ZOOM, msg='Down the corridor to the new door at its end, wider than life.' + TRUE), ['o3']),
     ('dress3', 'Dressing table', dict(pos=[400, 560, EYE], look=[300, 318, 110], z=ZOOM, msg='The dressing table, the hanging TV and the mirror, wider than life.' + TRUE), ['o3']),
     ('bath1', 'Bathroom', dict(pos=[845, 635, EYE], look=[680, 770, 90], z=ZOOM, msg='The shared bathroom from the door, wider than life.' + TRUE), ['o1']),
     ('bath2', 'Bathroom', dict(pos=[895, 745, EYE], look=[660, 690, 90], z=ZOOM, msg='The shared bathroom, wider than life: the shower at the far end.' + TRUE), ['o2']),

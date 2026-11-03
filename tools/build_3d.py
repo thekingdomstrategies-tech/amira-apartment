@@ -271,6 +271,25 @@ def main():
     s = rep("['existing','p1','c','d'].forEach(function(L){ db.doc('furnish/'+L)", "LAYOUT_ORDER.forEach(function(L){ db.doc('furnish/'+L)", s)
     s = rep("(LAYOUT==='existing'?'The original walls, furnished with a typical layout for comparison.'",
             "(LAYOUT==='existing'?'As built, with the architect\\'s furniture.':LAYOUT==='o1'?'Option 1, two bedrooms, with the architect\\'s furniture.':LAYOUT==='o2'?'Option 2, three bedrooms, with the architect\\'s furniture.':LAYOUT==='o3'?'Option 3, Amira\\'s layout: her furniture and measures.'", s)
+    # Amira's own furniture (option 3, tools/home_pieces.py), in the finishes of her photos: the grey painted kitchen
+    # and its granite, the mahogany wall unit and bed, brass handles, a mirror, the piano's gloss, the sofas' fabrics
+    s = rep("M.front=std({color:0xF5F4F0,roughness:.38}); TEXM.front=1;",
+            "M.front=std({color:0xF5F4F0,roughness:.38}); TEXM.front=1;\n"
+            "var texGranite=canvasTex(512,512,function(g,w,h){g.fillStyle='#9E9E9A';g.fillRect(0,0,w,h);blots(g,w,h,24,'128,128,125',30,90,.2,.4,41);"
+            "for(var j=0;j<16000;j++){var r=rnd(j*3+1);g.fillStyle=r<.45?'rgba(38,38,40,.6)':r<.82?'rgba(236,236,233,.65)':'rgba(150,138,132,.55)';"
+            "g.fillRect(rnd(j*3+2)*w,rnd(j*3+3)*h,1+rnd(j+7)*2.4,1+rnd(j+9)*2.4);}});   // her grey speckled granite\n"
+            "var texMahog=canvasTex(256,512,function(g,w,h){g.fillStyle='#5C2216';g.fillRect(0,0,w,h);blots(g,w,h,14,'92,36,22',20,80,.15,.3,17);"
+            "for(var i=0;i<90;i++){var x=rnd(i+5)*w;g.strokeStyle='rgba('+(rnd(i)>.4?'40,12,6':'112,46,26')+','+(.07+rnd(i+1)*.14)+')';g.lineWidth=.6+rnd(i+2)*2.4;"
+            "g.beginPath();g.moveTo(x,0);for(var y=0;y<=h;y+=24)g.lineTo(x+Math.sin(y/h*6.283*(1+rnd(i+3)*2)+i)*3,y);g.stroke();}});   // the wall unit's mahogany\n"
+            "M.kgrey=std({color:0x8E9895,roughness:.4,bumpMap:texOak,bumpScale:.12}); M.granite=std({map:texGranite,roughness:.22});\n"
+            "M.mahog=std({map:texMahog,roughness:.38}); M.mahogd=std({color:0x2E0F08,roughness:.6}); M.kgreyd=std({color:0x5F6866,roughness:.6}); M.brass=std({color:0xB38D50,roughness:.3,metalness:.9}); M.mirror=std({color:0xE6EAEC,roughness:.03,metalness:1});\n"
+            "M.piano=phys({color:0x0A0A0C,roughness:.14,clearcoat:1,clearcoatRoughness:.04});\n"
+            "M.taupe=std({color:0x8C7D6B,roughness:1,bumpMap:texWeave,bumpScale:.8}); M.sgrey=std({color:0x9D9A95,roughness:1,bumpMap:texWeave,bumpScale:.8});\n"
+            "M.pouf=std({color:0x7C6C5C,roughness:1,bumpMap:texWeave,bumpScale:.9}); M.beige=std({color:0xD0C4B2,roughness:1,bumpMap:texWeave,bumpScale:.7});\n"
+            "M.piping=std({color:0xF5F2EB,roughness:.8}); M.mustard=std({color:0xB49A57,roughness:1,bumpMap:texWeave,bumpScale:.8}); M.wine=std({color:0x7B2029,roughness:.9,bumpMap:texWeave,bumpScale:.6});\n"
+            "TEXM.granite=.6; TEXM.mahog=1; TEXM.kgrey=.9; ['taupe','sgrey','pouf','beige','mustard','wine'].forEach(function(k){TEXM[k]=.25;});", s)
+    s = rep("var r={front:.7,fabric:5,linen:3.2,", "var r={front:.7,fabric:5,linen:3.2,taupe:5,sgrey:5,pouf:4,beige:5,mustard:4,wine:3,kgrey:.4,mahog:.4,mahogd:.3,kgreyd:.2,granite:.6,piano:.5,", s)
+    s = rep("var NO_BEVEL={glass:1,", "var NO_BEVEL={glass:1,mirror:1,piping:1,brass:1,", s)
     # Option 3 offers two hobs; AZAD's island switch (state.isl, design / trial) chooses between them
     s = rep('<div class="ctl" data-only="p1"><div class="cl"><span>Kitchen island</span></div><div class="bt" data-state="isl">'
             '<button type="button" data-v="design" aria-pressed="true" title="Your design: the island with the oak L bar, and the oak table for 8 in the reception">Design</button>'
