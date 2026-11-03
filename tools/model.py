@@ -263,7 +263,7 @@ LAYOUTS['o3'] = dict(
         ('Reception', 'Reception', 1135, 440), ('Living', 'Living', 1410, 520), ('Dining', 'Dining', 1185, 650),
         ('Entrance', 'Entrance', 1305, 975), ('Terrace', 'Terrace', 1450, 105),
     ],
-    shelf=[[640, 160], [640, 320]], lamps=[[1300, 110], [1420, 640]],
+    shelf=[[612, 92], [612, 254]], lamps=[[1030, 418], [1525, 768]],
 )
 
 ORDER = ['existing', 'o1', 'o2', 'o3']
@@ -845,6 +845,8 @@ def furnish_o3(F):
     # ---------------- the shared bathroom: shower with glass | sink, washing machine, cupboard on one counter | WC
     F.shower(590, 622, 678, 788, [676, 622, 678, 712])
     F.vanity(690, 730, 790, 788)
+    box([712, 742, 91, 768, 780, 104], 'ceramic', **B)            # the basin
+    box([700, 786, 115, 780, 788, 190], 'glass', g='glass', **B)  # its mirror
     F.block('Washing machine', [790, 730, 850, 788], 88, 'white', built=True)
     F.block('Cupboard', [850, 730, 910, 788], 88, KD, built=True)
     box([690, 730, 88, 910, 788, 91], 'travertine', **B)
@@ -964,8 +966,9 @@ VIEWS = [   # key, button, view, plans it belongs to (None: all); z below 1 wide
     ('living3', 'Living', dict(pos=[1320, 560, EYE], look=[1000, 230, 95], z=ZOOM, msg='Across the living room to the 2.80 sofa and the kitchen wall, wider than life.' + TRUE), ['o3']),
     ('tv3', 'TV wall', dict(pos=[1040, 300, SIT], look=[1559, 380, 120], z=ZOOM, msg='From the 2.80 sofa to the TV wall unit, wider than life.' + TRUE), ['o3']),
     ('dining3', 'Dining', dict(pos=[1340, 960, EYE], look=[1150, 650, 85], z=ZOOM, msg='The dining table for eight and the 2.20 sideboard, wider than life.' + TRUE), ['o3']),
-    ('piano3', 'Piano corner', dict(pos=[1240, 700, EYE], look=[1520, 760, 80], z=ZOOM, msg='The piano corner: the 1.40 sofa, the nest of tables and the piano, wider than life.' + TRUE), ['o3']),
-    ('bath3', 'Bathroom', dict(pos=[780, 560, EYE], look=[780, 790, 80], z=ZOOM, msg='Through the sliding door into the bathroom, wider than life.' + TRUE), ['o3']),
+    ('piano3', 'Piano corner', dict(pos=[1270, 640, EYE], look=[1500, 790, 80], z=ZOOM, msg='The piano corner: the 1.40 sofa, the nest of tables and the piano, wider than life.' + TRUE), ['o3']),
+    ('bath3', 'Bathroom', dict(pos=[935, 705, EYE], look=[620, 745, 90], z=ZOOM, msg='The bathroom from the WC: the counter with the basin and washing machine, and the shower, wider than life.' + TRUE), ['o3']),
+    ('dress3', 'Dressing table', dict(pos=[400, 560, EYE], look=[300, 318, 110], z=ZOOM, msg='The dressing table, the hanging TV and the mirror, wider than life.' + TRUE), ['o3']),
     ('bath1', 'Bathroom', dict(pos=[845, 635, EYE], look=[680, 770, 90], z=ZOOM, msg='The shared bathroom from the door, wider than life.' + TRUE), ['o1']),
     ('bath2', 'Bathroom', dict(pos=[895, 745, EYE], look=[660, 690, 90], z=ZOOM, msg='The shared bathroom, wider than life: the shower at the far end.' + TRUE), ['o2']),
 ]
