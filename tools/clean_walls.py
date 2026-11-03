@@ -92,3 +92,32 @@ def clean(rects, W, H, clear=()):
 def path(rects, k):
     """One SVG path for all the rectangles (one shape, so no hairline seams between pieces)."""
     return ''.join('M%g %gh%gv%gh%gz' % (x0 * k, y0 * k, (x1 - x0) * k, (y1 - y0) * k, -(x1 - x0) * k) for x0, y0, x1, y1 in rects)
+
+
+def _runs(m, axis):
+    """For each wall cell: the length of its run along `axis`, and its distance to the run's two ends."""
+    a = m if axis == 1 else m.T
+    L = np.zeros(a.shape, np.int32); d0 = np.zeros(a.shape, np.int32); d1 = np.zeros(a.shape, np.int32)
+    for i in range(a.shape[0]):
+        row = a[i]
+        if not row.any(): continue
+        edges = np.diff(np.concatenate(([0], row.view(np.int8), [0])))
+        starts, ends = np.nonzero(edges == 1)[0], np.nonzero(edges == -1)[0]
+        for s, e in zip(starts, ends):
+            n = e - s
+            L[i, s:e] = n; d0[i, s:e] = np.arange(n); d1[i, s:e] = np.arange(n)[::-1]
+    return (L, d0, d1) if axis == 1 else (L.T, d0.T, d1.T)
+
+
+def thin(rects, W, H, share=.4, max_cut=5, min_core=4):
+    """The walls drawn thinner: each wall loses `share` of its thickness (at most max_cut cm a side), centred, and
+    only across its thickness, so wall ends, and the doors and windows between them, stay where they are."""
+    m = _mask(rects, W, H)
+    hL, hd0, hd1 = _runs(m, 1)        # along x
+    vL, vd0, vd1 = _runs(m, 0)        # along y
+    horiz = hL >= vL                  # a cell of a wall running along x: its thickness is its run along y
+    t = np.where(horiz, vL, hL)
+    near = np.where(horiz, np.minimum(vd0, vd1), np.minimum(hd0, hd1))
+    cut = np.minimum(max_cut, np.maximum(0, np.minimum(np.round(t * share / 2), (t - min_core) // 2)))
+    core = m & (near >= cut)
+    return _rects(core)
