@@ -216,6 +216,11 @@ These are only useful if AZAD gets new vector drawings.
   - The scale comes from a known building's roof against its floor plate.
 - **7.4 `tools/model.py`:** several plans in one `LAYOUTS` table: doors, openings, extra partitions, L-shaped rooms
   (a name repeated), labels, furniture functions and views per plan.
+  - A plan can also take walls away (`remove_walls`, rectangles cut from the traced walls before cleaning) and close
+    windows (`closed_windows`, by name; `windows_of(lay)` gives the windows a plan keeps, for the 3D cuts, frames,
+    shutters and the zoned plan).
+  - The island switch (`state.isl`, items with `v:'i-design'` / `v:'i-trial'`) can carry any two alternatives; here
+    it is option 3's 95 / 60 cm hob.
 
 ---
 
@@ -226,5 +231,5 @@ These are Creektown-only, listed so they are not ported by mistake:
 - the brand (Poppins, forest and leaf greens, the Creektown wordmark), and the AZAD-credit footer removal;
 - `CNAME` `amira.kamelnabil.com`, `.nojekyll`, and the Vercel DNS record;
 - the site latitude, longitude and facing, the 5th-floor height, and E07's surroundings;
-- the three Creektown plans, their furniture, rooms and views, and the hero photo;
+- the four Creektown plans, their furniture, rooms and views, and the hero photo;
 - "Monica's & Amira's" copy and the to-confirm notes.
