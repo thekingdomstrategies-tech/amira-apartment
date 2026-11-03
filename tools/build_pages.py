@@ -184,7 +184,7 @@ footer a{color:inherit}
 .zopt{display:flex;align-items:center;gap:8px}.zopt>span{font:600 10.5px var(--font);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
 .zopt .seg button{padding:8px 11px}
 .zbg{fill:#FBFAF8}.zroom,.zterr{stroke:none}.zterr{stroke:#8DAA7E;stroke-width:2;stroke-dasharray:8 6}
-.zwall{fill:#1C3B28}.zfacade{fill:#C9CEC8}
+.zwall{fill:#1C3B28}.zwallbed{fill:#E4E7E2}.zfacade{fill:#C9CEC8}
 .zwin{fill:#FFFFFF;stroke:#7F9BB0;stroke-width:1.5}.zwinl{stroke:#7F9BB0;stroke-width:1.5}
 .zleaf{stroke:#3B4A41;stroke-width:2.5}.zswing{fill:none;stroke:#6E7A73;stroke-width:1.5;stroke-dasharray:6 5}
 .zf{fill:rgba(255,255,255,.55);stroke:#9AA19C;stroke-width:1.4}.zrug{fill:none;stroke:#B9BFB9;stroke-width:1.2;stroke-dasharray:4 4}
@@ -414,7 +414,9 @@ def zones_svg(key, W, H):
               if it.get('g') == 'wall' and it['b'][2] == 0 and it['b'][5] == model.PARAPET]
     clear = [o for _, o, *_ in lay['doors'] + lay['openings']] + [w[1] for w in model.WINDOWS] + [w[1] for w in model.SLIDERS]
     g.append('<path class="zfacade" d="%s"/>' % clean_walls.path(clean_walls.clean(facade, W, H), k))
-    g.append('<path class="zwall" d="%s"/>' % clean_walls.path(clean_walls.clean(walls, W, H, clear), k))
+    cw = clean_walls.clean(walls, W, H, clear)
+    g.append('<path class="zwallbed" d="%s"/>' % clean_walls.path(cw, k))          # the wall's true footprint, pale
+    g.append('<path class="zwall" d="%s"/>' % clean_walls.path(clean_walls.thin(cw, W, H), k))   # drawn thinner
 
     # windows and the terrace doors: a pale pane with a line along it
     for pc in built['pieces']:
