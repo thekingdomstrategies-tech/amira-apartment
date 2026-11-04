@@ -223,6 +223,57 @@ footer a{color:inherit}
 @media (max-width:640px){.wrap{padding-inline:16px}.hero .bar nav a{margin-left:14px}.bar .wrap>span{display:none}
   th,td{padding:8px 8px}.hide-s{display:none}.seg button{padding:10px 10px;letter-spacing:.06em}.wm .w1{letter-spacing:.2em}}
 @media (prefers-reduced-motion:reduce){.card{transition:none}}
+
+/* renders page */
+.rhead{display:grid;gap:14px;padding-top:8px}
+.rhead h1{font:700 clamp(32px,5vw,58px)/1.02 var(--font);text-transform:uppercase}
+.rhead p{margin:0;max-width:72ch;color:var(--ink2)}
+.rmeta{display:flex;flex-wrap:wrap;gap:8px 22px;font:600 11px var(--font);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.rmeta span::before{content:"";display:inline-block;width:7px;height:7px;background:var(--leaf);margin-right:8px;vertical-align:1px}
+.rgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:34px 26px}
+.rgrid .wide{grid-column:1/-1}
+.shot{margin:0;display:grid;gap:12px;align-content:start}
+.ph{position:relative;overflow:hidden;background:var(--sheet);aspect-ratio:16/10;border:1px solid var(--line)}
+.ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;cursor:zoom-in;transition:opacity .45s ease,transform .8s cubic-bezier(.2,.7,.2,1)}
+.ph img.nt{opacity:0}.ph.night img.nt{opacity:1}.ph.night img.dy{opacity:0}
+.ph:hover img{transform:scale(1.015)}
+.dn{position:absolute;left:12px;bottom:12px;display:inline-flex;background:rgba(255,255,255,.92);box-shadow:0 2px 10px rgba(0,0,0,.18)}
+.dn button{appearance:none;border:0;background:none;font:600 10.5px var(--font);letter-spacing:.12em;text-transform:uppercase;padding:8px 11px;color:#3A3D3E;cursor:pointer}
+.dn button[aria-pressed="true"]{background:var(--forest);color:#fff}
+.dn button:focus-visible{outline:2px solid var(--lime);outline-offset:-2px}
+.shot figcaption{display:grid;gap:3px}
+.shot figcaption b{font:700 16px/1.3 var(--font);text-transform:uppercase;letter-spacing:.02em;color:var(--head)}
+.shot figcaption span{font-size:14px;color:var(--ink2);max-width:70ch}
+.shot figcaption small{font:500 11px var(--font);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.cmpx{position:relative;overflow:hidden;aspect-ratio:16/10;background:var(--sheet);border:1px solid var(--line);touch-action:pan-y;user-select:none}
+.cmpx img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
+.cmpx .top{clip-path:inset(0 0 0 var(--x,50%))}
+.cmpx .bar{position:absolute;top:0;bottom:0;left:var(--x,50%);width:2px;margin-left:-1px;background:#fff;box-shadow:0 0 0 1px rgba(0,0,0,.2);pointer-events:none}
+.cmpx .bar::after{content:"";position:absolute;top:50%;left:50%;width:44px;height:44px;border-radius:50%;transform:translate(-50%,-50%);
+  background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 6l-6 6 6 6M15 6l6 6-6 6' fill='none' stroke='%231C3B28' stroke-width='2'/%3E%3C/svg%3E") center/22px no-repeat;box-shadow:0 2px 12px rgba(0,0,0,.3)}
+.cmpx .tag{position:absolute;top:12px;font:600 10.5px var(--font);letter-spacing:.14em;text-transform:uppercase;background:rgba(255,255,255,.92);color:#1C3B28;padding:6px 10px;pointer-events:none}
+.cmpx input{position:absolute;inset:0;width:100%;height:100%;opacity:0;margin:0;cursor:ew-resize}
+.cmpx input:focus-visible ~ .bar{background:var(--lime)}
+.rsec{display:grid;gap:22px}
+.rsec h2{font:700 clamp(20px,2.2vw,26px)/1.1 var(--font);text-transform:uppercase;display:flex;gap:14px;align-items:baseline}
+.rsec h2 small{font:500 12px var(--font);letter-spacing:.12em;color:var(--muted)}
+.facts2{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0 36px}
+.facts2 div{border-top:2px solid var(--head);padding-top:12px;display:grid;gap:4px}
+.facts2 b{font:600 14px var(--font);color:var(--head)}.facts2 span{font-size:13.5px;color:var(--ink2)}
+dialog.lb{max-width:none;max-height:none;width:100vw;height:100dvh;margin:0;padding:0;border:0;background:#0B120D;color:#E8ECE8}
+dialog.lb[open]{display:grid;grid-template-rows:minmax(0,1fr) auto}
+dialog.lb::backdrop{background:#0B120D}
+.lb .imgwrap{position:relative;display:grid;place-items:center;min-height:0;padding:14px}
+.lb img{max-width:100%;max-height:100%;object-fit:contain;display:block}
+.lb .cap{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;justify-content:space-between;padding:12px 18px 18px;font:14px/1.5 var(--font)}
+.lb .cap b{font:700 15px var(--font);text-transform:uppercase;letter-spacing:.04em;margin-right:10px}
+.lb .cap .k{font:500 11px var(--font);letter-spacing:.12em;text-transform:uppercase;color:#9BB09F;margin-right:12px}
+.lb .nav{display:flex;gap:8px;flex:none}
+.lb button{appearance:none;border:1px solid #2C3D31;background:#14201A;color:#E8ECE8;font:600 12px var(--font);letter-spacing:.08em;text-transform:uppercase;padding:10px 14px;cursor:pointer}
+.lb button[aria-pressed="true"]{background:#E8ECE8;color:#0B120D}
+.lb button:focus-visible{outline:2px solid var(--lime);outline-offset:2px}
+@media (max-width:820px){.rgrid{grid-template-columns:1fr}.facts2{grid-template-columns:1fr;gap:16px}}
+@media (prefers-reduced-motion:reduce){.ph img{transition:none}}
 '''
 
 HEAD = '''<!doctype html>
@@ -271,7 +322,7 @@ def counts(key):
 
 PLAN_BODY = r'''<body>
 <header class="top"><div class="bar"><div class="wrap"><a href="index.html" style="margin:0">← %(name)s</a>
-<nav aria-label="Site"><a class="here" href="plan.html" aria-current="page">Plan</a><a href="3d.html" id="to3d">3D</a></nav></div></div></header>
+<nav aria-label="Site"><a class="here" href="plan.html" aria-current="page">Plan</a><a href="3d.html" id="to3d">3D</a><a href="renders.html">Renders</a></nav></div></div></header>
 <div class="wrap"><main>
 <section>
   <div class="ptitle"><div><div class="eyebrow">The architect's plans, to scale</div><h1 id="ptitle">Plan</h1>
@@ -565,7 +616,7 @@ OPTIONS = {
 INDEX_BODY = '''<body>
 <header class="hero">
   <div class="hero-bg" aria-hidden="true"></div><div class="hero-light" aria-hidden="true"></div>
-  <div class="bar"><div class="wrap"><span>5th floor · about %(tot)d m² · over a big garden</span><nav aria-label="Site"><a href="plan.html">Plan</a><a href="3d.html">3D</a></nav></div></div>
+  <div class="bar"><div class="wrap"><span>5th floor · about %(tot)d m² · over a big garden</span><nav aria-label="Site"><a href="plan.html">Plan</a><a href="3d.html">3D</a><a href="renders.html">Renders</a></nav></div></div>
   <div class="copy wrap">
     <div class="eyebrow">Creek Town · New Cairo · interior architecture</div>
     <h1 class="wm" aria-label="Creektown Apartment, New Cairo"><span class="w1">Creektown <b>Apartment</b></span><span class="w2">New Cairo</span></h1>
@@ -585,6 +636,7 @@ INDEX_BODY = '''<body>
   <div class="cards">
     <a class="card" href="plan.html"><div class="thumb"><img src="img/plan-thumb.jpg" alt="The furnished floor plan" loading="lazy"></div><div class="body"><div class="n">01 · Plan</div><h3>Layouts, to scale</h3><p>As built, both options and Amira's layout: the architect's sheets, furnished and empty, and the traced model; every room measured.</p></div></a>
     <a class="card" href="3d.html"><div class="thumb"><img src="img/3d-thumb.jpg" alt="The 3D model from above" loading="lazy"></div><div class="body"><div class="n">02 · 3D</div><h3>Walk it freely</h3><p>Switch between the four plans, from above or standing in any room; furnished or empty; the sun at any hour; true size on screen or in a VR headset.</p></div></a>
+    <a class="card" href="renders.html"><div class="thumb"><img src="img/renders-thumb.jpg" alt="A photoreal render of the living room" loading="lazy"></div><div class="body"><div class="n">03 · Renders</div><h3>Photoreal views</h3><p>Path-traced views of the main spaces, by day and by night, in Amira's layout with her own furniture.</p></div></a>
   </div>
 </section>
 <section>
@@ -662,12 +714,164 @@ DESC = {
     'Dining': 'A table for six, between the kitchen and the living area.',
 }
 
+# ---------------------------------------------------------------- the photoreal renders
+import render_views
+
+RENDER_GROUPS = [
+    ('Living and dining', ['living', 'tv', 'arrival', 'dining', 'piano']),
+    ('The kitchen', ['kitchen']),
+    ('The bedrooms', ['master', 'wardrobe', 'dressing', 'bedroom2']),
+    ('Bathroom and corridor', ['bathroom', 'corridor']),
+    ('Outside', ['terrace']),
+]
+RENDER_LENS = {v[0]: v[5] for v in render_views.RENDERS}
+RENDER_FEATURE = 'living'      # the day-to-night slider at the top
+
+
+def render_images():
+    """The renders on disk (renders/<view>-<day|night>.jpg) and a 1000 px copy of each for the page."""
+    from PIL import Image
+    src, small = os.path.join(ROOT, 'renders'), os.path.join(ROOT, 'renders', 's')
+    if not os.path.isdir(src):
+        return {}
+    os.makedirs(small, exist_ok=True)
+    have = {}
+    for fn in sorted(os.listdir(src)):
+        if not fn.endswith('.jpg'):
+            continue
+        key, t = fn[:-4].rsplit('-', 1)
+        out = os.path.join(small, fn)
+        if not os.path.exists(out) or os.path.getmtime(out) < os.path.getmtime(os.path.join(src, fn)):
+            im = Image.open(os.path.join(src, fn)).convert('RGB')
+            im.resize((1000, round(1000 * im.size[1] / im.size[0])), Image.LANCZOS).save(out, quality=82, optimize=True, progressive=True)
+        have.setdefault(key, {})[t] = fn
+    if 'living' in have:
+        im = Image.open(os.path.join(src, have['living'].get('day') or next(iter(have['living'].values())))).convert('RGB')
+        w, h = im.size; c = im.crop(((w - h * 4 // 3) // 2, 0, (w + h * 4 // 3) // 2, h)).resize((800, 600), Image.LANCZOS)
+        c.save(os.path.join(ROOT, 'img', 'renders-thumb.jpg'), quality=80, optimize=True)
+    return have
+
+
+def renders_page(have):
+    views = {v[0]: v for v in render_views.RENDERS}
+    figs = []
+
+    def figure(key, wide=False):
+        v = views[key]; h = have.get(key, {})
+        if not h:
+            return ''
+        title, cap = v[1], v[2]
+        day, night = h.get('day'), h.get('night')
+        first = day or night
+        imgs = ''
+        if day:
+            imgs += '<img class="dy" src="renders/s/%s" srcset="renders/s/%s 1000w, renders/%s 1920w" sizes="(max-width:820px) 100vw, %s" alt="%s, by day" loading="lazy" width="1920" height="1200" data-full="renders/%s">' % (
+                day, day, day, '1200px' if wide else '600px', html.escape(title), day)
+        if night:
+            imgs += '<img class="%s" src="renders/s/%s" srcset="renders/s/%s 1000w, renders/%s 1920w" sizes="(max-width:820px) 100vw, %s" alt="%s, in the evening" loading="lazy" width="1920" height="1200" data-full="renders/%s">' % (
+                'nt' if day else 'dy', night, night, night, '1200px' if wide else '600px', html.escape(title), night)
+        toggle = ('<div class="dn" role="group" aria-label="Time of day"><button type="button" data-t="day" aria-pressed="true">Day</button>'
+                  '<button type="button" data-t="night" aria-pressed="false">Evening</button></div>') if day and night else ''
+        when = ' · '.join(x for x in (('Day: ' + render_views.DAY_LABEL) if day else '', ('Evening, lights on') if night else '') if x)
+        figs.append(key)
+        return ('<figure class="shot%s" data-k="%s"><div class="ph">%s%s</div><figcaption><b>%s</b><span>%s</span><small>%s · %d mm</small></figcaption></figure>' % (
+            ' wide' if wide else '', key, imgs, toggle, html.escape(title), html.escape(cap), when, RENDER_LENS.get(key, 18)))
+
+    feature = ''
+    f = have.get(RENDER_FEATURE, {})
+    if f.get('day') and f.get('night'):
+        feature = ('<section class="rsec"><div class="cmpx" id="cmpx"><img src="renders/%s" alt="The living room by day" width="1920" height="1200">'
+                   '<img class="top" src="renders/%s" alt="The same view in the evening, the lamps and downlights on" width="1920" height="1200">'
+                   '<span class="tag" style="left:12px">Day</span><span class="tag" style="right:12px">Evening</span>'
+                   '<input type="range" min="0" max="100" value="50" aria-label="Compare the living room by day and in the evening"><span class="bar" aria-hidden="true"></span></div>'
+                   '<p class="note">Drag across the living room to see it at 1:30 pm in mid-November, with the sun coming in from the south-west, and in the evening with the downlights, the floor lamps and the dining pendants on.</p></section>' % (f['day'], f['night']))
+    secs = []
+    for name, keys in RENDER_GROUPS:
+        items = [figure(k, wide=(i == 0 and len(keys) % 2 == 1)) for i, k in enumerate(keys) if have.get(k)]
+        items = [x for x in items if x]
+        if items:
+            secs.append('<section class="rsec"><h2>%s<small>%d view%s</small></h2><div class="rgrid">%s</div></section>' % (
+                html.escape(name), len(items), '' if len(items) == 1 else 's', ''.join(items)))
+    n_day = sum(1 for h in have.values() if 'day' in h); n_night = sum(1 for h in have.values() if 'night' in h)
+    body = RENDERS_BODY % dict(name=NAME, feature=feature, secs=''.join(secs), foot=FOOT, nday=n_day, nnight=n_night,
+                               day=render_views.DAY_LABEL)
+    page = HEAD % dict(title='%s · Renders' % NAME, css=CSS,
+                       desc="Photoreal path-traced renders of Amira's layout for the Creektown apartment, by day and in the evening.") + body
+    open(os.path.join(ROOT, 'renders.html'), 'w', encoding='utf-8').write(page)
+    return len(figs)
+
+
+RENDERS_BODY = r'''<body>
+<header class="top"><div class="bar"><div class="wrap"><a href="index.html" style="margin:0">← %(name)s</a>
+<nav aria-label="Site"><a href="plan.html">Plan</a><a href="3d.html?plan=o3">3D</a><a class="here" href="renders.html" aria-current="page">Renders</a></nav></div></div></header>
+<div class="wrap"><main style="gap:64px">
+<section class="rhead">
+  <div class="eyebrow">03 · Renders</div>
+  <h1>Photoreal views</h1>
+  <p>Path-traced views of the main spaces, by day and by night: Option 3, Amira's layout, with her own furniture. Rendered in Blender Cycles from the same centimetre model as the plan and the <a href="3d.html?plan=o3">3D walkthrough</a>, so every wall, window and piece is at its true size, and the light is simulated as it bounces round the rooms. Tap any view to see it full screen.</p>
+  <div class="rmeta"><span>%(nday)d views by day</span><span>%(nnight)d in the evening</span><span>Sun and sky for New Cairo, %(day)s</span><span>Fifth floor, over the pool garden</span></div>
+</section>
+%(feature)s
+%(secs)s
+<section class="rsec">
+  <h2>What's real in these renders</h2>
+  <div class="facts2">
+    <div><b>To the centimetre</b><span>The walls and windows traced from the architect's drawings, Amira's corridor and bathroom changes, and every piece at the size she gave.</span></div>
+    <div><b>The light</b><span>Cairo's sun and sky for the date and hour, through the real windows, with the light bouncing between the surfaces; in the evening, the flat's downlights, lamps and pendants.</span></div>
+    <div><b>Still stand-ins</b><span>Finishes not yet chosen (walls, floors, the kitchen's repaint), the furniture without a photo, and the view outside, which is the compound's massing, not a photograph.</span></div>
+  </div>
+</section>
+</main></div>
+<dialog class="lb" id="lb" aria-label="Render viewer">
+  <div class="imgwrap"><img id="lbimg" alt=""></div>
+  <div class="cap"><div><span class="k" id="lbn"></span><b id="lbt"></b><span id="lbc"></span></div>
+  <div class="nav"><button type="button" id="lbday" aria-pressed="true" hidden>Day</button><button type="button" id="lbnight" aria-pressed="false" hidden>Evening</button>
+  <button type="button" id="lbprev" aria-label="Previous view">←</button><button type="button" id="lbnext" aria-label="Next view">→</button><button type="button" id="lbclose">Close</button></div></div>
+</dialog>
+%(foot)s
+<script>
+(function(){
+  var cmp=document.getElementById('cmpx');
+  if(cmp){var r=cmp.querySelector('input');var set=function(){cmp.style.setProperty('--x',r.value+'%%');};r.addEventListener('input',set);set();}
+  var figs=[].slice.call(document.querySelectorAll('figure.shot'));
+  figs.forEach(function(f){var ph=f.querySelector('.ph');
+    [].forEach.call(f.querySelectorAll('.dn button'),function(b){b.addEventListener('click',function(e){e.stopPropagation();
+      ph.classList.toggle('night',b.dataset.t==='night');
+      [].forEach.call(f.querySelectorAll('.dn button'),function(x){x.setAttribute('aria-pressed',x===b?'true':'false');});});});});
+  var lb=document.getElementById('lb'); if(!lb||!lb.showModal)return;
+  var img=document.getElementById('lbimg'), cur=0, t='day', bd=document.getElementById('lbday'), bn=document.getElementById('lbnight');
+  function srcs(f){var o={};[].forEach.call(f.querySelectorAll('.ph img'),function(i){o[/night|evening/.test(i.alt)?'night':'day']=i;});return o;}
+  function show(i,tt){cur=(i+figs.length)%%figs.length;var f=figs[cur],s=srcs(f);t=tt||(f.querySelector('.ph').classList.contains('night')?'night':'day');if(!s[t])t=s.day?'day':'night';
+    var im=s[t];img.src=im.dataset.full;img.alt=im.alt;
+    document.getElementById('lbt').textContent=f.querySelector('figcaption b').textContent;
+    document.getElementById('lbc').textContent=f.querySelector('figcaption span').textContent;
+    document.getElementById('lbn').textContent=(cur+1)+' / '+figs.length;
+    var both=!!(s.day&&s.night);bd.hidden=bn.hidden=!both;bd.setAttribute('aria-pressed',t==='day');bn.setAttribute('aria-pressed',t==='night');}
+  figs.forEach(function(f,i){[].forEach.call(f.querySelectorAll('.ph img'),function(im){im.tabIndex=0;im.setAttribute('role','button');
+    im.addEventListener('click',function(){show(i);lb.showModal();});
+    im.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();show(i);lb.showModal();}});});});
+  bd.onclick=function(){show(cur,'day');}; bn.onclick=function(){show(cur,'night');};
+  document.getElementById('lbprev').onclick=function(){show(cur-1);};
+  document.getElementById('lbnext').onclick=function(){show(cur+1);};
+  document.getElementById('lbclose').onclick=function(){lb.close();};
+  lb.addEventListener('keydown',function(e){if(e.key==='ArrowLeft')show(cur-1);if(e.key==='ArrowRight')show(cur+1);if(e.key==='n'||e.key==='d')show(cur,e.key==='n'?'night':'day');});
+  lb.addEventListener('click',function(e){if(e.target===lb||e.target.classList.contains('imgwrap'))lb.close();});
+  var x0=null;lb.addEventListener('touchstart',function(e){x0=e.touches[0].clientX;},{passive:true});
+  lb.addEventListener('touchend',function(e){if(x0===null)return;var dx=e.changedTouches[0].clientX-x0;if(Math.abs(dx)>50)show(cur+(dx<0?1:-1));x0=null;});
+})();
+</script>
+</body>
+</html>
+'''
+
 
 def main():
     hero_image()
     imgs, W, H = render_plans()
     totals = plan_page(imgs, W, H)
     index_page(totals)
+    n = renders_page(render_images())
+    print('renders.html with %d views' % n)
     print('index.html, plan.html and %d images; net inside: %s' % (
         sum(len(v) for v in imgs.values()) + 1, ', '.join('%s %.1f m²' % (k, v) for k, v in totals.items())))
 
