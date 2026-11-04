@@ -38,3 +38,9 @@ RENDERS = [
 EXPOSURE = {'corridor-day': .45, 'wardrobe-day': .8, 'dressing-day': .35, 'master-day': .25, 'kitchen-day': .2, 'living-day': -.2,
             'tv-day': -.2, 'terrace-day': -1.2, 'piano-day': -.1}
 
+
+# The high-quality renders (tools/render_hq.py): lower, photographers' cameras where they differ, and exposure for the real sky
+HQ_VIEWS = {
+    'living': ([1480, 430, 118], [1000, 228, 100], 19),
+}
+HQ_EXPOSURE = {}
