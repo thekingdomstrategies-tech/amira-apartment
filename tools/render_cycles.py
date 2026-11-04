@@ -387,6 +387,23 @@ def build_flat(L, g):
             g.cyl(cx, cy, 3, z + 20, z + 22, 'black', 16)
 
 
+def build_fittings(plan, g):
+    """Render-only details the plan does not draw: the shower's fittings in Amira's bathroom."""
+    if plan != 'o3':
+        return
+    wx, cy = 588, 705                                        # the shower's back wall, and the middle of the tray
+    g.cyl(wx + 3, cy - 8, 1, 95, 200, 'steel', 16)           # the slide rail
+    g.box([wx, cy - 10, 94, wx + 3, cy - 6, 98], 'steel'); g.box([wx, cy - 10, 197, wx + 3, cy - 6, 201], 'steel')
+    g.cyl(wx + 5, cy - 8, 2.4, 148, 170, 'steel', 20)        # the hand shower
+    g.box([wx, cy - 3, 212, wx + 22, cy + 1, 215], 'steel')  # the arm, and the rain head on it
+    g.cyl(wx + 22, cy - 1, .9, 205, 213, 'steel', 12)
+    g.cyl(wx + 22, cy - 1, 13, 203, 205, 'steel', 40)
+    g.box([wx, cy + 4, 100, wx + 6, cy + 22, 108], 'steel')  # the mixer, and its lever
+    g.box([wx + 6, cy + 10, 103, wx + 13, cy + 13, 105], 'steel')
+    g.box([630, cy - 8, 5, 642, cy + 8, 5.3], 'steel')       # the drain
+    g.box([700, 785.4, 115, 780, 785.9, 190], 'mirror')      # the basin's mirror, silvered
+
+
 def build_lights_geo(L, g):
     """The light fittings the viewer adds itself: recessed downlights, ceiling discs, floor lamps, the LED strip."""
     H = model.H
@@ -593,7 +610,7 @@ def build_scene(key, night):
     lay = model.LAYOUTS[key]
     mats = Mats(night)
     g = Geo()
-    build_flat(L, g); build_lights_geo(L, g); build_surroundings(g)
+    build_flat(L, g); build_fittings(key, g); build_lights_geo(L, g); build_surroundings(g)
     g.link(mats, scene)
     if night:
         world_night(scene); lights_night(L, scene)

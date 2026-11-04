@@ -20,8 +20,8 @@ RENDERS = [
      [803, 575, 150], [803, 140, 100], 16, ('day', 'night')),
     ('corridor', 'The corridor', 'Down the corridor to the new door at its end: the kitchen open on the left, the bathroom\'s sliding door on the right.',
      [445, 556, 150], [1030, 553, 110], 18, ('day',)),
-    ('bathroom', 'The bathroom', 'From the sliding door: the shower behind its glass, and one counter to the far wall with the basin and the washing machine.',
-     [785, 618, 150], [640, 760, 95], 14, ('day',)),
+    ('bathroom', 'The bathroom', 'From beside the WC: the walk-in shower at the far end behind its glass, with a rain head and a hand shower, and on the left the one counter with the basin, the washing machine and the cupboard.',
+     [950, 700, 150], [600, 698, 105], 16, ('day',)),
     ('master', 'The master bedroom', 'Her mahogany bed, headboard on the wall to bedroom 2, with the new 80 cm bedside tables.',
      [415, 370, 150], [190, 650, 70], 16, ('day', 'night')),
     ('wardrobe', 'The dressing area', 'Her mahogany wall unit as the wardrobe: 70 and 60 along the window, the corner, then five units down the kitchen wall.',
@@ -38,3 +38,9 @@ RENDERS = [
 EXPOSURE = {'corridor-day': .45, 'wardrobe-day': .8, 'dressing-day': .35, 'master-day': .25, 'kitchen-day': .2, 'living-day': -.2,
             'tv-day': -.2, 'terrace-day': -1.2, 'piano-day': -.1}
 
+
+# The high-quality renders (tools/render_hq.py): lower, photographers' cameras where they differ, and exposure for the real sky
+HQ_VIEWS = {
+    'living': ([1480, 430, 118], [1000, 228, 100], 19),
+}
+HQ_EXPOSURE = {}
