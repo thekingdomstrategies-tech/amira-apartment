@@ -15,7 +15,11 @@ TEXTURES = ['white_plaster_02', 'oak_veneer_01', 'rough_linen', 'wool_boucle', '
 MAPS = {'Diffuse': 'diff', 'nor_gl': 'nor', 'Rough': 'rough'}
 HDRIS = ['kloofendal_48d_partly_cloudy_puresky']
 MODELS = ['potted_plant_02', 'potted_plant_04', 'book_encyclopedia_set_01', 'ceramic_vase_01', 'ceramic_vase_03',
-          'hanging_picture_frame_02', 'throw_pillows_01', 'wooden_bowl_01']
+          'hanging_picture_frame_02', 'throw_pillows_01', 'wooden_bowl_01',
+          # furniture, each stretched to the measured size of the piece it stands in for
+          'Sofa_01', 'sofa_02', 'sofa_03', 'modern_arm_chair_01', 'Ottoman_01', 'modern_coffee_table_01',
+          'modern_coffee_table_02', 'coffee_table_round_01', 'side_table_01', 'side_table_tall_01', 'dining_table',
+          'dining_chair_02', 'modern_wooden_cabinet']
 
 
 def get(url, path):

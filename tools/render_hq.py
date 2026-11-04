@@ -11,12 +11,14 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import render_cycles as rc
 from render_cycles import bpy, bmesh, Vector, CM, lin, model
 import addon_utils
+from mathutils import noise
 import numpy as np
 from render_views import RENDERS, EXPOSURE, HQ_VIEWS, HQ_EXPOSURE
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ASSETS = os.path.join(ROOT, '.assets')
 HDRI = 'kloofendal_48d_partly_cloudy_puresky'
+SUN_GAIN = 1.3       # a touch more sun than the partly cloudy photo had: the clear November day
 DAY_EV = 4.0          # the photographed sky is far dimmer than Blender's physical one: a longer exposure
 
 # ---------------------------------------------------------------- materials from photo textures
@@ -29,11 +31,11 @@ PBR = {
     'cap':       ('white_plaster_02', 2.0, '#F1EEE8', .15, (.85, .95), .2, 0, 0),
     'oak':       ('oak_veneer_01', .9, None, 1, (.32, .5), .4, 0, .25),
     'oakdark':   ('oak_veneer_01', .9, '#5A3E26', .9, (.3, .45), .4, 0, .25),
-    'beige':     ('rough_linen', .22, '#CDBFAA', .45, (.85, 1), .8, .35, 0),
-    'fabric':    ('rough_linen', .22, '#E0D6C6', .45, (.85, 1), .8, .35, 0),
-    'linen':     ('rough_linen', .2, '#EEE8DD', .45, (.85, 1), .8, .35, 0),
-    'taupe':     ('rough_linen', .12, '#7C6C5A', .5, (.88, 1), .9, .4, 0),
-    'sgrey':     ('rough_linen', .12, '#8E8B85', .5, (.88, 1), .9, .4, 0),
+    'beige':     ('rough_linen', .45, '#CDBFAA', .6, (.85, 1), 1.3, .35, 0),
+    'fabric':    ('rough_linen', .45, '#E0D6C6', .6, (.85, 1), 1.3, .35, 0),
+    'linen':     ('rough_linen', .35, '#EEE8DD', .55, (.85, 1), 1.2, .35, 0),
+    'taupe':     ('rough_linen', .35, '#7C6C5A', .65, (.88, 1), 1.4, .4, 0),
+    'sgrey':     ('rough_linen', .35, '#8E8B85', .65, (.88, 1), 1.4, .4, 0),
     'pouf':      ('wool_boucle', .1, '#705F4E', .6, (.9, 1), 1, .4, 0),
     'throw':     ('wool_boucle', .1, '#EAE2D4', .5, (.9, 1), 1, .4, 0),
     'throwrust': ('wool_boucle', .1, '#A25E3E', .5, (.9, 1), 1, .4, 0),
@@ -98,7 +100,17 @@ def make_pbr(mats, k):
         mx.inputs['Factor'].default_value = 1
         mx.inputs[6].default_value = lin(tint)
         nt.links.new(mr.outputs['Result'], mx.inputs[7])
-        nt.links.new(mx.outputs[2], b.inputs['Base Color'])
+        col = mx.outputs[2]
+        if k in SOFT:       # cloth is never one even colour: a faint, large mottle where it has worn and been sat on
+            tc = nt.nodes.new('ShaderNodeTexCoord')
+            nz = nt.nodes.new('ShaderNodeTexNoise'); nz.inputs['Scale'].default_value = 2.5; nz.inputs['Detail'].default_value = 3
+            nt.links.new(tc.outputs['Object'], nz.inputs['Vector'])
+            mo = nt.nodes.new('ShaderNodeMapRange'); mo.inputs['To Min'].default_value = .93; mo.inputs['To Max'].default_value = 1.05
+            mo.inputs['From Min'].default_value = .3; mo.inputs['From Max'].default_value = .7
+            nt.links.new(nz.outputs['Fac'], mo.inputs['Value'])
+            m2 = nt.nodes.new('ShaderNodeMix'); m2.data_type = 'RGBA'; m2.blend_type = 'MULTIPLY'; m2.inputs['Factor'].default_value = 1
+            nt.links.new(col, m2.inputs[6]); nt.links.new(mo.outputs['Result'], m2.inputs[7]); col = m2.outputs[2]
+        nt.links.new(col, b.inputs['Base Color'])
     else:
         nt.links.new(d.outputs['Color'], b.inputs['Base Color'])
     if os.path.exists(tex_path(name, 'rough')):
@@ -138,10 +150,13 @@ def make_porcelain(mats):
     mx = nt.nodes.new('ShaderNodeMix'); mx.data_type = 'RGBA'; mx.blend_type = 'MULTIPLY'; mx.inputs['Factor'].default_value = 1
     nt.links.new(br.outputs['Color'], mx.inputs[6]); nt.links.new(mr.outputs['Result'], mx.inputs[7])
     b = nt.nodes.new('ShaderNodeBsdfPrincipled'); nt.links.new(mx.outputs[2], b.inputs['Base Color'])
-    rr = nt.nodes.new('ShaderNodeMapRange'); rr.inputs['To Min'].default_value = .07; rr.inputs['To Max'].default_value = .5
-    inv = nt.nodes.new('ShaderNodeMath'); inv.operation = 'SUBTRACT'; inv.inputs[0].default_value = 1
-    nt.links.new(br.outputs['Fac'], inv.inputs[1]); nt.links.new(inv.outputs[0], rr.inputs['Value'])
-    nt.links.new(rr.outputs['Result'], b.inputs['Roughness'])
+    # polished tiles, matt joints (the brick texture's Fac is 1 in the joints), a faint unevenness in the polish
+    rr = nt.nodes.new('ShaderNodeMapRange'); rr.inputs['To Min'].default_value = .06; rr.inputs['To Max'].default_value = .6
+    nt.links.new(br.outputs['Fac'], rr.inputs['Value'])
+    nz = nt.nodes.new('ShaderNodeTexNoise'); nz.inputs['Scale'].default_value = 3; nt.links.new(tc.outputs['Object'], nz.inputs['Vector'])
+    ad = nt.nodes.new('ShaderNodeMath'); ad.operation = 'MULTIPLY_ADD'; ad.inputs[1].default_value = .06
+    nt.links.new(nz.outputs['Fac'], ad.inputs[0]); nt.links.new(rr.outputs['Result'], ad.inputs[2])
+    nt.links.new(ad.outputs[0], b.inputs['Roughness'])
     bump = nt.nodes.new('ShaderNodeBump'); bump.inputs['Strength'].default_value = .4; bump.inputs['Distance'].default_value = .0015
     nt.links.new(br.outputs['Fac'], bump.inputs['Height']); nt.links.new(bump.outputs['Normal'], b.inputs['Normal'])
     b.inputs['Specular IOR Level'].default_value = .55
@@ -276,31 +291,78 @@ class HQGeo(rc.Geo):
             soft_box(scene, mats, b, m, i)
 
 
+def cushion_mesh(dx, dy, dz, r, bulge, wrinkle, seed=0, cuts=28):
+    """A sewn cover over a box (sizes in metres): the seams rounded, each face filled out most in its middle and
+    pinched at the seams, and soft creases, most toward the corners, where the cover gathers."""
+    bm = bmesh.new(); bmesh.ops.create_cube(bm, size=2)
+    bmesh.ops.subdivide_edges(bm, edges=bm.edges[:], cuts=cuts, use_grid_fill=True)
+    h = np.array([dx, dy, dz]) / 2
+    r = min(r, *(h * .95))
+    off = Vector((seed * 7.1, seed * 3.3, seed * 1.7))
+    for v in bm.verts:
+        p = np.array(v.co)
+        s = p * h
+        q = np.clip(s, -(h - r), h - r)
+        d = s - q; n = np.linalg.norm(d)
+        pt = q + (d / n * r if n > 1e-9 else 0)
+        ax = int(np.argmax(np.abs(p))); o = [i for i in range(3) if i != ax]
+        f = (1 - p[o[0]] ** 2) * (1 - p[o[1]] ** 2)
+        nrm = np.zeros(3); nrm[ax] = np.sign(p[ax])
+        pt = pt + nrm * bulge * f ** .8 * (.35 if ax != 2 else 1)
+        w = noise.noise(Vector(pt * 14) + off) * .6 + noise.noise(Vector(pt * 33) + off) * .4
+        pt = pt - nrm * wrinkle * (1 - abs(w)) ** 3 * (.25 + 1 - f)
+        v.co = Vector(pt)
+    me = bpy.data.meshes.new('cushion'); bm.to_mesh(me); bm.free()
+    return me
+
+
 def soft_box(scene, mats, b, m, i):
-    """An upholstered piece: the measured box, its edges rounded and the faces a little full, like a cushion."""
+    """An upholstered piece at its measured box: a sewn cover, filled out and softly creased."""
     x0, y0, z0, x1, y1, z1 = b
     dx, dy, dz = x1 - x0, y1 - y0, z1 - z0
     if min(dx, dy, dz) <= 0:
         return
-    bm = bmesh.new()
-    bmesh.ops.create_cube(bm, size=1)
-    me = bpy.data.meshes.new('soft'); bm.to_mesh(me); bm.free()
+    small = min(dx, dy, dz)
+    full = small >= 8 and max(dx, dy) >= 30                # cushions and seats, not throws and piping
+    arm = not full and dz >= 40 and small <= 25 and m in ('taupe', 'sgrey')     # her sofas' rolled arms
+    r = small * .48 if arm else min(small * .3, 4)
+    me = cushion_mesh(dx * CM, dy * CM, dz * CM, r=r * CM,
+                      bulge=min(small * .1, 2) * CM if full else 0, wrinkle=min(small * .06, 1.0) * CM, seed=i,
+                      cuts=max(8, min(28, int(max(dx, dy, dz) / 3))))
     ob = bpy.data.objects.new('soft %s %d' % (m, i), me)
     ob.location = ((x0 + x1) / 2 * CM, -(y0 + y1) / 2 * CM, (z0 + z1) / 2 * CM)
-    ob.scale = (dx * CM, dy * CM, dz * CM)
     scene.collection.objects.link(ob)
-    # the modifiers work in the object's own space: apply the scale first so the rounding is even
-    me.transform(ob.matrix_basis.to_3x3().to_4x4()); ob.scale = (1, 1, 1)
-    small = min(dx, dy, dz)
-    bv = ob.modifiers.new('round', 'BEVEL'); bv.width = min(small * .42, 6) * CM; bv.segments = 3; bv.limit_method = 'NONE'
-    ss = ob.modifiers.new('soft', 'SUBSURF'); ss.levels = ss.render_levels = 2
-    if small >= 8 and max(dx, dy) >= 30:             # cushions and seats: a little fuller in the middle
-        cast = ob.modifiers.new('full', 'CAST'); cast.factor = .12; cast.cast_type = 'SPHERE'
-        cast.use_x = cast.use_y = True; cast.use_z = small < 25
+    ss = ob.modifiers.new('soft', 'SUBSURF'); ss.levels = ss.render_levels = 1
     for p in me.polygons:
         p.use_smooth = True
     box_uvs(me)
     me.materials.append(mats.get(m))
+    if full and dz <= 40:                            # cushions: the welt along the top and bottom seams
+        piping(scene, mats, ob.location, dx * CM, dy * CM, dz * CM, min(small * .3, 4) * CM, PIPING.get(m, m))
+
+
+PIPING = {'beige': 'linen'}      # the showroom sofa has white piping
+
+
+def piping(scene, mats, c, dx, dy, dz, r, m):
+    k = r * (1 - .7071)
+    ax, ay, az = dx / 2 - k, dy / 2 - k, dz / 2 - k
+    cr = min(r * .8, ax * .5, ay * .5)
+    for zs in (1, -1):
+        cu = bpy.data.curves.new('piping', 'CURVE'); cu.dimensions = '3D'
+        cu.bevel_depth = .0032; cu.bevel_resolution = 2
+        sp = cu.splines.new('POLY')
+        pts = []
+        for qx, qy, a0 in ((ax - cr, ay - cr, 0), (-ax + cr, ay - cr, 90), (-ax + cr, -ay + cr, 180), (ax - cr, -ay + cr, 270)):
+            for j in range(5):
+                a = math.radians(a0 + j * 22.5)
+                pts.append((qx + cr * math.cos(a), qy + cr * math.sin(a), zs * az))
+        sp.points.add(len(pts) - 1)
+        for pt, co in zip(sp.points, pts):
+            pt.co = (*co, 1)
+        sp.use_cyclic_u = True
+        ob = bpy.data.objects.new('piping', cu); ob.location = c
+        cu.materials.append(mats.get(m)); scene.collection.objects.link(ob)
 
 
 # ---------------------------------------------------------------- the sky
@@ -326,8 +388,25 @@ def world_hdri(scene, az, alt):
     tc = nt.nodes.new('ShaderNodeTexCoord'); mp = nt.nodes.new('ShaderNodeMapping')
     mp.inputs['Rotation'].default_value = (0, 0, rot)
     nt.links.new(tc.outputs['Generated'], mp.inputs['Vector']); nt.links.new(mp.outputs[0], env.inputs['Vector'])
-    nt.links.new(env.outputs['Color'], bg.inputs[0]); bg.inputs[1].default_value = 1.0
-    print('HDRI sun at %.0f deg, turned %.0f deg' % (math.degrees(math.asin(s.z)), math.degrees(rot)))
+    # the photo's sun is a few hundred pixels: indoors, through the windows, Cycles finds it too seldom to cast a
+    # crisp patch of sunlight. Take it out of the sky (clamp the brightest pixels) and put it back as a sun lamp,
+    # as strong, at Cairo's true height and bearing
+    w_, h_ = env.image.size
+    a = np.empty(w_ * h_ * 4, np.float32); env.image.pixels.foreach_get(a)
+    px = a.reshape(h_, w_, 4)[h_ // 2:, :, :3].mean(-1)
+    cap = float(np.percentile(px, 99.5))
+    el = math.pi * ((np.arange(h_ // 2, h_) + .5) / h_ - .5)
+    cw = (np.sin(el) * np.cos(el))[:, None] * (2 * math.pi / w_) * (math.pi / h_)
+    e_sun = float(((px - np.minimum(px, cap)) * cw).sum())               # its light on the ground
+    cl = nt.nodes.new('ShaderNodeVectorMath'); cl.operation = 'MINIMUM'; cl.inputs[1].default_value = (cap,) * 3
+    nt.links.new(env.outputs['Color'], cl.inputs[0])
+    nt.links.new(cl.outputs['Vector'], bg.inputs[0]); bg.inputs[1].default_value = 1.0
+    sun = bpy.data.lights.new('sun', 'SUN'); sun.energy = SUN_GAIN * e_sun / max(s.z, .1); sun.angle = math.radians(.55)
+    sun.color = (1, .96, .9)
+    ob = bpy.data.objects.new('sun', sun); scene.collection.objects.link(ob)
+    ob.rotation_euler = (-d).to_track_quat('-Z', 'Y').to_euler()
+    print('HDRI sun at %.0f deg, turned %.0f deg; sun lamp %.2f at %.0f deg' % (
+        math.degrees(math.asin(s.z)), math.degrees(rot), sun.energy, alt))
 
 
 # ---------------------------------------------------------------- props
@@ -537,7 +616,52 @@ def dress(scene, mats, key):
     pillow(scene, mats, (370, 1030, 72), 42, 42, 13, 90, 15, 'mustard', 5)
 
 
-def add_props(scene, key, plants):
+SWAPS = {   # measured pieces drawn as real furniture models, each stretched to the piece's own box; turn in degrees
+    'o3': [('Coffee table', 'modern_coffee_table_01', 0), ('Side table', 'side_table_01', 0)],
+}
+
+
+def take_pieces(L, key):
+    """Clear the boxes of each swapped piece out of the plan, and return where its model goes."""
+    out = []
+    for name, mdl, rot in SWAPS.get(key, []):
+        if not os.path.exists(os.path.join(ASSETS, 'models', mdl, mdl + '.gltf')):
+            print('missing model', mdl, '- keeping the drawn', name); continue
+        for pc in L['pieces']:
+            if pc['n'] != name:
+                continue
+            x0, y0, z0, x1, y1, z1 = pc['b']
+            def inside(it):
+                if it['t'] != 'b' or it.get('g') or it.get('m') == 'rug':
+                    return False
+                a = it['b']
+                return a[0] >= x0 - .1 and a[1] >= y0 - .1 and a[3] <= x1 + .1 and a[4] <= y1 + .1 and a[5] <= z1 + .1
+            L['items'] = [it for it in L['items'] if not inside(it)]
+            out.append((mdl, pc['b'], rot))
+    return out
+
+
+def fit_model(scene, name, b, rot=0):
+    """A model stretched to fill the box b (plan cm) exactly: footprint and height."""
+    root = import_model(scene, name, (0, 0, 0))
+    bpy.context.view_layer.update()
+    pts = [o.matrix_world @ Vector(c) for o in root.children_recursive if o.type == 'MESH' for c in o.bound_box]
+    lo = Vector([min(p[i] for p in pts) for i in range(3)]); hi = Vector([max(p[i] for p in pts) for i in range(3)])
+    size = hi - lo
+    w, d, h = (b[3] - b[0]) * CM, (b[4] - b[1]) * CM, (b[5] - b[2]) * CM
+    if rot % 180:
+        w, d = d, w
+    root.scale = (w / size.x, d / size.y, h / size.z)
+    c = (lo + hi) / 2
+    root.rotation_euler = (0, 0, math.radians(rot))
+    off = Vector((c.x * root.scale.x, c.y * root.scale.y, lo.z * root.scale.z))
+    off.rotate(root.rotation_euler)
+    root.location = Vector(((b[0] + b[3]) / 2 * CM, -(b[1] + b[4]) / 2 * CM, b[2] * CM)) - off
+
+
+def add_props(scene, key, plants, swaps=()):
+    for mdl, b, rot in swaps:
+        fit_model(scene, mdl, b, rot)
     for c, top in plants:
         import_model(scene, 'potted_plant_02', (c[0], c[1], 0), 20, fit_h=top)
     for name, at, rot, s, fit in PROPS.get(key, []):
@@ -610,6 +734,7 @@ def build_scene(key, night):
     scene = bpy.context.scene
     L = model.build(key)
     plants = take_plants(L)
+    swaps = take_pieces(L, key)
     lay = model.LAYOUTS[key]
     mats = rc.Mats(night)
     g = HQGeo()
@@ -620,7 +745,7 @@ def build_scene(key, night):
         hang_print(scene, mats, g, 972, 281, 152, 50, 70, 8)
         hang_print(scene, mats, g, 683, 227, 168, 80, 56, 5, axis="x", side=-1)     # one over the master bed
     g.link(mats, scene)
-    add_props(scene, key, plants)
+    add_props(scene, key, plants, swaps)
     dress(scene, mats, key)
     if night:
         rc.world_night(scene); rc.lights_night(L, scene)
@@ -635,7 +760,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--plan', default='o3')
     ap.add_argument('--only', default='')
-    ap.add_argument('--times', default='day,night')
+    ap.add_argument('--times', default='day')
     ap.add_argument('--res', default='1920x1200')
     ap.add_argument('--samples', type=int, default=384)
     ap.add_argument('--out', default=os.path.join(ROOT, 'renders'))
