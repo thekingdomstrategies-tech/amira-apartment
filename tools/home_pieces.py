@@ -42,6 +42,28 @@ def handle_h(fc, u0, u1, z, t, m='steel'):
     fc.rect(u0, u1, z - .6, z + .6, t, t + 1.6, m)
 
 
+RISE, STRIPS = 5, 18     # the arched heads: how far the arch rises, and the strips that draw its curve
+
+
+def _arc(u, uc, half):
+    """0 at the ends of the arch, 1 at its crown: a circular segment."""
+    k = (u - uc) / half
+    return max(0., 1 - k * k) ** .5
+
+
+def arch_strips(fc, u0, u1, z_base, z_top_extra, t0, t1, m, grow=0.):
+    """A curved head drawn as thin vertical strips: from z_base up to z_base + RISE * arc(u) + z_top_extra. The strips
+    take the finish's unbevelled twin (m + 'a'), so they read as one curved surface."""
+    m = m + 'a' if m in ('kgrey', 'kgreyd', 'mahog', 'mahogd') else m
+    uc, half = (u0 + u1) / 2, (u1 - u0) / 2 + grow
+    n = STRIPS
+    for i in range(n):
+        a, b = u0 + (u1 - u0) * i / n, u0 + (u1 - u0) * (i + 1) / n
+        h = RISE * _arc((a + b) / 2, uc, half) + z_top_extra
+        if h > .05:
+            fc.rect(a, b, z_base, z_base + h, t0, t1, m)
+
+
 def panel_door(fc, u0, u1, z0, z1, m, hinge='l', arch=False, hz=None, hm='steel', knob=False):
     """A frame-and-panel door: the slab, its raised panel (with an arched head if asked), and a handle on the side
     away from the hinge (hinge: 'l' / 'r' along u, or None for no handle). hz: the handle's height, z0..z1 centre if
@@ -50,14 +72,14 @@ def panel_door(fc, u0, u1, z0, z1, m, hinge='l', arch=False, hz=None, hm='steel'
     fc.rect(u0, u1, z0, z1, 0, 2, m)
     w, h = u1 - u0, z1 - z0
     mg = min(7, w * .16, h * .16)
-    top = z1 - mg - (4 if arch else 0)
+    top = z1 - mg - (RISE if arch else 0)
     if m in DARK:
-        fc.rect(u0 + mg - 1.2, u1 - mg + 1.2, z0 + mg - 1.2, top + (5.4 if arch else 1.2), 2, 2.15, DARK[m])
+        fc.rect(u0 + mg - 1.2, u1 - mg + 1.2, z0 + mg - 1.2, top + 1.2, 2, 2.15, DARK[m])
+        if arch:
+            arch_strips(fc, u0 + mg - 1.2, u1 - mg + 1.2, top + 1.2, 0, 2, 2.15, DARK[m], grow=1.2)
     fc.rect(u0 + mg, u1 - mg, z0 + mg, top, 2, 2.8, m)
-    if arch:     # the arched head, in steps
-        cw = (w - 2 * mg)
-        for k, s in enumerate((.86, .6, .3)):
-            fc.rect(u0 + mg + cw * (1 - s) / 2, u1 - mg - cw * (1 - s) / 2, top, top + 1.4 * (k + 1), 2, 2.8, m)
+    if arch:     # the arched head, a smooth curve
+        arch_strips(fc, u0 + mg, u1 - mg, top, 0, 2, 2.8, m)
     if hinge:
         u = u1 - 3.5 if hinge == 'l' else u0 + 3.5
         zc = hz if hz is not None else (z0 + z1) / 2
@@ -72,14 +94,16 @@ def glass_door(fc, u0, u1, z0, z1, m, hinge='l', arch=True, cols=2, rows=3, hz=N
     u0, u1, z0, z1 = u0 + GAP, u1 - GAP, z0 + GAP, z1 - GAP
     s = 4.5
     fc.rect(u0, u0 + s, z0, z1, 0, 2.2, m); fc.rect(u1 - s, u1, z0, z1, 0, 2.2, m)
-    fc.rect(u0, u1, z0, z0 + s, 0, 2.2, m); fc.rect(u0, u1, z1 - s - (4 if arch else 0), z1, 0, 2.2, m)
-    if arch:
-        cw = u1 - u0 - 2 * s
-        for k, f in enumerate((.7, .4)):
-            fc.rect(u0 + s, u0 + s + cw * (1 - f) / 2, z1 - s - 4 - 2.5 * (k + 1), z1 - s - 4, 0, 2.2, m)
-            fc.rect(u1 - s - cw * (1 - f) / 2, u1 - s, z1 - s - 4 - 2.5 * (k + 1), z1 - s - 4, 0, 2.2, m)
-    gz1 = z1 - s - (4 if arch else 0)
-    fc.F.box(_g(fc, u0 + s, u1 - s, z0 + s, gz1, .9, 1.3), 'glass', g='glass', f=fc.f)
+    fc.rect(u0, u1, z0, z0 + s, 0, 2.2, m)
+    gz1 = z1 - s - (RISE + 1 if arch else 0)     # the glass's top at the sides; an arch rises RISE above it
+    if arch:     # the top rail, its lower edge arched: strips from the curve up to the rail
+        uc, half, n = (u0 + u1) / 2, (u1 - u0 - 2 * s) / 2, STRIPS
+        for i in range(n):
+            a, b = u0 + s + 2 * half * i / n, u0 + s + 2 * half * (i + 1) / n
+            fc.rect(a, b, gz1 + RISE * _arc((a + b) / 2, uc, half), z1, 0, 2.2, m + 'a')
+    else:
+        fc.rect(u0, u1, gz1, z1, 0, 2.2, m)
+    fc.F.box(_g(fc, u0 + s, u1 - s, z0 + s, gz1 + (RISE if arch else 0), .9, 1.3), 'glass', g='glass', f=fc.f)
     for i in range(1, cols):
         u = u0 + s + (u1 - u0 - 2 * s) * i / cols
         fc.rect(u - .6, u + .6, z0 + s, gz1, 1, 1.9, m)

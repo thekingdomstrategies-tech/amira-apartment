@@ -933,7 +933,7 @@ VIEWS = [   # key, button, view, plans it belongs to (None: all); z below 1 wide
     ('tv3', 'TV wall', dict(pos=[1040, 300, SIT], look=[1559, 380, 120], z=ZOOM, msg='From the 2.80 sofa to the TV wall unit, wider than life.' + TRUE), ['o3']),
     ('dining3', 'Dining', dict(pos=[1340, 960, EYE], look=[1150, 650, 85], z=ZOOM, msg='The dining table for eight and the 2.20 sideboard, wider than life.' + TRUE), ['o3']),
     ('piano3', 'Piano corner', dict(pos=[1270, 640, EYE], look=[1500, 790, 80], z=ZOOM, msg='The piano corner: the 1.40 sofa, the nest of tables and the piano, wider than life.' + TRUE), ['o3']),
-    ('bath3', 'Bathroom', dict(pos=[935, 705, EYE], look=[620, 745, 90], z=ZOOM, msg='The bathroom from the WC: the counter with the basin and washing machine, and the shower, wider than life.' + TRUE), ['o3']),
+    ('bath3', 'Bathroom', dict(pos=[885, 688, EYE], look=[590, 712, 92], z=ZOOM, msg='The bathroom from the far corner by the WC: the counter with the basin and washing machine, and the shower, wider than life.' + TRUE), ['o3']),
     ('wardrobe3', 'Wardrobe', dict(pos=[460, 470, EYE], look=[600, 150, 140], z=ZOOM, msg='Her mahogany wall unit as the master wardrobe, wider than life.' + TRUE), ['o3']),
     ('door3', 'Corridor door', dict(pos=[520, 553, EYE], look=[1030, 558, 105], z=ZOOM, msg='Down the corridor to the new door at its end, wider than life.' + TRUE), ['o3']),
     ('dress3', 'Dressing table', dict(pos=[400, 560, EYE], look=[300, 318, 110], z=ZOOM, msg='The dressing table, the hanging TV and the mirror, wider than life.' + TRUE), ['o3']),

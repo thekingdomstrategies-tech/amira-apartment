@@ -287,9 +287,10 @@ def main():
             "M.taupe=std({color:0x8C7D6B,roughness:1,bumpMap:texWeave,bumpScale:.8}); M.sgrey=std({color:0x9D9A95,roughness:1,bumpMap:texWeave,bumpScale:.8});\n"
             "M.pouf=std({color:0x7C6C5C,roughness:1,bumpMap:texWeave,bumpScale:.9}); M.beige=std({color:0xD0C4B2,roughness:1,bumpMap:texWeave,bumpScale:.7});\n"
             "M.piping=std({color:0xF5F2EB,roughness:.8}); M.mustard=std({color:0xB49A57,roughness:1,bumpMap:texWeave,bumpScale:.8}); M.wine=std({color:0x7B2029,roughness:.9,bumpMap:texWeave,bumpScale:.6});\n"
-            "TEXM.granite=.6; TEXM.mahog=1; TEXM.kgrey=.9; ['taupe','sgrey','pouf','beige','mustard','wine'].forEach(function(k){TEXM[k]=.25;});", s)
+            "M.kgreya=M.kgrey; M.kgreyda=M.kgreyd; M.mahoga=M.mahog; M.mahogda=M.mahogd;   // the arch strips: the same finish, unbevelled\n"
+            "TEXM.granite=.6; TEXM.mahog=1; TEXM.kgrey=.9; TEXM.kgreya=.9; TEXM.mahoga=1; ['taupe','sgrey','pouf','beige','mustard','wine'].forEach(function(k){TEXM[k]=.25;});", s)
     s = rep("var r={front:.7,fabric:5,linen:3.2,", "var r={front:.7,fabric:5,linen:3.2,taupe:5,sgrey:5,pouf:4,beige:5,mustard:4,wine:3,kgrey:.4,mahog:.4,mahogd:.3,kgreyd:.2,granite:.6,piano:.5,", s)
-    s = rep("var NO_BEVEL={glass:1,", "var NO_BEVEL={glass:1,mirror:1,piping:1,brass:1,", s)
+    s = rep("var NO_BEVEL={glass:1,", "var NO_BEVEL={glass:1,mirror:1,piping:1,brass:1,kgreya:1,kgreyda:1,mahoga:1,mahogda:1,", s)
     # Option 3 offers two hobs; AZAD's island switch (state.isl, design / trial) chooses between them
     s = rep('<div class="ctl" data-only="p1"><div class="cl"><span>Kitchen island</span></div><div class="bt" data-state="isl">'
             '<button type="button" data-v="design" aria-pressed="true" title="Your design: the island with the oak L bar, and the oak table for 8 in the reception">Design</button>'
@@ -304,7 +305,7 @@ def main():
              '<meta name="description" content="Walk-through 3D model of the Creektown apartment: as built and the architect\'s two layout options and Amira\'s, furnished, in true measurements from the plans.">', s)
     s = rep('aria-label="AZAD Apartment: home">← <span class="hn">AZAD Apartment</span>',
             'aria-label="%s: home">← <span class="hn">%s</span>' % (NAME, NAME), s)
-    s = sub1(r'<a href="renders.html">Renders</a>\s*<a href="package.html">Package</a>', '', s)
+    s = sub1(r'(<a href="renders.html">Renders</a>)\s*<a href="package.html">Package</a>', r'\1', s)   # the renders page; no package
     s = rep('<div class="eyebrow">AZAD Apartment · 3D</div>', '<div class="eyebrow">%s · 3D</div>' % NAME, s)
     plans = ''.join('<button type="button" data-v="%s" aria-pressed="%s" title="%s">%s<small>%s</small></button>' % (
         k, 'true' if k == 'existing' else 'false', html.escape(model.LAYOUTS[k]['title']), *model.LAYOUTS[k]['button']) for k in model.ORDER)

@@ -10,6 +10,8 @@ a 3D walkthrough of each with the real sun. The site reuses the
   (furnished and empty), every room clickable, and a room schedule; `plan.html?plan=o1` opens option 1
 - `3d.html`: the AZAD walkthrough with this apartment's walls, windows, doors, furniture, lighting and viewpoints, with
   a plan button each for as built, option 1, option 2 and option 3; `3d.html?plan=o2` opens option 2
+- `renders.html`: photoreal, path-traced views of Option 3 (Amira's layout, with her furniture), by day and in the
+  evening, with a day-to-evening slider, a day/evening switch on each view and a full-screen viewer
 
 | Plan | Key | Sheets | In short |
 | --- | --- | --- | --- |
@@ -72,12 +74,29 @@ facade band, which no option changes; all three plans then share one set of coor
 | The compound round building E07, from the brochure's masterplan | `tools/surroundings.py` | `data/surroundings.json` |
 | Each plan's doors, rooms, furniture, lights, viewpoints | `tools/model.py` | (imported by the two below) |
 | The 3D page from AZAD's viewer | `tools/build_3d.py --azad PATH` | `3d.html` |
-| Plan images, plan page and overview | `tools/build_pages.py` | `plan.html`, `index.html`, `img/plan-<sheet>-*.jpg` |
+| Plan images, plan page, overview and renders page | `tools/build_pages.py` | `plan.html`, `index.html`, `renders.html`, `img/plan-<sheet>-*.jpg`, `renders/s/` |
+| Photoreal renders, path-traced in Blender Cycles | `tools/render_cycles.py` (views in `tools/render_views.py`) | `renders/<view>-<day\|night>.jpg` |
 
 `build_3d.py` needs a checkout of `kamelshenouda/azad` (by default next to this repository, at
 `../kamelshenouda/azad`); it takes AZAD's `3d.html` as the template and replaces its model data, plans, viewpoints, site
 and names. `lib/` is AZAD's vendored three.js r169 and three-mesh-bvh 0.8.3 (MIT). The scripts need Python 3 with numpy
 and Pillow, and poppler's `pdftocairo` and `pdftoppm`. `img/3d-thumb.jpg` is a screenshot of the 3D overview.
+
+## Renders
+
+`tools/render_cycles.py` builds the same model in Blender and path-traces it with Cycles: the flat from
+`tools/model.py`, the compound round it (the neighbouring blocks, pools, roads and trees), and either New Cairo's sun
+and sky for the date and hour in `tools/render_views.py` (with sky portals at the windows) or, for the evening, the
+flat's own downlights, ceiling lights, floor lamps, dining pendants and the kitchen's LED strip. Cameras are level, with
+the lens shifted to frame the view, so verticals stay vertical as in architectural photographs. It needs Blender's
+Python module, which is on PyPI:
+
+    python3 -m venv bvenv && bvenv/bin/pip install bpy==5.2.3 scipy
+    bvenv/bin/python tools/render_cycles.py                       # every view, day and evening, 1920 x 1200
+    bvenv/bin/python tools/render_cycles.py --only kitchen --times night --res 960x600 --samples 32 --out /tmp/test
+
+On four CPU cores a 1920 x 1200 view at 64 samples (denoised with OpenImageDenoise) takes about ten minutes.
+`tools/build_pages.py` then makes the 1000 px copies in `renders/s/` and `renders.html`.
 
 ## Still to confirm
 
