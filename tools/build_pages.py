@@ -793,7 +793,9 @@ def renders_page(have):
             secs.append('<section class="rsec"><h2>%s<small>%d view%s</small></h2><div class="rgrid">%s</div></section>' % (
                 html.escape(name), len(items), '' if len(items) == 1 else 's', ''.join(items)))
     n_day = sum(1 for h in have.values() if 'day' in h); n_night = sum(1 for h in have.values() if 'night' in h)
-    body = RENDERS_BODY % dict(name=NAME, feature=feature, secs=''.join(secs), foot=FOOT, nday=n_day, nnight=n_night,
+    body = RENDERS_BODY % dict(name=NAME, feature=feature, secs=''.join(secs), foot=FOOT,
+                               nday='%d view%s by day' % (n_day, '' if n_day == 1 else 's'),
+                               nnight='<span>%d in the evening</span>' % n_night if n_night else '',
                                day=render_views.DAY_LABEL)
     page = HEAD % dict(title='%s · Renders' % NAME, css=CSS,
                        desc="Photoreal path-traced renders of Amira's layout for the Creektown apartment, by day and in the evening.") + body
@@ -809,7 +811,7 @@ RENDERS_BODY = r'''<body>
   <div class="eyebrow">03 · Renders</div>
   <h1>Photoreal views</h1>
   <p>Path-traced views of the main spaces, by day and by night: Option 3, Amira's layout, with her own furniture. Rendered in Blender Cycles from the same centimetre model as the plan and the <a href="3d.html?plan=o3">3D walkthrough</a>, so every wall, window and piece is at its true size, and the light is simulated as it bounces round the rooms. Tap any view to see it full screen.</p>
-  <div class="rmeta"><span>%(nday)d views by day</span><span>%(nnight)d in the evening</span><span>Sun and sky for New Cairo, %(day)s</span><span>Fifth floor, over the pool garden</span></div>
+  <div class="rmeta"><span>%(nday)s</span>%(nnight)s<span>Sun and sky for New Cairo, %(day)s</span><span>Fifth floor, over the pool garden</span></div>
 </section>
 %(feature)s
 %(secs)s
