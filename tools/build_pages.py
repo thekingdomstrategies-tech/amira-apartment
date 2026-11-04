@@ -810,7 +810,7 @@ RENDERS_BODY = r'''<body>
 <section class="rhead">
   <div class="eyebrow">03 · Renders</div>
   <h1>Photoreal views</h1>
-  <p>Path-traced views of the main spaces, by day and by night: Option 3, Amira's layout, with her own furniture. Rendered in Blender Cycles from the same centimetre model as the plan and the <a href="3d.html?plan=o3">3D walkthrough</a>, so every wall, window and piece is at its true size, and the light is simulated as it bounces round the rooms. Tap any view to see it full screen.</p>
+  <p>Path-traced views of the main spaces, by day and by night: Option 3, Amira's layout, with her own furniture. Rendered in Blender Cycles, with textures, sky and plants from <a href="https://polyhaven.com">Poly Haven</a> (CC0), from the same centimetre model as the plan and the <a href="3d.html?plan=o3">3D walkthrough</a>, so every wall, window and piece is at its true size, and the light is simulated as it bounces round the rooms. Tap any view to see it full screen.</p>
   <div class="rmeta"><span>%(nday)s</span>%(nnight)s<span>Sun and sky for New Cairo, %(day)s</span><span>Fifth floor, over the pool garden</span></div>
 </section>
 %(feature)s
@@ -819,8 +819,8 @@ RENDERS_BODY = r'''<body>
   <h2>What's real in these renders</h2>
   <div class="facts2">
     <div><b>To the centimetre</b><span>The walls and windows traced from the architect's drawings, Amira's corridor and bathroom changes, and every piece at the size she gave.</span></div>
-    <div><b>The light</b><span>Cairo's sun and sky for the date and hour, through the real windows, with the light bouncing between the surfaces; in the evening, the flat's downlights, lamps and pendants.</span></div>
-    <div><b>Still stand-ins</b><span>Finishes not yet chosen (walls, floors, the kitchen's repaint), the furniture without a photo, and the view outside, which is the compound's massing, not a photograph.</span></div>
+    <div><b>The light</b><span>A photographed sky, turned so its sun stands where Cairo's does on the date and hour, coming through the real windows and bouncing between the surfaces; in the evening, the flat's downlights, lamps and pendants.</span></div>
+    <div><b>Styled, not chosen</b><span>Photo-scanned plaster, oak, linen and stone stand in for finishes not yet picked. The curtains, cushions, throws, books, plants and prints are a stylist's touches to show the rooms lived in, not things to buy. The neighbours outside are the compound's massing, not a photograph.</span></div>
   </div>
 </section>
 </main></div>

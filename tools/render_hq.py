@@ -32,14 +32,19 @@ PBR = {
     'beige':     ('rough_linen', .22, '#CDBFAA', .45, (.85, 1), .8, .35, 0),
     'fabric':    ('rough_linen', .22, '#E0D6C6', .45, (.85, 1), .8, .35, 0),
     'linen':     ('rough_linen', .2, '#EEE8DD', .45, (.85, 1), .8, .35, 0),
-    'taupe':     ('wool_boucle', .14, '#7C6C5A', .6, (.9, 1), 1, .4, 0),
-    'sgrey':     ('wool_boucle', .14, '#8E8B85', .6, (.9, 1), 1, .4, 0),
-    'pouf':      ('wool_boucle', .14, '#705F4E', .6, (.9, 1), 1, .4, 0),
+    'taupe':     ('rough_linen', .12, '#7C6C5A', .5, (.88, 1), .9, .4, 0),
+    'sgrey':     ('rough_linen', .12, '#8E8B85', .5, (.88, 1), .9, .4, 0),
+    'pouf':      ('wool_boucle', .1, '#705F4E', .6, (.9, 1), 1, .4, 0),
+    'throw':     ('wool_boucle', .1, '#EAE2D4', .5, (.9, 1), 1, .4, 0),
+    'throwrust': ('wool_boucle', .1, '#A25E3E', .5, (.9, 1), 1, .4, 0),
+    'throwsage': ('wool_boucle', .1, '#8C9A82', .5, (.9, 1), 1, .4, 0),
+    'book_a':    ('rough_linen', .08, '#3B3833', .3, (.55, .8), .3, 0, 0),
+    'book_b':    ('rough_linen', .08, '#C9B593', .3, (.55, .8), .3, 0, 0),
     'mustard':   ('velour_velvet', .25, '#B59A52', .5, (.6, .85), .6, .8, 0),
     'wine':      ('velour_velvet', .25, '#7A1E28', .5, (.6, .85), .6, .8, 0),
     'rug':       ('curly_teddy_natural', .35, '#DCD0BA', .55, (.95, 1), 1.2, .5, 0),
 }
-SOFT = {'beige', 'fabric', 'linen', 'taupe', 'sgrey', 'pouf', 'mustard', 'wine'}
+SOFT = {'beige', 'fabric', 'linen', 'taupe', 'sgrey', 'pouf', 'mustard', 'wine', 'throw', 'throwrust', 'throwsage'}
 
 
 def tex_path(name, m):
@@ -144,6 +149,67 @@ def make_porcelain(mats):
     return m
 
 
+def make_context(mats):
+    """The neighbours: sand-coloured rendered blocks, a window every 3.2 m on every 3.1 m floor, glass that
+    catches the sky, a little haze with distance; at night some of the windows are lit."""
+    m, nt, out = mats.new('context')
+    N = nt.nodes.new; L = nt.links.new
+    uv = N('ShaderNodeUVMap'); uv.uv_map = 'UVMap'
+    sep = N('ShaderNodeSeparateXYZ'); L(uv.outputs['UV'], sep.inputs[0])
+
+    def math_(op, a, b=None):
+        n = N('ShaderNodeMath'); n.operation = op
+        for i, v in enumerate((a, b)):
+            if v is None:
+                continue
+            if isinstance(v, (int, float)):
+                n.inputs[i].default_value = v
+            else:
+                L(v, n.inputs[i])
+        return n.outputs[0]
+
+    U, V = sep.outputs['X'], sep.outputs['Y']
+    cu, cv = math_('DIVIDE', U, 3.2), math_('DIVIDE', V, 3.1)
+    fu, fv = math_('FRACT', cu), math_('FRACT', cv)
+    wu = math_('MULTIPLY', math_('GREATER_THAN', fu, .2), math_('LESS_THAN', fu, .8))
+    wv = math_('MULTIPLY', math_('GREATER_THAN', fv, .3), math_('LESS_THAN', fv, .82))
+    geo = N('ShaderNodeNewGeometry'); gz = N('ShaderNodeSeparateXYZ'); L(geo.outputs['Normal'], gz.inputs[0])
+    vert = math_('LESS_THAN', math_('ABSOLUTE', gz.outputs['Z']), .5)
+    win = math_('MULTIPLY', math_('MULTIPLY', wu, wv), vert)
+    # the walls
+    d = nt.nodes.new('ShaderNodeTexImage'); d.image = image(tex_path('white_plaster_02', 'diff'))
+    mp = N('ShaderNodeMapping'); mp.inputs['Scale'].default_value = (1 / 3, 1 / 3, 1); L(uv.outputs['UV'], mp.inputs['Vector']); L(mp.outputs[0], d.inputs['Vector'])
+    bw = N('ShaderNodeRGBToBW'); L(d.outputs['Color'], bw.inputs['Color'])
+    mr = N('ShaderNodeMapRange'); mr.inputs['From Max'].default_value = mean_luma(tex_path('white_plaster_02', 'diff'))
+    mr.inputs['To Min'].default_value = .8; mr.clamp = False; L(bw.outputs['Val'], mr.inputs['Value'])
+    wall = N('ShaderNodeMix'); wall.data_type = 'RGBA'; wall.blend_type = 'MULTIPLY'; wall.inputs['Factor'].default_value = 1
+    wall.inputs[6].default_value = lin('#D9C9AC'); L(mr.outputs['Result'], wall.inputs[7])
+    col = N('ShaderNodeMix'); col.data_type = 'RGBA'; L(win, col.inputs['Factor'])
+    L(wall.outputs[2], col.inputs[6]); col.inputs[7].default_value = lin('#2A333B')
+    b = N('ShaderNodeBsdfPrincipled'); L(col.outputs[2], b.inputs['Base Color'])
+    rr = N('ShaderNodeMapRange'); rr.inputs['To Min'].default_value = .85; rr.inputs['To Max'].default_value = .06
+    L(win, rr.inputs['Value']); L(rr.outputs['Result'], b.inputs['Roughness'])
+    sp = N('ShaderNodeMapRange'); sp.inputs['To Min'].default_value = .4; sp.inputs['To Max'].default_value = 1
+    L(win, sp.inputs['Value']); L(sp.outputs['Result'], b.inputs['Specular IOR Level'])
+    if mats.night:      # about four windows in ten lit, each its own warmth
+        cell = N('ShaderNodeCombineXYZ'); L(math_('FLOOR', cu), cell.inputs['X']); L(math_('FLOOR', cv), cell.inputs['Y'])
+        wn = N('ShaderNodeTexWhiteNoise'); wn.noise_dimensions = '3D'; L(cell.outputs[0], wn.inputs['Vector'])
+        lit = math_('MULTIPLY', math_('GREATER_THAN', wn.outputs['Value'], .6), win)
+        warm = N('ShaderNodeValToRGB'); L(wn.outputs['Value'], warm.inputs['Fac'])
+        warm.color_ramp.elements[0].color = lin('#FFB86A'); warm.color_ramp.elements[1].color = lin('#FFE2B8')
+        L(warm.outputs['Color'], b.inputs['Emission Color']); L(math_('MULTIPLY', lit, 2.5), b.inputs['Emission Strength'])
+    # haze: mix toward the horizon's colour with distance
+    cam = N('ShaderNodeCameraData')
+    f = math_('SUBTRACT', 1, math_('EXPONENT', math_('DIVIDE', cam.outputs['View Distance'], -900)))
+    if mats.night:
+        f = math_('MULTIPLY', f, .3)
+    hz = N('ShaderNodeEmission'); hz.inputs['Color'].default_value = lin('#C8D2DC' if not mats.night else '#1A2030')
+    hz.inputs['Strength'].default_value = 1.4 if not mats.night else .3
+    mx = N('ShaderNodeMixShader'); L(f, mx.inputs[0]); L(b.outputs[0], mx.inputs[1]); L(hz.outputs[0], mx.inputs[2])
+    L(mx.outputs[0], out.inputs['Surface'])
+    return m
+
+
 def make_sheer(mats):
     m, nt, out = mats.new('sheer')
     tr = nt.nodes.new('ShaderNodeBsdfTranslucent'); tr.inputs['Color'].default_value = lin('#F6F1E8')
@@ -167,6 +233,8 @@ def make_hq(self, k):
         return make_porcelain(self)
     if k == 'sheer':
         return make_sheer(self)
+    if k == 'context':
+        return make_context(self)
     return _make(self, k)
 
 
@@ -302,27 +370,57 @@ def take_plants(L):
     return plants
 
 
-def curtains(g, x0, x1, y, z1=270, gap=0):
-    """Sheer curtains drawn to both sides of a window in a wall along x, on a slim black rod."""
-    g.box([x0 - 15, y - 1, z1 - 4, x1 + 15, y + 1, z1 - 2], 'black')
+def all_curtains(g, lay):
+    """Sheer curtains, drawn to the sides, on the windows of the bedrooms and the living rooms."""
+    rooms = lay['rooms']
+
+    def kind(x, y):
+        for n, (a, b, c, d), k in rooms:
+            if a <= x <= c and b <= y <= d:
+                return k
+        return None
+    for n, r, axis, sill, head, panes in model.windows_of(lay) + [(n, r, a, 0, 230, 2) for n, r, a in model.SLIDERS]:
+        x0, y0, x1, y1 = r
+        if axis == 'x':
+            cx = (x0 + x1) / 2
+            side = 1 if kind(cx, y1 + 30) else -1
+            if kind(cx, y1 + 30 if side > 0 else y0 - 30) not in ('pri', 'pub'):
+                continue
+            curtains(g, x0, x1, y1 if side > 0 else y0, side=side)
+        else:
+            cy = (y0 + y1) / 2
+            side = 1 if kind(x1 + 30, cy) else -1
+            if kind(x1 + 30 if side > 0 else x0 - 30, cy) not in ('pri', 'pub'):
+                continue
+            curtains(g, y0, y1, x1 if side > 0 else x0, side=side, axis='y')
+
+
+def curtains(g, x0, x1, y, z1=270, side=1, axis='x'):
+    """Sheer curtains drawn to both sides of a window, on a slim black rod, `side` toward the room. For a window in a
+    wall along y, x0/x1 are its y extent and y the wall face's x."""
+    def P(u, w, z):                        # along the wall, out from it, height -> Blender
+        return ((u * CM, -w * CM, z * CM) if axis == 'x' else (w * CM, -u * CM, z * CM))
+    r0, r1 = y + side * 5, y + side * 7
+    rod = [x0 - 15, min(r0, r1), z1 - 4, x1 + 15, max(r0, r1), z1 - 2]
+    g.box(rod if axis == 'x' else [rod[1], rod[0], rod[2], rod[4], rod[3], rod[5]], 'black')
     for a, b in ((x0 - 12, x0 + 40), (x1 - 40, x1 + 12)):
         bm = g._bm('sheer')
         n = int((b - a) / 1.2)
         top, bot = [], []
         for i in range(n + 1):
-            x = a + (b - a) * i / n
-            yy = y + 4 + 3.5 * math.sin(2 * math.pi * (x - a) / 11)
-            top.append(bm.verts.new((x * CM, -yy * CM, (z1 - 6) * CM)))
-            bot.append(bm.verts.new((x * CM, -(yy + .6) * CM, 1 * CM)))
+            u = a + (b - a) * i / n
+            w = y + side * (10 + 3.5 * math.sin(2 * math.pi * (u - a) / 11))
+            top.append(bm.verts.new(P(u, w, z1 - 6)))
+            bot.append(bm.verts.new(P(u, w + side * .6, 1)))
         for i in range(n):
             bm.faces.new([bot[i], bot[i + 1], top[i + 1], top[i]])
 
 
 PROPS = {   # plan cm; rotation in degrees about the vertical
     'o3': [
-        ('wooden_bowl_01', (1192, 222, 38), 0, 1, None),
+        ('wooden_bowl_01', (1200, 231, 44.2), 0, .9, None),
         ('ceramic_vase_03', (1176, 288, 38), 0, .8, None),
-        ('potted_plant_04', (1214, 282, 38), 30, 1.1, None),
+        ('potted_plant_04', (1207, 288, 38), 30, 1.1, None),
         ('book_encyclopedia_set_01', (1536, 540, 62), 90, .8, None),
         ('ceramic_vase_01', (1536, 400, 50), 0, .9, None),
     ],
@@ -341,10 +439,12 @@ def artwork(seed, w=600, h=840):
         d = np.hypot(xx - cx, yy - cy) - rr
         m = np.clip(.5 - d / soft, 0, 1)[..., None]
         return img * (1 - m) + np.array(col, np.float32) * m
+    H = h / w                                                       # the canvas is 1 wide and H high
+    k = min(1, H)
     for i in range(3):
-        img = blob(rng.uniform(.25, .75), rng.uniform(.3, 1.1), rng.uniform(.16, .3), pal[(seed + i) % 4])
+        img = blob(rng.uniform(.3, .7), rng.uniform(.3, .7) * H, rng.uniform(.16, .28) * k, pal[(seed + i) % 4])
     t = np.linspace(0, 1, 4000)                                     # one charcoal brush line
-    cx, cy, r = rng.uniform(.3, .7), rng.uniform(.4, 1.0), rng.uniform(.2, .35)
+    cx, cy, r = rng.uniform(.35, .65), rng.uniform(.4, .6) * H, rng.uniform(.2, .32) * k
     px, py = cx + r * np.cos(t * 4 + seed), cy + r * .8 * np.sin(t * 4 + seed)
     line = np.zeros((h, w), np.float32)
     ix, iy = (px * w).astype(int), (py * w).astype(int)
@@ -359,26 +459,82 @@ def artwork(seed, w=600, h=840):
     return im
 
 
-def hang_print(scene, mats, g, x_wall, yc, zc, w, h, seed):
-    """A print framed in black with a white mat, on a wall running along y, facing +x."""
+def hang_print(scene, mats, g, wall, uc, zc, w, h, seed, axis='y', side=1):
+    """A print framed in black with a white mat. axis 'y': on a wall along y at x = wall, facing +x (side 1) or -x;
+    axis 'x': on a wall along x at y = wall, facing +y (side 1) or -y. uc is its centre along the wall."""
     f, mat = 2.5, 6
-    y0, y1, z0, z1 = yc - w / 2, yc + w / 2, zc - h / 2, zc + h / 2
-    for b in ((y0, y0 + f, z0, z1), (y1 - f, y1, z0, z1), (y0, y1, z0, z0 + f), (y0, y1, z1 - f, z1)):
-        g.box([x_wall, b[0], b[2], x_wall + 3, b[1], b[3]], 'black')
-    g.box([x_wall, y0 + f, z0 + f, x_wall + 1.5, y1 - f, z1 - f], 'white')
+
+    def bx(u0, u1, d0, d1, z0, z1):           # d: distance out from the wall
+        w0, w1 = sorted((wall + side * d0, wall + side * d1))
+        g.box([w0, u0, z0, w1, u1, z1] if axis == 'y' else [u0, w0, z0, u1, w1, z1], 'black' if d1 > 2 else 'white')
+
+    def P(u, d, z):
+        ww = wall + side * d
+        return (ww * CM, -u * CM, z * CM) if axis == 'y' else (u * CM, -ww * CM, z * CM)
+    u0, u1, z0, z1 = uc - w / 2, uc + w / 2, zc - h / 2, zc + h / 2
+    for a, b, c, d in ((u0, u0 + f, z0, z1), (u1 - f, u1, z0, z1), (u0, u1, z0, z0 + f), (u0, u1, z1 - f, z1)):
+        bx(a, b, 0, 3, c, d)
+    bx(u0 + f, u1 - f, 0, 1.5, z0 + f, z1 - f)
     m, nt, out = mats.new('art%d' % seed)
-    t = nt.nodes.new('ShaderNodeTexImage'); t.image = artwork(seed)
+    a0, a1, c0, c1 = u0 + f + mat, u1 - f - mat, z0 + f + mat, z1 - f - mat
+    t = nt.nodes.new('ShaderNodeTexImage'); t.image = artwork(seed, 600, int(600 * (c1 - c0) / (a1 - a0)))
     b = nt.nodes.new('ShaderNodeBsdfPrincipled'); b.inputs['Roughness'].default_value = .8
     nt.links.new(t.outputs['Color'], b.inputs['Base Color']); nt.links.new(b.outputs[0], out.inputs['Surface'])
-    ay0, ay1, az0, az1 = y0 + f + mat, y1 - f - mat, z0 + f + mat, z1 - f - mat
-    X = (x_wall + 1.6) * CM
+    # the picture reads left to right as seen from the room
+    left, right = (a1, a0) if (axis == 'y') == (side > 0) else (a0, a1)
     me = bpy.data.meshes.new('art')
-    me.from_pydata([(X, -ay1 * CM, az0 * CM), (X, -ay0 * CM, az0 * CM), (X, -ay0 * CM, az1 * CM), (X, -ay1 * CM, az1 * CM)], [], [(0, 1, 2, 3)])
+    me.from_pydata([P(left, 1.6, c0), P(right, 1.6, c0), P(right, 1.6, c1), P(left, 1.6, c1)], [], [(0, 1, 2, 3)])
     uv = me.uv_layers.new(name='UVMap')
     for i, c in enumerate(((0, 0), (1, 0), (1, 1), (0, 1))):
         uv.data[i].uv = c
     me.materials.append(m)
     scene.collection.objects.link(bpy.data.objects.new('art', me))
+
+def pillow(scene, mats, c, w, h, t, yaw, tilt, m, i):
+    """A throw pillow: a subdivided box, plump in the middle, leaning back by `tilt` degrees; faces +x before `yaw`."""
+    bm = bmesh.new(); bmesh.ops.create_cube(bm, size=1)
+    me = bpy.data.meshes.new('pillow'); bm.to_mesh(me); bm.free()
+    for v in me.vertices:
+        v.co.x *= t * CM; v.co.y *= w * CM; v.co.z *= h * CM
+    box_uvs(me)
+    ob = bpy.data.objects.new('pillow %d' % i, me); scene.collection.objects.link(ob)
+    bv = ob.modifiers.new('round', 'BEVEL'); bv.width = t * .35 * CM; bv.segments = 2
+    ss = ob.modifiers.new('soft', 'SUBSURF'); ss.levels = ss.render_levels = 2
+    cast = ob.modifiers.new('plump', 'CAST'); cast.factor = .1; cast.use_z = cast.use_y = True; cast.use_x = False
+    for p in me.polygons:
+        p.use_smooth = True
+    ob.rotation_euler = (0, math.radians(-tilt), math.radians(yaw))
+    ob.location = (c[0] * CM, -c[1] * CM, c[2] * CM)
+    me.materials.append(mats.get(m))
+
+
+def rbox(scene, mats, c, size, yaw, m, bevel=.2):
+    """A box turned `yaw` degrees, its base at c: books and the like."""
+    bm = bmesh.new(); bmesh.ops.create_cube(bm, size=1)
+    me = bpy.data.meshes.new('rbox'); bm.to_mesh(me); bm.free()
+    for v in me.vertices:
+        v.co.x *= size[0] * CM; v.co.y *= size[1] * CM; v.co.z = (v.co.z + .5) * size[2] * CM
+    box_uvs(me)
+    ob = bpy.data.objects.new('rbox ' + m, me); scene.collection.objects.link(ob)
+    bv = ob.modifiers.new('edge', 'BEVEL'); bv.width = bevel * CM; bv.segments = 2
+    ob.rotation_euler = (0, 0, math.radians(yaw)); ob.location = (c[0] * CM, -c[1] * CM, c[2] * CM)
+    me.materials.append(mats.get(m))
+
+
+def dress(scene, mats, key):
+    """The soft touches a stylist would add, on Amira's own pieces."""
+    if key != 'o3':
+        return
+    pillow(scene, mats, (1031, 250, 71), 44, 44, 13, 4, 14, 'mustard', 1)          # the beige sofa
+    pillow(scene, mats, (1029, 205, 69), 40, 40, 12, -8, 16, 'linen', 2)
+    soft_box(scene, mats, [1032, 322, 55, 1074, 366, 61], 'throw', 99)             # a folded throw on its seat
+    rbox(scene, mats, (1200, 232, 38), (30, 23, 3.4), 8, 'book_a')                 # books on the coffee table
+    rbox(scene, mats, (1201, 231, 41.4), (26, 20, 2.8), -5, 'book_b')
+    pillow(scene, mats, (187, 668, 78), 62, 50, 16, 90, 14, 'linen', 3)           # the master bed: big pillows behind,
+    pillow(scene, mats, (267, 668, 78), 62, 50, 16, 90, 14, 'linen', 4)
+    soft_box(scene, mats, [149, 497, 57, 305, 548, 62], 'throwrust', 98)           # a throw across its foot
+    soft_box(scene, mats, [312, 848, 52, 428, 888, 56], 'throwsage', 97)           # bedroom 2: a throw, a cushion
+    pillow(scene, mats, (370, 1030, 72), 42, 42, 13, 90, 15, 'mustard', 5)
 
 
 def add_props(scene, key, plants):
@@ -389,12 +545,31 @@ def add_props(scene, key, plants):
 
 
 # ---------------------------------------------------------------- the photographic finish
-def finish(path_png, path_jpg):
-    img = bpy.data.images.load(path_png)
+def to_srgb(x):
+    x = np.clip(x, 0, None)
+    return np.where(x <= .0031308, x * 12.92, 1.055 * np.power(x, 1 / 2.4) - .055)
+
+
+def to_linear(x):
+    return np.where(x <= .04045, x / 12.92, np.power((x + .055) / 1.055, 2.4))
+
+
+def load_display(path):
+    """An image's pixels as display (sRGB) values: Blender hands a 16-bit PNG back linearised."""
+    img = bpy.data.images.load(path)
     w, h = img.size
     a = np.empty(w * h * 4, np.float32); img.pixels.foreach_get(a)
     a = a.reshape(h, w, 4)
-    rgb = a[..., :3]
+    if img.is_float:
+        a[..., :3] = to_srgb(a[..., :3])
+    bpy.data.images.remove(img)
+    return a
+
+
+def finish(path_png, path_jpg):
+    a = load_display(path_png)
+    h, w = a.shape[:2]
+    rgb = to_linear(a[..., :3])                   # the glow is light, so it is added in linear
     from scipy.ndimage import gaussian_filter
     lum = rgb @ np.array([.2126, .7152, .0722], np.float32)
     hi = np.clip(lum - .82, 0, None)[..., None] * rgb / np.maximum(lum[..., None], 1e-4)
@@ -403,13 +578,28 @@ def finish(path_png, path_jpg):
     yy, xx = np.mgrid[0:h, 0:w].astype(np.float32)
     r2 = ((xx - w / 2) / (w / 2)) ** 2 * .8 + ((yy - h / 2) / (h / 2)) ** 2 * .6
     rgb = rgb * (1 - .16 * np.clip(r2, 0, 1.4))[..., None]
-    a[..., :3] = np.clip(rgb, 0, 1)
+    a[..., :3] = np.clip(to_srgb(rgb), 0, 1)
     out = bpy.data.images.new('out', w, h)
     out.pixels.foreach_set(a.ravel())
     out.filepath_raw = path_jpg; out.file_format = 'JPEG'
     bpy.context.scene.render.image_settings.quality = 92
     out.save_render(path_jpg) if hasattr(out, 'save_render') else out.save()
-    bpy.data.images.remove(img)
+    bpy.data.images.remove(out)
+
+
+# ---------------------------------------------------------------- exposure
+def auto_ev(scene, ev, target=.40):
+    """A quick small render, then the exposure that brings its median to a photographer's middle grey."""
+    r, c = scene.render, scene.cycles
+    keep = (r.resolution_x, r.resolution_y, c.samples, r.filepath)
+    r.resolution_x, r.resolution_y, c.samples = 240, 150, 12
+    tmp = os.path.join(bpy.app.tempdir or '/tmp', 'ev.png'); r.filepath = tmp
+    scene.view_settings.exposure = ev
+    bpy.ops.render.render(write_still=True)
+    a = load_display(tmp).reshape(-1, 4)
+    med = float(np.median(a[:, 0] * .2126 + a[:, 1] * .7152 + a[:, 2] * .0722))
+    r.resolution_x, r.resolution_y, c.samples, r.filepath = keep
+    return ev + max(-2.5, min(2.5, 2.2 * math.log2(target / max(med, .02)))), med
 
 
 # ---------------------------------------------------------------- the scene
@@ -424,12 +614,14 @@ def build_scene(key, night):
     mats = rc.Mats(night)
     g = HQGeo()
     rc.build_flat(L, g); rc.build_fittings(key, g); rc.build_lights_geo(L, g); rc.build_surroundings(g)
+    all_curtains(g, lay)
     if key == 'o3':
-        curtains(g, 1358, 1546, 186)
         hang_print(scene, mats, g, 972, 219, 152, 50, 70, 3)      # a pair of prints over the sofa
         hang_print(scene, mats, g, 972, 281, 152, 50, 70, 8)
+        hang_print(scene, mats, g, 683, 227, 168, 80, 56, 5, axis="x", side=-1)     # one over the master bed
     g.link(mats, scene)
     add_props(scene, key, plants)
+    dress(scene, mats, key)
     if night:
         rc.world_night(scene); rc.lights_night(L, scene)
     else:
@@ -464,9 +656,16 @@ def main():
         for v in views:
             key = v[0]
             pos, look, lens = HQ_VIEWS.get(key, v[3:6])
+            if key not in HQ_VIEWS and key != 'terrace':
+                pos = [pos[0], pos[1], min(pos[2], 125)]          # a photographer's eye height
             k = '%s-%s' % (key, t)
-            scene.view_settings.exposure = (.6 if night else DAY_EV) + a.ev + HQ_EXPOSURE.get(k, EXPOSURE.get(k, 0))
             cam = rc.camera(scene, pos, look, lens, *res)
+            if night:
+                scene.view_settings.exposure = .6 + a.ev + HQ_EXPOSURE.get(k, EXPOSURE.get(k, 0))
+            else:
+                ev, med = auto_ev(scene, DAY_EV)
+                scene.view_settings.exposure = ev + a.ev + HQ_EXPOSURE.get(k, 0)
+                print('EXPOSURE %s: median %.2f at %.1f -> %.2f' % (k, med, DAY_EV, scene.view_settings.exposure), flush=True)
             png = os.path.join(a.out, k + '.png')
             scene.render.filepath = png
             t0 = time.time()
