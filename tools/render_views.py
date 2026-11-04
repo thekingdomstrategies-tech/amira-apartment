@@ -19,7 +19,7 @@ RENDERS = [
     ('kitchen', 'The kitchen', 'Her own units, re-used: grey painted doors, arched and glazed wall cupboards, the granite worktop, the new fridge and built-in oven.',
      [803, 575, 150], [803, 140, 100], 16, ('day', 'night')),
     ('corridor', 'The corridor', 'Down the corridor to the new door at its end: the kitchen open on the left, the bathroom\'s sliding door on the right.',
-     [470, 553, 150], [1030, 553, 110], 20, ('day',)),
+     [445, 556, 150], [1030, 553, 110], 18, ('day',)),
     ('bathroom', 'The bathroom', 'From the corner by the WC: one counter from the shower glass to the wall, with the basin and the washing machine.',
      [958, 692, 150], [600, 712, 92], 14, ('day',)),
     ('master', 'The master bedroom', 'Her mahogany bed, headboard on the wall to bedroom 2, with the new 80 cm bedside tables.',
@@ -35,6 +35,6 @@ RENDERS = [
 ]
 
 # exposure, in stops, on top of the day's or the night's: the dark mahogany dressing area gets more, bright rooms less
-EXPOSURE = {'wardrobe-day': .8, 'dressing-day': .35, 'master-day': .25, 'kitchen-day': .2, 'living-day': -.2,
+EXPOSURE = {'corridor-day': .45, 'wardrobe-day': .8, 'dressing-day': .35, 'master-day': .25, 'kitchen-day': .2, 'living-day': -.2,
             'tv-day': -.2, 'terrace-day': -1.2, 'piano-day': -.1}
 
