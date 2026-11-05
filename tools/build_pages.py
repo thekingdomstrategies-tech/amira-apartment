@@ -636,7 +636,7 @@ INDEX_BODY = '''<body>
   <div class="cards">
     <a class="card" href="plan.html"><div class="thumb"><img src="img/plan-thumb.jpg" alt="The furnished floor plan" loading="lazy"></div><div class="body"><div class="n">01 · Plan</div><h3>Layouts, to scale</h3><p>As built, both options and Amira's layout: the architect's sheets, furnished and empty, and the traced model; every room measured.</p></div></a>
     <a class="card" href="3d.html"><div class="thumb"><img src="img/3d-thumb.jpg" alt="The 3D model from above" loading="lazy"></div><div class="body"><div class="n">02 · 3D</div><h3>Walk it freely</h3><p>Switch between the four plans, from above or standing in any room; furnished or empty; the sun at any hour; true size on screen or in a VR headset.</p></div></a>
-    <a class="card" href="renders.html"><div class="thumb"><img src="img/renders-thumb.jpg" alt="A photoreal render of the living room" loading="lazy"></div><div class="body"><div class="n">03 · Renders</div><h3>Photoreal views</h3><p>Path-traced views of the main spaces, by day and by night, in Amira's layout with her own furniture.</p></div></a>
+    <a class="card" href="renders.html"><div class="thumb"><img src="img/renders-thumb.jpg" alt="A photoreal render of the living room" loading="lazy"></div><div class="body"><div class="n">03 · Renders</div><h3>Photoreal views</h3><p>Path-traced views of the main spaces by day, in Amira's layout with her own furniture.</p></div></a>
   </div>
 </section>
 <section>
@@ -810,7 +810,7 @@ RENDERS_BODY = r'''<body>
 <section class="rhead">
   <div class="eyebrow">03 · Renders</div>
   <h1>Photoreal views</h1>
-  <p>Path-traced views of the main spaces, by day and by night: Option 3, Amira's layout, with her own furniture. Rendered in Blender Cycles, with textures, sky and plants from <a href="https://polyhaven.com">Poly Haven</a> (CC0), from the same centimetre model as the plan and the <a href="3d.html?plan=o3">3D walkthrough</a>, so every wall, window and piece is at its true size, and the light is simulated as it bounces round the rooms. Tap any view to see it full screen.</p>
+  <p>Path-traced views of the main spaces, by day, in mid-November sun: Option 3, Amira's layout, with her own furniture. Rendered in Blender Cycles, with textures, sky and plants from <a href="https://polyhaven.com">Poly Haven</a> (CC0), from the same centimetre model as the plan and the <a href="3d.html?plan=o3">3D walkthrough</a>, so every wall, window and piece is at its true size, and the light is simulated as it bounces round the rooms. Tap any view to see it full screen.</p>
   <div class="rmeta"><span>%(nday)s</span>%(nnight)s<span>Sun and sky for New Cairo, %(day)s</span><span>Fifth floor, over the pool garden</span></div>
 </section>
 %(feature)s
