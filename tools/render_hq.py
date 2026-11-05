@@ -637,11 +637,61 @@ def take_pieces(L, key):
                 a = it['b']
                 return a[0] >= x0 - .1 and a[1] >= y0 - .1 and a[3] <= x1 + .1 and a[4] <= y1 + .1 and a[5] <= z1 + .1
             L['items'] = [it for it in L['items'] if not inside(it)]
-            out.append((mdl, pc['b'], rot))
+            out.append((mdl, pc['b'], rot, None))
     return out
 
 
-def fit_model(scene, name, b, rot=0):
+CHAIR = ('dining_chair_02', '#D9CDBB')     # a tufted dining chair, its leather re-dyed to the room's beige
+
+
+def take_chairs(L, key):
+    """The plan's dining chairs (a 44 x 44 seat block and a back slab) give way to a real chair, facing the same way."""
+    if key != 'o3' or not os.path.exists(os.path.join(ASSETS, 'models', CHAIR[0], CHAIR[0] + '.gltf')):
+        return []
+    seats = [it for it in L['items'] if it['t'] == 'b' and it.get('m') == 'fabric' and it['b'][2] == 0
+             and it['b'][5] == 46 and it['b'][3] - it['b'][0] == 44 and it['b'][4] - it['b'][1] == 44]
+    drop, out = set(), []
+    for st in seats:
+        x0, y0, _, x1, y1, _ = st['b']
+        backs = [it for it in L['items'] if it['t'] == 'b' and it.get('m') == 'fabric' and it['b'][2] == 46
+                 and it['b'][5] == 88 and x0 <= it['b'][0] and it['b'][3] <= x1 and y0 <= it['b'][1] and it['b'][4] <= y1]
+        if len(backs) != 1:
+            continue
+        bk = backs[0]['b']; cx, cy = (x0 + x1) / 2, (y0 + y1) / 2
+        if bk[3] - bk[0] < bk[4] - bk[1]:                          # the back runs along y: the chair faces along x
+            rot = -90 if bk[0] > cx else 90
+            box = [cx - 27, cy - 22, 0, cx + 27, cy + 22, 95]
+        else:
+            rot = 180 if bk[1] > cy else 0                         # the model's back is toward Blender +Y (plan -y)
+            box = [cx - 22, cy - 27, 0, cx + 22, cy + 27, 95]
+        drop.add(id(st)); drop.add(id(backs[0])); out.append((CHAIR[0], box, rot, CHAIR[1]))
+    L['items'] = [it for it in L['items'] if id(it) not in drop]
+    return out
+
+
+def redye(root, tint):
+    """Keep a model's texture detail but bring its colour to `tint`: its own light and dark, around the new colour."""
+    for o in root.children_recursive:
+        for sl in getattr(o, 'material_slots', []):
+            m = sl.material
+            if not m or m.get('redyed'):
+                continue
+            m['redyed'] = 1
+            nt = m.node_tree
+            b = next((n for n in nt.nodes if n.type == 'BSDF_PRINCIPLED'), None)
+            if not b or not b.inputs['Base Color'].links:
+                continue
+            src = b.inputs['Base Color'].links[0].from_socket
+            bw = nt.nodes.new('ShaderNodeRGBToBW'); nt.links.new(src, bw.inputs['Color'])
+            mr = nt.nodes.new('ShaderNodeMapRange'); mr.inputs['From Max'].default_value = .12
+            mr.inputs['To Min'].default_value = .55; mr.inputs['To Max'].default_value = 1; mr.clamp = False
+            nt.links.new(bw.outputs['Val'], mr.inputs['Value'])
+            mx = nt.nodes.new('ShaderNodeMix'); mx.data_type = 'RGBA'; mx.blend_type = 'MULTIPLY'
+            mx.inputs['Factor'].default_value = 1; mx.inputs[6].default_value = lin(tint)
+            nt.links.new(mr.outputs['Result'], mx.inputs[7]); nt.links.new(mx.outputs[2], b.inputs['Base Color'])
+
+
+def fit_model(scene, name, b, rot=0, tint=None):
     """A model stretched to fill the box b (plan cm) exactly: footprint and height."""
     root = import_model(scene, name, (0, 0, 0))
     bpy.context.view_layer.update()
@@ -657,11 +707,13 @@ def fit_model(scene, name, b, rot=0):
     off = Vector((c.x * root.scale.x, c.y * root.scale.y, lo.z * root.scale.z))
     off.rotate(root.rotation_euler)
     root.location = Vector(((b[0] + b[3]) / 2 * CM, -(b[1] + b[4]) / 2 * CM, b[2] * CM)) - off
+    if tint:
+        redye(root, tint)
 
 
 def add_props(scene, key, plants, swaps=()):
-    for mdl, b, rot in swaps:
-        fit_model(scene, mdl, b, rot)
+    for mdl, b, rot, tint in swaps:
+        fit_model(scene, mdl, b, rot, tint)
     for c, top in plants:
         import_model(scene, 'potted_plant_02', (c[0], c[1], 0), 20, fit_h=top)
     for name, at, rot, s, fit in PROPS.get(key, []):
@@ -721,9 +773,14 @@ def auto_ev(scene, ev, target=.40):
     scene.view_settings.exposure = ev
     bpy.ops.render.render(write_still=True)
     a = load_display(tmp).reshape(-1, 4)
-    med = float(np.median(a[:, 0] * .2126 + a[:, 1] * .7152 + a[:, 2] * .0722))
+    lum = a[:, 0] * .2126 + a[:, 1] * .7152 + a[:, 2] * .0722
+    med, hi = float(np.median(lum)), float(np.percentile(lum, 90))
     r.resolution_x, r.resolution_y, c.samples, r.filepath = keep
-    return ev + max(-2.5, min(2.5, 2.2 * math.log2(target / max(med, .02)))), med
+    # the middle of the picture to middle grey, but never so far that its brighter tenth burns out: a dark door
+    # frame or a deep corridor in the foreground would otherwise wash the rest of the room out
+    up = min(2.2 * math.log2(target / max(med, .02)), 2.2 * math.log2(.80 / max(hi, .02)), .8)
+    print('  median %.2f, 90th percentile %.2f' % (med, hi))
+    return ev + max(-2.5, min(2.5, up)), med
 
 
 # ---------------------------------------------------------------- the scene
@@ -734,7 +791,7 @@ def build_scene(key, night):
     scene = bpy.context.scene
     L = model.build(key)
     plants = take_plants(L)
-    swaps = take_pieces(L, key)
+    swaps = take_pieces(L, key) + take_chairs(L, key)
     lay = model.LAYOUTS[key]
     mats = rc.Mats(night)
     g = HQGeo()

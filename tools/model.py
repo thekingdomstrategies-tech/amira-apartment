@@ -658,7 +658,7 @@ def furnish_existing(F):
     # dining: table for six
     F.table('Dining table', 1378, 574, 1478, 744)
     for y in (615, 690): F.chair(1356, y, 'r'); F.chair(1500, y, 'l')
-    F.chair(1428, 552, 't'); F.chair(1428, 766, 'b')
+    F.chair(1428, 552, 'b'); F.chair(1428, 766, 't')       # the head chairs, their backs away from the table
     F.pendant(1428, 615); F.pendant(1428, 705)
     F.terrace()
     return F.done()
@@ -859,7 +859,7 @@ def furnish_o3(F):
     F.table('Dining table', 1135, 685, 1235, 885)
     for y in (720, 785, 850):
         F.chair(1113, y, 'r'); F.chair(1257, y, 'l')
-    F.chair(1185, 663, 't'); F.chair(1185, 907, 'b')
+    F.chair(1185, 663, 'b'); F.chair(1185, 907, 't')       # the head chairs, their backs away from the table
     F.pendant(1185, 745); F.pendant(1185, 825)
     # the piano corner: the 1.40 sofa on the right wall, a nest of two round tables, a rug; the black upright piano
     box([1360, 570, 1, 1555, 760, 2], 'rug', f='loose')
