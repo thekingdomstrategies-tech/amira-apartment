@@ -91,11 +91,28 @@ flat's own downlights, ceiling lights, floor lamps, dining pendants and the kitc
 the lens shifted to frame the view, so verticals stay vertical as in architectural photographs. It needs Blender's
 Python module, which is on PyPI:
 
-    python3 -m venv bvenv && bvenv/bin/pip install bpy==5.2.3 scipy
+    python3 -m venv bvenv && bvenv/bin/pip install bpy==5.2.3 scipy numpy
     bvenv/bin/python tools/render_cycles.py                       # every view, day and evening, 1920 x 1200
     bvenv/bin/python tools/render_cycles.py --only kitchen --times night --res 960x600 --samples 32 --out /tmp/test
 
 On four CPU cores a 1920 x 1200 view at 64 samples (denoised with OpenImageDenoise) takes about ten minutes.
+
+The renders on the page come from `tools/render_hq.py`, which builds the same scene and adds:
+
+- photo-scanned textures (plaster, oak veneer, linen, boucle, marble, a rug) mapped at their real size, tinted to the
+  flat's colours
+- a photographed sky (an HDRI), turned so its sun stands where New Cairo's does on the day and hour
+- upholstery with rounded edges and full cushions, sheer curtains on the bedroom and living-room windows, Poly Haven
+  plant models in place of the viewer's plants, and a stylist's touches (cushions, throws, books, a bowl, vases,
+  generated abstract prints)
+- the neighbouring blocks with a window grid, glass that catches the sky, distance haze, and lit windows at night
+- a camera at 1.25 m, an exposure set per view from a quick trial render, and a light bloom and vignette
+
+Its assets are free (CC0) from [Poly Haven](https://polyhaven.com). Fetch them once into `.assets/` (not committed):
+
+    python3 tools/fetch_assets.py
+    bvenv/bin/python tools/render_hq.py --res 1920x1200 --samples 256      # about 35 minutes a view
+
 `tools/build_pages.py` then makes the 1000 px copies in `renders/s/` and `renders.html`.
 
 ## Still to confirm
