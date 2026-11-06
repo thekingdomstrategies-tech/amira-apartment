@@ -13,6 +13,7 @@ from render_cycles import bpy, bmesh, Vector, CM, lin, model
 import addon_utils
 from mathutils import noise
 import numpy as np
+import compound
 from render_views import RENDERS, EXPOSURE, HQ_VIEWS, HQ_EXPOSURE
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -795,7 +796,12 @@ def build_scene(key, night):
     lay = model.LAYOUTS[key]
     mats = rc.Mats(night)
     g = HQGeo()
-    rc.build_flat(L, g); rc.build_fittings(key, g); rc.build_lights_geo(L, g); rc.build_surroundings(g)
+    rc.build_flat(L, g); rc.build_fittings(key, g); rc.build_lights_geo(L, g)
+    for c in model.CONTEXT:         # E07 itself, as massing; the rest of the compound is built in full below
+        if c['name'] == 'the floors below':
+            g.prism(c['p'], c['z'][0], c['z'][1], 'cap')
+        elif c['name'].startswith('E07'):
+            g.prism(c['p'], c['z'][0], c['z'][1], 'context')
     all_curtains(g, lay)
     if key == 'o3':
         hang_print(scene, mats, g, 972, 219, 152, 50, 70, 3)      # a pair of prints over the sofa
@@ -804,6 +810,7 @@ def build_scene(key, night):
     g.link(mats, scene)
     add_props(scene, key, plants, swaps)
     dress(scene, mats, key)
+    compound.build(scene)
     if night:
         rc.world_night(scene); rc.lights_night(L, scene)
     else:
