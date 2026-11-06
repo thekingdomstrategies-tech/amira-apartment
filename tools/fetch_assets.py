@@ -11,7 +11,9 @@ ROOT = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
 API = 'https://api.polyhaven.com/files/'
 
 TEXTURES = ['white_plaster_02', 'oak_veneer_01', 'rough_linen', 'wool_boucle', 'curly_teddy_natural', 'marble_01',
-            'fabric_pattern_07', 'velour_velvet']
+            'fabric_pattern_07', 'velour_velvet',
+            # the compound seen from the terrace: lawn, paving, roads, the facades
+            'leafy_grass', 'concrete_pavers_02', 'asphalt_02', 'concrete_floor_01']
 MAPS = {'Diffuse': 'diff', 'nor_gl': 'nor', 'Rough': 'rough'}
 HDRIS = ['kloofendal_48d_partly_cloudy_puresky']
 MODELS = ['potted_plant_02', 'potted_plant_04', 'book_encyclopedia_set_01', 'ceramic_vase_01', 'ceramic_vase_03',
@@ -19,7 +21,9 @@ MODELS = ['potted_plant_02', 'potted_plant_04', 'book_encyclopedia_set_01', 'cer
           # furniture, each stretched to the measured size of the piece it stands in for
           'Sofa_01', 'sofa_02', 'sofa_03', 'modern_arm_chair_01', 'Ottoman_01', 'modern_coffee_table_01',
           'modern_coffee_table_02', 'coffee_table_round_01', 'side_table_01', 'side_table_tall_01', 'dining_table',
-          'dining_chair_02', 'modern_wooden_cabinet']
+          'dining_chair_02', 'modern_wooden_cabinet',
+          # the compound's gardens
+          'jacaranda_tree', 'searsia_lucida', 'island_tree_02', 'shrub_02', 'shrub_04', 'shrub_03']
 
 
 def get(url, path):

@@ -42,5 +42,6 @@ EXPOSURE = {'corridor-day': .45, 'wardrobe-day': .8, 'dressing-day': .35, 'maste
 # The high-quality renders (tools/render_hq.py): lower, photographers' cameras where they differ, and exposure for the real sky
 HQ_VIEWS = {
     'living': ([1480, 430, 118], [1000, 228, 100], 19),
+    'terrace': ([1450, 80, 168], [1350, -2600, -1300], 18),     # at the parapet, looking down the pool garden
 }
-HQ_EXPOSURE = {}
+HQ_EXPOSURE = {'terrace-day': -.7}      # out in the sun, a scene brighter than any room: the meter would leave it pale
